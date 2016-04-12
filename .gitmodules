@@ -1,0 +1,3 @@
+[submodule "RTChat"]
+	path = RTChat
+	url = https://github.com/RTChat/RTChat.git
