@@ -1,4 +1,5 @@
 // Put configuration variables here.
 {
 	"AppName": "LiveSlide",
+	"s3_bucket": "thanndemosunshare"
 }
