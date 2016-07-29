@@ -1,5 +1,5 @@
 // Put configuration variables here.
 {
 	"AppName": "LiveSlide",
-	"s3_bucket": "thanndemosunshare"
+	"imgur_client_id": "f55a248021c48d6"
 }

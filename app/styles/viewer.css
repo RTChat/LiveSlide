@@ -1,0 +1,43 @@
+
+$ping-size: 45px;
+
+#Viewer {
+	/*height: 100%;*/
+	width: 100%;
+
+	img {
+		margin: auto;
+	}
+
+	.ping {
+		top: 0;
+		color: red;
+		opacity: 1;
+		position: absolute;
+		width: $ping-size;
+		height: $ping-size;
+		line-height: $ping-size;
+		text-align: center;
+		pointer-events: none;
+
+		&.hidden {
+			opacity: 0;
+			display: block !important;
+			transition: opacity 5s cubic-bezier(0.6, 0.04, 0.98, 0.335); /* easeOutCirc */
+
+			animation-name: ping;
+			animation-duration: 1s;
+			animation-direction: alternate;
+			animation-iteration-count: infinite;
+		}
+	}
+}
+
+@keyframes ping {
+	from {
+		font-size: 1;
+	}
+	to {
+		font-size: $ping-size;
+	}
+}

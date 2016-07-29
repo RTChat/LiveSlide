@@ -20,7 +20,6 @@ module.exports = {
 			// These become available to all files.
 			$: "jquery",
 			_: "underscore",
-			Rivets: "rivets",
 		}),
 	],
 	module: {
