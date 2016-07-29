@@ -1,0 +1,11 @@
+
+#Sidebar {
+
+	> * {
+		margin: 0 5px;
+	}
+
+	li.selected {
+		color: yellow;
+	}
+}

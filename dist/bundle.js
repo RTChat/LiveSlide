@@ -1650,25 +1650,20 @@
 		attributes: {
 			"rv-show": "scope.noHash |or scope.extra.isAdmin"
 		},
-		template: "\n\t\t<div class=\"fa fa-bars toggle-left-sidebar\"></div>\n\t\t<span>\n\t\t\t<span rv-unless=\"scope.roomName\">{ scope.appName }</span>\n\t\t\t<span rv-if=\"scope.roomName\"><a href=\"#\">{ scope.appName }</a>\n\t\t\t\t<span rv-if=\"scope.state.presentation\"> &nbsp; { scope.state.presentation } </span>\n\t\t\t</span>\n\t\t</span>\n\t\t<button class=\"stop btn btn-default fa fa-stop\" rv-show=\"scope.state.albumId\"></button>\n\t\t<button class=\"ping btn btn-default fa fa-crosshairs\" rv-class-active=\"capturePing\" rv-show=\"scope.state.albumId\"></button>\n\t\t<span class=\"pull-right\" rv-show=\"scope.roomName\"> { scope.rtc.connection.peers | length } viewers</span>\n\t",
+		template: "\n\t\t<div class=\"fa fa-bars toggle-left-sidebar\"></div>\n\t\t<span>\n\t\t\t<span rv-unless=\"scope.roomName\">{ scope.appName }</span>\n\t\t\t<span rv-if=\"scope.roomName\"><a href=\"#\">{ scope.appName }</a>\n\t\t\t\t<span rv-if=\"scope.state.presentation\"> &nbsp; { scope.state.presentation } </span>\n\t\t\t</span>\n\t\t</span>\n\t\t<button class=\"stop btn btn-default fa fa-stop\" rv-show=\"scope.state.albumId\"></button>\n\t\t<button class=\"ping btn btn-default fa fa-crosshairs\" rv-class-active=\"capturePing\" rv-show=\"scope.state.albumId\"></button>\n\t\t<span class=\"pull-right\" rv-show=\"scope.roomName\">\n\t\t\t{ scope.rtc.connection.peers | length } viewers\n\t\t</span>\n\t",
 		//TODO:
 		// <span> Copy Invite Link </span>
 		events: {
 			'click .stop': function clickStop(e) {
 				RTChat.RTCWrapper.updateState({ albumId: null, slides: null });
-			},
-			'click .ping': function clickPing(e) {
-				this.scope.capturePing = !this.scope.capturePing;
-				e.stopPropagation();
 			}
 		},
 		initialize: function initialize() {
 			var self = this;
 			Backbone.Subviews.add(this);
 			RTChat.RTCWrapper.onStateChange(function (old, newState) {
-				// _.extend(self.scope.state, newState); //TODO: remove elements?
-				self.scope.state = newState;
 				self.scope.extra = RTChat.RTCWrapper.connection.extra;
+				self.scope.state = newState;
 			});
 			this.scope.noHash = function () {
 				return !window.location.hash;
@@ -1680,26 +1675,20 @@
 /* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
+	/* WEBPACK VAR INJECTION */(function(_) {'use strict';
 	
 	__webpack_require__(5);
 	
-	// var original_render = RTChat.Views.Layout.prototype.render;
+	var original_events = RTChat.Views.Layout.prototype.events;
 	
 	module.exports = RTChat.Views.Layout.extend({
-		// render: function() {
-		// original_render.call(this);
-	
-		// 	// Room-names ending w/ a questionmark will display the "admin" view.
-		// 	if (document.location.hash.substr(document.location.hash.length -1) == '?') {
-		// 		this.$el.addClass("admin");
-		// 	}	else {
-		// 		this.$el.removeClass("admin");
-		// 	}
-	
-		// 	return this;
-		// }
+		events: _.extend(original_events, {
+			'click .ping': function clickPing() {
+				this.subviews.room.subviews.viewer.startPing();
+			}
+		})
 	});
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ },
 /* 5 */
@@ -14027,7 +14016,8 @@
 	__webpack_require__(29);
 	
 	module.exports = Backbone.View.extend({
-	  template: '\n    <div id="viewer" class="carousel slide" rv-show="scope.state.slides | length | gt 0">\n      <!-- Indicators -->\n      <ol class="carousel-indicators" rv-show="scope.extra.isAdmin">\n        <li rv-each-item="scope.state.slides" rv-data-slide-to="index" data-target="#viewer"></li>\n      </ol>\n\n      <!-- Wrapper for slides -->\n      <div class="carousel-inner" role="listbox">\n        <div rv-each-url="scope.state.slides" class="item">\n          <img rv-src="url" alt="...">\n        </div>\n      </div>\n\n      <!-- Controls -->\n      <a class="left carousel-control" rv-show="scope.extra.isAdmin" href="#viewer" role="button" data-slide="prev">\n        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>\n        <span class="sr-only">Previous</span>\n      </a>\n      <a class="right carousel-control" rv-show="scope.extra.isAdmin" href="#viewer" role="button" data-slide="next">\n        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>\n        <span class="sr-only">Next</span>\n      </a>\n      <div id="ping" class="fa fa-circle-thin hidden"></div>\n    </div>\n  ',
+	  id: 'Viewer',
+	  template: '\n    <div class="carousel slide" rv-show="scope.state.slides | length | gt 0" rv-class-mouse-crosshair="scope.capturePing">\n      <!-- Indicators -->\n      <ol class="carousel-indicators" rv-show="scope.extra.isAdmin">\n        <li rv-each-item="scope.state.slides" rv-data-slide-to="index" data-target="#Viewer .carousel"></li>\n      </ol>\n\n      <!-- Wrapper for slides -->\n      <div class="carousel-inner" role="listbox">\n        <div rv-each-url="scope.state.slides" class="item">\n          <img rv-src="url" alt="...">\n        </div>\n      </div>\n\n      <!-- Controls -->\n      <a class="left carousel-control" rv-show="scope.extra.isAdmin" href="#Viewer .carousel" role="button" data-slide="prev">\n        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>\n        <span class="sr-only">Previous</span>\n      </a>\n      <a class="right carousel-control" rv-show="scope.extra.isAdmin" href="#Viewer .carousel" role="button" data-slide="next">\n        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>\n        <span class="sr-only">Next</span>\n      </a>\n\n      <!-- Ping -->\n      <div class="ping fa fa-circle-thin hidden"></div>\n    </div>\n  ',
 	  events: {
 	    'click .carousel-control': function clickCarouselControl(e) {
 	      // if (!(this.scope.extra.isAdmin)) return;
@@ -14043,7 +14033,17 @@
 	    'click .carousel-indicators > li': function clickCarouselIndicatorsLi(e) {
 	      // if (!(this.scope.user.isAdmin)) return;
 	      RTChat.RTCWrapper.updateState({ currentSlide: $(e.currentTarget).data('slide-to') });
-	      self.renderPing(false);
+	      self.renderPing(false); // Stop ping
+	    },
+	    'click .mouse-crosshair': function clickMouseCrosshair(e) {
+	      // Ping
+	      this.scope.capturePing = false;
+	      var viewer = $(e.currentTarget);
+	      var offset = viewer.offset();
+	      RTChat.RTCWrapper.updateState({ ping: {
+	          left: (e.pageX - offset.left) / viewer.width(),
+	          top: (e.pageY - offset.top) / viewer.height()
+	        } });
 	    }
 	  },
 	  initialize: function initialize() {
@@ -14053,8 +14053,8 @@
 	        self.scope.state = state;
 	        self.render(); //TODO: why is a full render necessary? (the carousel doesnt load images otherwise)
 	      } else if (prevState.currentSlide != state.currentSlide) {
-	        self.scope.state = state;
-	        self.$('#viewer').carousel(state.currentSlide);
+	        // self.scope.state = state;
+	        self.$('.carousel').carousel(state.currentSlide);
 	        self.renderPing(false);
 	      } else if (prevState.ping != state.ping) {
 	        self.renderPing(state.ping);
@@ -14064,10 +14064,6 @@
 	    this.scope.extra = RTChat.RTCWrapper.connection.extra;
 	  },
 	  render: function render() {
-	    console.log("RRRRRRR");
-	    // this.scope.state = RTChat.RTCWrapper.state;
-	    // this.scope.user = UserService;
-	
 	    this.$el.html(this.template);
 	    RTChat.Rivets.bind(this.$el, { scope: this.scope });
 	
@@ -14077,15 +14073,20 @@
 	    this.$('.carousel-indicators > li').eq(active).addClass('active');
 	
 	    // Prevent autoslide.
-	    this.$('#viewer').carousel({ interval: false });
+	    this.$('.carousel').carousel({ interval: false });
 	
 	    return this;
 	  },
+	  startPing: function startPing() {
+	    this.scope.capturePing = true;
+	  },
 	  renderPing: function renderPing(ping_state) {
+	    this.scope.capturePing == false;
+	
 	    if (!ping_state) ping_state = { top: 0, left: -100 }; // Render off screen.
-	    var viewer = this.$('#viewer .active img');
+	    var viewer = this.$('.active img');
 	    var offset = parseInt(viewer.css('marginLeft'), 10); // for when the screen is wider than the image.
-	    var ping = this.$('#ping').removeClass('hidden');
+	    var ping = this.$('.ping').removeClass('hidden');
 	    ping.css({
 	      top: ping_state.top * viewer.height() - ping.height() / 2,
 	      left: ping_state.left * viewer.width() - ping.width() / 2 + offset
@@ -14132,7 +14133,7 @@
 	
 	
 	// module
-	exports.push([module.id, "#Viewer {\n  /*height: 100%;*/\n  width: 100%; }\n  #Viewer img {\n    margin: auto; }\n  #Viewer .ping {\n    top: 0;\n    color: red;\n    opacity: 1;\n    position: absolute;\n    width: 45px;\n    height: 45px;\n    line-height: 45px;\n    text-align: center;\n    pointer-events: none; }\n    #Viewer .ping.hidden {\n      opacity: 0;\n      display: block !important;\n      transition: opacity 5s cubic-bezier(0.6, 0.04, 0.98, 0.335);\n      /* easeOutCirc */\n      animation-name: ping;\n      animation-duration: 1s;\n      animation-direction: alternate;\n      animation-iteration-count: infinite; }\n\n@keyframes ping {\n  from {\n    font-size: 1; }\n  to {\n    font-size: 45px; } }\n", "", {"version":3,"sources":["/./app/styles/viewer.css"],"names":[],"mappings":"AAAA;EACE,iBAAiB;EACjB,YAAY,EAAE;EACd;IACE,aAAa,EAAE;EACjB;IACE,OAAO;IACP,WAAW;IACX,WAAW;IACX,mBAAmB;IACnB,YAAY;IACZ,aAAa;IACb,kBAAkB;IAClB,mBAAmB;IACnB,qBAAqB,EAAE;IACvB;MACE,WAAW;MACX,0BAA0B;MAC1B,4DAA4D;MAC5D,iBAAiB;MACjB,qBAAqB;MACrB,uBAAuB;MACvB,+BAA+B;MAC/B,oCAAoC,EAAE;;AAE5C;EACE;IACE,aAAa,EAAE;EACjB;IACE,gBAAgB,EAAE,EAAE","file":"viewer.css","sourcesContent":["#Viewer {\n  /*height: 100%;*/\n  width: 100%; }\n  #Viewer img {\n    margin: auto; }\n  #Viewer .ping {\n    top: 0;\n    color: red;\n    opacity: 1;\n    position: absolute;\n    width: 45px;\n    height: 45px;\n    line-height: 45px;\n    text-align: center;\n    pointer-events: none; }\n    #Viewer .ping.hidden {\n      opacity: 0;\n      display: block !important;\n      transition: opacity 5s cubic-bezier(0.6, 0.04, 0.98, 0.335);\n      /* easeOutCirc */\n      animation-name: ping;\n      animation-duration: 1s;\n      animation-direction: alternate;\n      animation-iteration-count: infinite; }\n\n@keyframes ping {\n  from {\n    font-size: 1; }\n  to {\n    font-size: 45px; } }\n"],"sourceRoot":"webpack://"}]);
+	exports.push([module.id, "#Viewer img {\n  margin: auto; }\n\n#Viewer .ping {\n  top: 0;\n  color: red;\n  opacity: 1;\n  position: absolute;\n  width: 45px;\n  height: 45px;\n  line-height: 45px;\n  text-align: center;\n  pointer-events: none; }\n  #Viewer .ping.hidden {\n    opacity: 0;\n    display: block !important;\n    transition: opacity 5s cubic-bezier(0.6, 0.04, 0.98, 0.335);\n    /* easeOutCirc */\n    animation-name: ping;\n    animation-duration: 1s;\n    animation-direction: alternate;\n    animation-iteration-count: infinite; }\n\n#Viewer .mouse-crosshair {\n  pointer-events: none;\n  /* Ignore clicks while pinging. */ }\n  #Viewer .mouse-crosshair img {\n    pointer-events: auto;\n    cursor: crosshair !important; }\n\n@keyframes ping {\n  from {\n    font-size: 1; }\n  to {\n    font-size: 45px; } }\n", "", {"version":3,"sources":["/./app/styles/viewer.css"],"names":[],"mappings":"AAAA;EACE,aAAa,EAAE;;AAEjB;EACE,OAAO;EACP,WAAW;EACX,WAAW;EACX,mBAAmB;EACnB,YAAY;EACZ,aAAa;EACb,kBAAkB;EAClB,mBAAmB;EACnB,qBAAqB,EAAE;EACvB;IACE,WAAW;IACX,0BAA0B;IAC1B,4DAA4D;IAC5D,iBAAiB;IACjB,qBAAqB;IACrB,uBAAuB;IACvB,+BAA+B;IAC/B,oCAAoC,EAAE;;AAE1C;EACE,qBAAqB;EACrB,kCAAkC,EAAE;EACpC;IACE,qBAAqB;IACrB,6BAA6B,EAAE;;AAEnC;EACE;IACE,aAAa,EAAE;EACjB;IACE,gBAAgB,EAAE,EAAE","file":"viewer.css","sourcesContent":["#Viewer img {\n  margin: auto; }\n\n#Viewer .ping {\n  top: 0;\n  color: red;\n  opacity: 1;\n  position: absolute;\n  width: 45px;\n  height: 45px;\n  line-height: 45px;\n  text-align: center;\n  pointer-events: none; }\n  #Viewer .ping.hidden {\n    opacity: 0;\n    display: block !important;\n    transition: opacity 5s cubic-bezier(0.6, 0.04, 0.98, 0.335);\n    /* easeOutCirc */\n    animation-name: ping;\n    animation-duration: 1s;\n    animation-direction: alternate;\n    animation-iteration-count: infinite; }\n\n#Viewer .mouse-crosshair {\n  pointer-events: none;\n  /* Ignore clicks while pinging. */ }\n  #Viewer .mouse-crosshair img {\n    pointer-events: auto;\n    cursor: crosshair !important; }\n\n@keyframes ping {\n  from {\n    font-size: 1; }\n  to {\n    font-size: 45px; } }\n"],"sourceRoot":"webpack://"}]);
 	
 	// exports
 

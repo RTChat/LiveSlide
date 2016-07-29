@@ -2,8 +2,6 @@
 $ping-size: 45px;
 
 #Viewer {
-	/*height: 100%;*/
-	width: 100%;
 
 	img {
 		margin: auto;
@@ -31,6 +29,16 @@ $ping-size: 45px;
 			animation-iteration-count: infinite;
 		}
 	}
+
+	.mouse-crosshair {
+		pointer-events: none; /* Ignore clicks while pinging. */
+
+		img {
+			pointer-events: auto;
+			cursor: crosshair !important;
+		}
+	}
+
 }
 
 @keyframes ping {
