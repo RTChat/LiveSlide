@@ -1,16 +1,15 @@
-
 require('styles/sidebar.css');
 
+var AppConfig = require('app/config');
 // var UploadModal = require('views/upload_modal');
-// var PresLoader = require('utils/presentation_loader.js');
 var ImgurLoader = require('utils/imgur_loader.js');
 
-module.exports = RTChat.Views.Sidebar
-.extend({
+module.exports = RTChat.Views.Sidebar.extend({
 	template: `
-		<div rv-unless="scope.signedIn">
+		<a rv-unless="scope.signedIn"
+			rv-href="'https://api.imgur.com/oauth2/authorize?client_id=' |+ scope.clientId |+ '&response_type=token&state=' |+ scope.hash">
 			Sign in to imgur
-		</div>
+		</a>
 		<ul rv-if="scope.signedIn">
 			<li rv-each-album="scope.userAlbums" rv-data-path="scope.userName |+ '/' |+ album">
 		</ul>
@@ -58,40 +57,12 @@ module.exports = RTChat.Views.Sidebar
 		},
 	},
  	initialize: function() {
+		this.scope = {};
 		//TODO: populate from UserService
 		this.savedImgurAccounts = ['thannman', 'deadpoolsupplier'];
 		this.getAlbums();
 
-		var self = this;
-		RTChat.RTCWrapper.onStateChange(function(old, newState) {
-			// Open or close if starts or ends
-			setTimeout(function() { //HACK: "extra" gets set by an onStateChange handler
-				if (RTChat.RTCWrapper.connection.extra.isAdmin) {
-					if (!newState.albumId && newState.admins) { //HACK: check admins to ensure we are still in a room
-						self.$el.addClass('open');
-					} else {
-						self.$el.removeClass('open');
-					}
-				}
-			})
 
-			// self.extra = RTChat.RTCWrapper.connection.extra;
-
-			//TODO: update "selected"
-			// if (old.presentation !== newState.presentation) {
-			// 	self.scope.presentation = newState.presentation;
-			// 	// Keep selection in sync.
-			// 	self.$('.selected').removeClass('selected');
-			// 	if (newState.presentation)
-			// 		self.$('li[data-path="'+newState.presentation+'"]').addClass('selected');
-			// }
-			// if (old.albumId !== newState.albumId) {
-
-			// if (!newState.albumId && RTChat.RTCWrapper.connection.extra.isAdmin) {
-			// 	self.$el.toggleClass('open', !newState.albumId)
-			// }
-
-		});
 		// UploadModal = new UploadModal();
 		// UploadModal.onsuccess = function() { self.getList(); };
 		// this.extra = RTChat.RTCWrapper.connection.extra;
@@ -129,7 +100,42 @@ module.exports = RTChat.Views.Sidebar
 		this.$el.html(this.template);
 		RTChat.Rivets.bind(this.$el, {scope: this.scope});
 
+		// start closed.
 		this.$el.removeClass('open');
+
+		this.scope.hash = window.location.hash;
+		this.scope.clientId = AppConfig['imgur_client_id'];
+
+		var self = this;
+		RTChat.RTCWrapper.onStateChange(function(old, newState) {
+			// Open or close if starts or ends
+			setTimeout(function() { //HACK: "extra" gets set by an onStateChange handler
+				if (RTChat.RTCWrapper.connection.extra.isAdmin) {
+					if (!newState.albumId && newState.admins) { //HACK: check admins to ensure we are still in a room
+						self.$el.addClass('open');
+					} else {
+						self.$el.removeClass('open');
+					}
+				}
+			})
+
+			// self.extra = RTChat.RTCWrapper.connection.extra;
+
+			//TODO: update "selected"
+			// if (old.presentation !== newState.presentation) {
+			// 	self.scope.presentation = newState.presentation;
+			// 	// Keep selection in sync.
+			// 	self.$('.selected').removeClass('selected');
+			// 	if (newState.presentation)
+			// 		self.$('li[data-path="'+newState.presentation+'"]').addClass('selected');
+			// }
+			// if (old.albumId !== newState.albumId) {
+
+			// if (!newState.albumId && RTChat.RTCWrapper.connection.extra.isAdmin) {
+			// 	self.$el.toggleClass('open', !newState.albumId)
+			// }
+
+		});
 
 		// this.$('li[data-path="'+this.scope.presentation+'"]').addClass('selected');
 		return this;
