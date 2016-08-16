@@ -19,14 +19,14 @@ module.exports = Backbone.View.extend({
       </div>
 
       <!-- Controls -->
-      <a class="left carousel-control" rv-show="scope.extra.isAdmin" href="#Viewer .carousel" role="button" data-slide="prev">
+      <div class="left carousel-control" rv-show="scope.extra.isAdmin" href="#Viewer .carousel" role="button" data-slide="prev">
         <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
         <span class="sr-only">Previous</span>
-      </a>
-      <a class="right carousel-control" rv-show="scope.extra.isAdmin" href="#Viewer .carousel" role="button" data-slide="next">
+      </div>
+      <div class="right carousel-control" rv-show="scope.extra.isAdmin" href="#Viewer .carousel" role="button" data-slide="next">
         <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
         <span class="sr-only">Next</span>
-      </a>
+      </div>
 
       <!-- Ping -->
       <div class="ping fa fa-circle-thin hidden"></div>
@@ -46,7 +46,7 @@ module.exports = Backbone.View.extend({
     'click .carousel-indicators > li': function(e) {
       // if (!(this.scope.user.isAdmin)) return;
       RTChat.RTCWrapper.updateState({ currentSlide: $(e.currentTarget).data('slide-to') });
-      self.renderPing(false); // Stop ping
+      this.renderPing(false); // Stop ping
     },
     'click .mouse-crosshair': function(e) { // Ping
       this.scope.capturePing = false;
@@ -60,12 +60,12 @@ module.exports = Backbone.View.extend({
   },
   initialize: function() {
     var self = this;
+    this.scope.state = {};
     RTChat.RTCWrapper.onStateChange(function(prevState, state) {
+      self.scope.state = state;
       if (prevState.albumId != state.albumId) {
-        self.scope.state = state;
         self.render(); //TODO: why is a full render necessary? (the carousel doesnt load images otherwise)
       } else if (prevState.currentSlide != state.currentSlide) {
-        // self.scope.state = state;
         self.$('.carousel').carousel(state.currentSlide);
         self.renderPing(false);
       } else if (prevState.ping != state.ping) {
@@ -80,7 +80,7 @@ module.exports = Backbone.View.extend({
     RTChat.Rivets.bind(this.$el, {scope: this.scope});
 
     // Make the proper slide active.
-    var active = this.scope.state && this.scope.state.currentSlide || 0;
+    var active = this.scope.state.currentSlide || 0;
     this.$('.item').eq(active).addClass('active');
     this.$('.carousel-indicators > li').eq(active).addClass('active');
 

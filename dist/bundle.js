@@ -56,7 +56,7 @@
 	_.extend(RTChat.Views, views);
 	
 	// Extend AppConfig
-	_.extend(RTChat.AppConfig, __webpack_require__(23));
+	_.extend(RTChat.AppConfig, __webpack_require__(15));
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ },
@@ -1621,10 +1621,10 @@
 		"./header.js": 3,
 		"./layout.js": 4,
 		"./room_panel.js": 9,
-		"./sidebar.js": 12,
-		"./upload_modal.js": 15,
-		"./viewer.js": 28,
-		"./welcome_panel.js": 25
+		"./sidebar.js": 10,
+		"./upload_modal.js": 16,
+		"./viewer.js": 23,
+		"./welcome_panel.js": 26
 	};
 	function webpackContext(req) {
 		return __webpack_require__(webpackContextResolve(req));
@@ -1662,7 +1662,7 @@
 			var self = this;
 			Backbone.Subviews.add(this);
 			RTChat.RTCWrapper.onStateChange(function (old, newState) {
-				self.scope.extra = RTChat.RTCWrapper.connection.extra;
+				if (!self.scope.extra) self.scope.extra = RTChat.RTCWrapper.connection.extra;
 				self.scope.state = newState;
 			});
 			this.scope.noHash = function () {
@@ -2045,28 +2045,34 @@
 	"use strict";
 	
 	module.exports = RTChat.Views.RoomPanel.extend({
-		template: "\n\t\t<div class=\"waiting-msg\" rv-hide=\"scope.rtc_state.slides\">\n\t\t\tWaiting for presentation to start..\n\t\t</div>\n\t\t<div data-subview=\"viewer\"></div>\n\t",
-		// <div data-subview="chat"></div>
+		template: "\n\t\t<div class=\"waiting-msg\" rv-hide=\"scope.rtc_state.slides\">\n\t\t\tWaiting for presentation to start..\n\t\t</div>\n\t\t<div data-subview=\"viewer\"></div>\n\t\t<div rv-show=\"scope.rtc_state.showChat\">\n\t\t\t<div data-subview=\"chat\"></div>\n\t\t</div>\n\t",
 		initialize: function initialize() {
+			console.log("initroomView");
 			Backbone.Subviews.add(this);
+	
 			var self = this;
+			self.scope.rtc_state = {};
 			RTChat.RTCWrapper.onStateChange(function (old, newState) {
 				console.log("StateUpdate", old, newState);
 				// if(self.scope.isAdmin) return; // TODO: Never remove admin?
 				// Become admin if the others think you should be.
-				if (newState.admins) RTChat.RTCWrapper.connection.extra.isAdmin = newState.admins.indexOf(RTChat.RTCWrapper.connection.extra.fullId) !== -1;
+				if (newState.admins) RTChat.RTCWrapper.connection.extra.isAdmin = newState.admins.indexOf(RTChat.RTCWrapper.connection.extra.fullId) >= 0;
 				self.scope.rtc_state = newState;
 			});
 		},
 		subviewCreators: {
 			viewer: function viewer() {
 				return new RTChat.Views.Viewer();
+			},
+			chat: function chat() {
+				return new RTChat.Views.ChatPanel();
 			}
 		},
 		render: function render() {
 			this.$el.html(this.template);
 			RTChat.Rivets.bind(this.$el, { scope: this.scope });
 	
+			//TODO: initialize state?
 			// Make the magic happen~~
 			RTChat.RTCWrapper.joinRoom(window.location.hash, { xVideoContainer: this.$('.video-container') }, function (hasPeers) {
 				//TODO: push on the list of admins
@@ -2078,18 +2084,16 @@
 	});
 
 /***/ },
-/* 10 */,
-/* 11 */,
-/* 12 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(_) {'use strict';
 	
-	__webpack_require__(13);
+	__webpack_require__(11);
 	
 	// var UploadModal = require('views/upload_modal');
 	// var PresLoader = require('utils/presentation_loader.js');
-	var ImgurLoader = __webpack_require__(24);
+	var ImgurLoader = __webpack_require__(13);
 	
 	module.exports = RTChat.Views.Sidebar.extend({
 		template: '\n\t\t<div rv-unless="scope.signedIn">\n\t\t\tSign in to imgur\n\t\t</div>\n\t\t<ul rv-if="scope.signedIn">\n\t\t\t<li rv-each-album="scope.userAlbums" rv-data-path="scope.userName |+ \'/\' |+ album">\n\t\t</ul>\n\t\t<div class="add-acct"> Add  Imgur Account </div>\n\t\t<ul rv-each-user="scope.iaccts" class="album">\n\t\t\t<div class="header">\n\t\t\t\t{ user.name  }\n\t\t\t\t<span class="pull-right fa fa-ellipsis-v"></>\n\t\t\t</div>\n\t\t\t<li rv-each-album="user.albums" rv-data-id="album.id">\n\t\t\t\t{ album.title }\n\t\t\t</li>\n\t\t</ul>\n\t',
@@ -2210,13 +2214,13 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ },
-/* 13 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(14);
+	var content = __webpack_require__(12);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(8)(content, {});
@@ -2236,7 +2240,7 @@
 	}
 
 /***/ },
-/* 14 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(7)();
@@ -2250,97 +2254,43 @@
 
 
 /***/ },
-/* 15 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function($) {'use strict';
+	/* WEBPACK VAR INJECTION */(function($) {"use strict";
 	
-	__webpack_require__(17);
+	// Wraps Imgur.com API for our use.
 	
-	var rivets = __webpack_require__(19);
+	var AppConfig = __webpack_require__(15);
 	
-	var PresLoader = __webpack_require__(22);
-	
-	module.exports = Backbone.View.extend({
-	  className: 'modal fade upload',
-	  template: '\n    <div class="modal-dialog">\n      <div class="modal-content">\n        <div class="modal-header">\n          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>\n          <h4 class="modal-title">Upload Presentation</h4>\n        </div>\n\n        <div class="modal-body">\n          <form class="form-inline">\n            <div class="form-group">\n              <input type="text" placeholder="Presentation Name" name="name" autocomplete="off" class="form-control">\n            </div>\n            <div class="btn-group" data-toggle="buttons">\n              <label class="btn btn-default active">\n                <input type="radio" name="folder" value="user" autocomplete="off" checked>\n                User\n              </label>\n              <label class="btn btn-default">\n                <input type="radio" name="folder" value="global" autocomplete="off">\n                Global\n              </label>\n            </div>\n            <label class="btn btn-default" for="fileSelector">\n              <input id="fileSelector" type="file" name="file" style="display:none;">\n              <span>Select File</span>\n            </label>\n          </form>\n          <div class="alert alert-danger" rv-show="errorMsg">\n            <strong>Error:</strong> { errorMsg }\n          </div>\n        </div>\n\n        <div class="modal-footer">\n          <button type="button" class="btn btn-primary upload">Upload</button>\n          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>\n          <div class="progress" rv-show="progress">\n            <div class="progress-bar progress-bar-striped active" rv-width="progress"></div>\n          </div>\n        </div>\n      </div><!-- /.modal-content -->\n    </div><!-- /.modal-dialog -->\n  ',
-	  events: {
-	    'click .disabled': function clickDisabled(e) {
-	      e.preventDefault();
-	      e.stopImmediatePropagation();
-	    },
-	    'change  #fileSelector': function changeFileSelector(e) {
-	      // Update button text when a file is selected.
-	      $(e.target).next('span').html(e.target.files[0].name);
-	    },
-	    'click button.upload': function clickButtonUpload() {
-	      var self = this;
-	      this.scope.errorMsg = undefined;
-	
-	      // Validate Name.
-	      if (this.$('form [name="name"]').val().length < 1) {
-	        return this.scope.errorMsg = "Must enter a name!";
-	      }
-	
-	      // Validate File.
-	      if (this.$('form [name="file"]')[0].files.length < 1) {
-	        return this.scope.errorMsg = "Must select a file!";
-	      }
-	
-	      // Submit!
-	      PresLoader.upload({
-	        data: new FormData(this.$('form')[0]),
-	        // Enable progress tracking.
-	        xhr: function xhr() {
-	          var xhr = new window.XMLHttpRequest();
-	          xhr.upload.addEventListener("progress", function (e) {
-	            console.log("UPLOAD", e.loaded / e.total);
-	            self.onprogress(e.loaded / e.total);
-	          }, false);
-	          xhr.addEventListener("progress", function (e) {
-	            console.log("DOWNLOAD", e.loaded, '/', e.total);
-	            // self.onprogress(e.loaded / e.total);
-	          }, false);
-	          //TODO: s3_upload progress??
-	          return xhr;
-	        }
-	      }, function () {
-	        // After Upload...
-	        //TODO: display success msg.
-	        self.$el.modal('hide');
-	        self.onsuccess && self.onsuccess();
-	      });
-	
-	      // Disable elements.
-	      this.$('.btn').addClass('disabled');
-	      this.$('input').prop('disabled', true);
-	
-	      // start progress bar.
-	      self.onprogress(0.001);
-	    }
-	  },
-	  initialize: function initialize() {
-	    this.scope = {};
-	  },
-	  render: function render() {
-	    this.onprogress(0);
-	    this.$el.html(this.template);
-	    rivets.bind(this.$el, this.scope);
-	
-	    this.$el.modal('show');
-	    return this;
-	  },
-	  onprogress: function onprogress(percent) {
-	    this.scope.progress = percent;
-	    this.$('.progress-bar').css({ width: percent * 100 + '%' });
-	  },
-	  onsuccess: null,
-	  scope: {}
-	});
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(16)))
+	module.exports = {
+		// Lists all albums in an imgur account (excludes empty ones)
+		listAlbums: function listAlbums(account, callback) {
+			$.ajax({
+				url: "https://api.imgur.com/3/account/" + account + "/albums",
+				headers: {
+					"Authorization": "Client-ID " + AppConfig['imgur_client_id']
+				}
+			}).success(function (data) {
+				callback(data.data);
+			});
+		},
+		// Gets a single album by ID
+		getAlbum: function getAlbum(id, callback) {
+			$.ajax({
+				url: "https://api.imgur.com/3/album/" + id,
+				headers: {
+					"Authorization": "Client-ID " + AppConfig['imgur_client_id']
+				}
+			}).success(function (data) {
+				callback(data.data);
+			});
+		}
+	};
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(14)))
 
 /***/ },
-/* 16 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -12160,6 +12110,102 @@
 
 
 /***/ },
+/* 15 */
+/***/ function(module, exports) {
+
+	module.exports = {"AppName":"LiveSlide","imgur_client_id":"f55a248021c48d6"}
+
+/***/ },
+/* 16 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function($) {'use strict';
+	
+	__webpack_require__(17);
+	
+	var rivets = __webpack_require__(19);
+	
+	var PresLoader = __webpack_require__(22);
+	
+	module.exports = Backbone.View.extend({
+	  className: 'modal fade upload',
+	  template: '\n    <div class="modal-dialog">\n      <div class="modal-content">\n        <div class="modal-header">\n          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>\n          <h4 class="modal-title">Upload Presentation</h4>\n        </div>\n\n        <div class="modal-body">\n          <form class="form-inline">\n            <div class="form-group">\n              <input type="text" placeholder="Presentation Name" name="name" autocomplete="off" class="form-control">\n            </div>\n            <div class="btn-group" data-toggle="buttons">\n              <label class="btn btn-default active">\n                <input type="radio" name="folder" value="user" autocomplete="off" checked>\n                User\n              </label>\n              <label class="btn btn-default">\n                <input type="radio" name="folder" value="global" autocomplete="off">\n                Global\n              </label>\n            </div>\n            <label class="btn btn-default" for="fileSelector">\n              <input id="fileSelector" type="file" name="file" style="display:none;">\n              <span>Select File</span>\n            </label>\n          </form>\n          <div class="alert alert-danger" rv-show="errorMsg">\n            <strong>Error:</strong> { errorMsg }\n          </div>\n        </div>\n\n        <div class="modal-footer">\n          <button type="button" class="btn btn-primary upload">Upload</button>\n          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>\n          <div class="progress" rv-show="progress">\n            <div class="progress-bar progress-bar-striped active" rv-width="progress"></div>\n          </div>\n        </div>\n      </div><!-- /.modal-content -->\n    </div><!-- /.modal-dialog -->\n  ',
+	  events: {
+	    'click .disabled': function clickDisabled(e) {
+	      e.preventDefault();
+	      e.stopImmediatePropagation();
+	    },
+	    'change  #fileSelector': function changeFileSelector(e) {
+	      // Update button text when a file is selected.
+	      $(e.target).next('span').html(e.target.files[0].name);
+	    },
+	    'click button.upload': function clickButtonUpload() {
+	      var self = this;
+	      this.scope.errorMsg = undefined;
+	
+	      // Validate Name.
+	      if (this.$('form [name="name"]').val().length < 1) {
+	        return this.scope.errorMsg = "Must enter a name!";
+	      }
+	
+	      // Validate File.
+	      if (this.$('form [name="file"]')[0].files.length < 1) {
+	        return this.scope.errorMsg = "Must select a file!";
+	      }
+	
+	      // Submit!
+	      PresLoader.upload({
+	        data: new FormData(this.$('form')[0]),
+	        // Enable progress tracking.
+	        xhr: function xhr() {
+	          var xhr = new window.XMLHttpRequest();
+	          xhr.upload.addEventListener("progress", function (e) {
+	            console.log("UPLOAD", e.loaded / e.total);
+	            self.onprogress(e.loaded / e.total);
+	          }, false);
+	          xhr.addEventListener("progress", function (e) {
+	            console.log("DOWNLOAD", e.loaded, '/', e.total);
+	            // self.onprogress(e.loaded / e.total);
+	          }, false);
+	          //TODO: s3_upload progress??
+	          return xhr;
+	        }
+	      }, function () {
+	        // After Upload...
+	        //TODO: display success msg.
+	        self.$el.modal('hide');
+	        self.onsuccess && self.onsuccess();
+	      });
+	
+	      // Disable elements.
+	      this.$('.btn').addClass('disabled');
+	      this.$('input').prop('disabled', true);
+	
+	      // start progress bar.
+	      self.onprogress(0.001);
+	    }
+	  },
+	  initialize: function initialize() {
+	    this.scope = {};
+	  },
+	  render: function render() {
+	    this.onprogress(0);
+	    this.$el.html(this.template);
+	    rivets.bind(this.$el, this.scope);
+	
+	    this.$el.modal('show');
+	    return this;
+	  },
+	  onprogress: function onprogress(percent) {
+	    this.scope.progress = percent;
+	    this.$('.progress-bar').css({ width: percent * 100 + '%' });
+	  },
+	  onsuccess: null,
+	  scope: {}
+	});
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(14)))
+
+/***/ },
 /* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -13834,7 +13880,7 @@
 	
 	// Handles fetching the list of presentations.
 	
-	var AppConfig = __webpack_require__(23);
+	var AppConfig = __webpack_require__(15);
 	
 	// var listing_format_example = {
 	//   "folder_name1": {
@@ -13908,116 +13954,21 @@
 			}).then(callback);
 		}
 	};
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(16), __webpack_require__(1)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(14), __webpack_require__(1)))
 
 /***/ },
 /* 23 */
-/***/ function(module, exports) {
-
-	module.exports = {"AppName":"LiveSlide","imgur_client_id":"f55a248021c48d6"}
-
-/***/ },
-/* 24 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function($) {"use strict";
-	
-	// Wraps Imgur.com API for our use.
-	
-	var AppConfig = __webpack_require__(23);
-	
-	module.exports = {
-		// Lists all albums in an imgur account (excludes empty ones)
-		listAlbums: function listAlbums(account, callback) {
-			$.ajax({
-				url: "https://api.imgur.com/3/account/" + account + "/albums",
-				headers: {
-					"Authorization": "Client-ID " + AppConfig['imgur_client_id']
-				}
-			}).success(function (data) {
-				callback(data.data);
-			});
-		},
-		// Gets a single album by ID
-		getAlbum: function getAlbum(id, callback) {
-			$.ajax({
-				url: "https://api.imgur.com/3/album/" + id,
-				headers: {
-					"Authorization": "Client-ID " + AppConfig['imgur_client_id']
-				}
-			}).success(function (data) {
-				callback(data.data);
-			});
-		}
-	};
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(16)))
-
-/***/ },
-/* 25 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	__webpack_require__(26);
-	
-	// Extend WelcomePanel
-	module.exports = RTChat.Views.WelcomePanel.extend({
-		template: '<h2>Welcome To LiveSLide!</h2>\n\t\tbuilt using the <a href="https://github.com/RTChat/RTChat">RTChat</a> framework!\n\t\t<br><br>\n\t\t<a class="btn btn-default" href="#global-chat">Go To global chat</a>\n\t'
-	});
-
-/***/ },
-/* 26 */
-/***/ function(module, exports, __webpack_require__) {
-
-	// style-loader: Adds some css to the DOM by adding a <style> tag
-	
-	// load the styles
-	var content = __webpack_require__(27);
-	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(8)(content, {});
-	if(content.locals) module.exports = content.locals;
-	// Hot Module Replacement
-	if(false) {
-		// When the styles change, update the <style> tags
-		if(!content.locals) {
-			module.hot.accept("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/sass-loader/index.js!./welcome_panel.css", function() {
-				var newContent = require("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/sass-loader/index.js!./welcome_panel.css");
-				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-				update(newContent);
-			});
-		}
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
-	}
-
-/***/ },
-/* 27 */
-/***/ function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(7)();
-	// imports
-	
-	
-	// module
-	exports.push([module.id, "", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"welcome_panel.css","sourceRoot":"webpack://"}]);
-	
-	// exports
-
-
-/***/ },
-/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($) {'use strict';
 	
 	// A glorified wrapper for bootstrap carousel.
 	
-	__webpack_require__(29);
+	__webpack_require__(24);
 	
 	module.exports = Backbone.View.extend({
 	  id: 'Viewer',
-	  template: '\n    <div class="carousel slide" rv-show="scope.state.slides | length | gt 0" rv-class-mouse-crosshair="scope.capturePing">\n      <!-- Indicators -->\n      <ol class="carousel-indicators" rv-show="scope.extra.isAdmin">\n        <li rv-each-item="scope.state.slides" rv-data-slide-to="index" data-target="#Viewer .carousel"></li>\n      </ol>\n\n      <!-- Wrapper for slides -->\n      <div class="carousel-inner" role="listbox">\n        <div rv-each-url="scope.state.slides" class="item">\n          <img rv-src="url" alt="...">\n        </div>\n      </div>\n\n      <!-- Controls -->\n      <a class="left carousel-control" rv-show="scope.extra.isAdmin" href="#Viewer .carousel" role="button" data-slide="prev">\n        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>\n        <span class="sr-only">Previous</span>\n      </a>\n      <a class="right carousel-control" rv-show="scope.extra.isAdmin" href="#Viewer .carousel" role="button" data-slide="next">\n        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>\n        <span class="sr-only">Next</span>\n      </a>\n\n      <!-- Ping -->\n      <div class="ping fa fa-circle-thin hidden"></div>\n    </div>\n  ',
+	  template: '\n    <div class="carousel slide" rv-show="scope.state.slides | length | gt 0" rv-class-mouse-crosshair="scope.capturePing">\n      <!-- Indicators -->\n      <ol class="carousel-indicators" rv-show="scope.extra.isAdmin">\n        <li rv-each-item="scope.state.slides" rv-data-slide-to="index" data-target="#Viewer .carousel"></li>\n      </ol>\n\n      <!-- Wrapper for slides -->\n      <div class="carousel-inner" role="listbox">\n        <div rv-each-url="scope.state.slides" class="item">\n          <img rv-src="url" alt="...">\n        </div>\n      </div>\n\n      <!-- Controls -->\n      <div class="left carousel-control" rv-show="scope.extra.isAdmin" href="#Viewer .carousel" role="button" data-slide="prev">\n        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>\n        <span class="sr-only">Previous</span>\n      </div>\n      <div class="right carousel-control" rv-show="scope.extra.isAdmin" href="#Viewer .carousel" role="button" data-slide="next">\n        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>\n        <span class="sr-only">Next</span>\n      </div>\n\n      <!-- Ping -->\n      <div class="ping fa fa-circle-thin hidden"></div>\n    </div>\n  ',
 	  events: {
 	    'click .carousel-control': function clickCarouselControl(e) {
 	      // if (!(this.scope.extra.isAdmin)) return;
@@ -14048,12 +13999,12 @@
 	  },
 	  initialize: function initialize() {
 	    var self = this;
+	    this.scope.state = {};
 	    RTChat.RTCWrapper.onStateChange(function (prevState, state) {
+	      self.scope.state = state;
 	      if (prevState.albumId != state.albumId) {
-	        self.scope.state = state;
 	        self.render(); //TODO: why is a full render necessary? (the carousel doesnt load images otherwise)
 	      } else if (prevState.currentSlide != state.currentSlide) {
-	        // self.scope.state = state;
 	        self.$('.carousel').carousel(state.currentSlide);
 	        self.renderPing(false);
 	      } else if (prevState.ping != state.ping) {
@@ -14068,7 +14019,7 @@
 	    RTChat.Rivets.bind(this.$el, { scope: this.scope });
 	
 	    // Make the proper slide active.
-	    var active = this.scope.state && this.scope.state.currentSlide || 0;
+	    var active = this.scope.state.currentSlide || 0;
 	    this.$('.item').eq(active).addClass('active');
 	    this.$('.carousel-indicators > li').eq(active).addClass('active');
 	
@@ -14096,16 +14047,16 @@
 	  },
 	  scope: {}
 	});
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(16)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(14)))
 
 /***/ },
-/* 29 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(30);
+	var content = __webpack_require__(25);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(8)(content, {});
@@ -14125,7 +14076,7 @@
 	}
 
 /***/ },
-/* 30 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(7)();
@@ -14133,7 +14084,60 @@
 	
 	
 	// module
-	exports.push([module.id, "#Viewer img {\n  margin: auto; }\n\n#Viewer .ping {\n  top: 0;\n  color: red;\n  opacity: 1;\n  position: absolute;\n  width: 45px;\n  height: 45px;\n  line-height: 45px;\n  text-align: center;\n  pointer-events: none; }\n  #Viewer .ping.hidden {\n    opacity: 0;\n    display: block !important;\n    transition: opacity 5s cubic-bezier(0.6, 0.04, 0.98, 0.335);\n    /* easeOutCirc */\n    animation-name: ping;\n    animation-duration: 1s;\n    animation-direction: alternate;\n    animation-iteration-count: infinite; }\n\n#Viewer .mouse-crosshair {\n  pointer-events: none;\n  /* Ignore clicks while pinging. */ }\n  #Viewer .mouse-crosshair img {\n    pointer-events: auto;\n    cursor: crosshair !important; }\n\n@keyframes ping {\n  from {\n    font-size: 1; }\n  to {\n    font-size: 45px; } }\n", "", {"version":3,"sources":["/./app/styles/viewer.css"],"names":[],"mappings":"AAAA;EACE,aAAa,EAAE;;AAEjB;EACE,OAAO;EACP,WAAW;EACX,WAAW;EACX,mBAAmB;EACnB,YAAY;EACZ,aAAa;EACb,kBAAkB;EAClB,mBAAmB;EACnB,qBAAqB,EAAE;EACvB;IACE,WAAW;IACX,0BAA0B;IAC1B,4DAA4D;IAC5D,iBAAiB;IACjB,qBAAqB;IACrB,uBAAuB;IACvB,+BAA+B;IAC/B,oCAAoC,EAAE;;AAE1C;EACE,qBAAqB;EACrB,kCAAkC,EAAE;EACpC;IACE,qBAAqB;IACrB,6BAA6B,EAAE;;AAEnC;EACE;IACE,aAAa,EAAE;EACjB;IACE,gBAAgB,EAAE,EAAE","file":"viewer.css","sourcesContent":["#Viewer img {\n  margin: auto; }\n\n#Viewer .ping {\n  top: 0;\n  color: red;\n  opacity: 1;\n  position: absolute;\n  width: 45px;\n  height: 45px;\n  line-height: 45px;\n  text-align: center;\n  pointer-events: none; }\n  #Viewer .ping.hidden {\n    opacity: 0;\n    display: block !important;\n    transition: opacity 5s cubic-bezier(0.6, 0.04, 0.98, 0.335);\n    /* easeOutCirc */\n    animation-name: ping;\n    animation-duration: 1s;\n    animation-direction: alternate;\n    animation-iteration-count: infinite; }\n\n#Viewer .mouse-crosshair {\n  pointer-events: none;\n  /* Ignore clicks while pinging. */ }\n  #Viewer .mouse-crosshair img {\n    pointer-events: auto;\n    cursor: crosshair !important; }\n\n@keyframes ping {\n  from {\n    font-size: 1; }\n  to {\n    font-size: 45px; } }\n"],"sourceRoot":"webpack://"}]);
+	exports.push([module.id, "#Viewer {\n  --webkit-user-select: none;\n  --webkit-user-drag: none; }\n  #Viewer * {\n    --webkit-user-select: none;\n    --webkit-user-drag: none; }\n  #Viewer img {\n    margin: auto; }\n  #Viewer .ping {\n    top: 0;\n    color: red;\n    opacity: 1;\n    position: absolute;\n    width: 45px;\n    height: 45px;\n    line-height: 45px;\n    text-align: center;\n    pointer-events: none; }\n    #Viewer .ping.hidden {\n      opacity: 0;\n      display: block !important;\n      transition: opacity 5s cubic-bezier(0.6, 0.04, 0.98, 0.335);\n      /* easeOutCirc */\n      animation-name: ping;\n      animation-duration: 1s;\n      animation-direction: alternate;\n      animation-iteration-count: infinite; }\n  #Viewer .mouse-crosshair {\n    pointer-events: none;\n    /* Ignore clicks while pinging. */ }\n    #Viewer .mouse-crosshair img {\n      pointer-events: auto;\n      cursor: crosshair !important; }\n\n@keyframes ping {\n  from {\n    font-size: 1; }\n  to {\n    font-size: 45px; } }\n", "", {"version":3,"sources":["/./app/styles/viewer.css"],"names":[],"mappings":"AAAA;EACE,2BAA2B;EAC3B,yBAAyB,EAAE;EAC3B;IACE,2BAA2B;IAC3B,yBAAyB,EAAE;EAC7B;IACE,aAAa,EAAE;EACjB;IACE,OAAO;IACP,WAAW;IACX,WAAW;IACX,mBAAmB;IACnB,YAAY;IACZ,aAAa;IACb,kBAAkB;IAClB,mBAAmB;IACnB,qBAAqB,EAAE;IACvB;MACE,WAAW;MACX,0BAA0B;MAC1B,4DAA4D;MAC5D,iBAAiB;MACjB,qBAAqB;MACrB,uBAAuB;MACvB,+BAA+B;MAC/B,oCAAoC,EAAE;EAC1C;IACE,qBAAqB;IACrB,kCAAkC,EAAE;IACpC;MACE,qBAAqB;MACrB,6BAA6B,EAAE;;AAErC;EACE;IACE,aAAa,EAAE;EACjB;IACE,gBAAgB,EAAE,EAAE","file":"viewer.css","sourcesContent":["#Viewer {\n  --webkit-user-select: none;\n  --webkit-user-drag: none; }\n  #Viewer * {\n    --webkit-user-select: none;\n    --webkit-user-drag: none; }\n  #Viewer img {\n    margin: auto; }\n  #Viewer .ping {\n    top: 0;\n    color: red;\n    opacity: 1;\n    position: absolute;\n    width: 45px;\n    height: 45px;\n    line-height: 45px;\n    text-align: center;\n    pointer-events: none; }\n    #Viewer .ping.hidden {\n      opacity: 0;\n      display: block !important;\n      transition: opacity 5s cubic-bezier(0.6, 0.04, 0.98, 0.335);\n      /* easeOutCirc */\n      animation-name: ping;\n      animation-duration: 1s;\n      animation-direction: alternate;\n      animation-iteration-count: infinite; }\n  #Viewer .mouse-crosshair {\n    pointer-events: none;\n    /* Ignore clicks while pinging. */ }\n    #Viewer .mouse-crosshair img {\n      pointer-events: auto;\n      cursor: crosshair !important; }\n\n@keyframes ping {\n  from {\n    font-size: 1; }\n  to {\n    font-size: 45px; } }\n"],"sourceRoot":"webpack://"}]);
+	
+	// exports
+
+
+/***/ },
+/* 26 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	__webpack_require__(27);
+	
+	// Extend WelcomePanel
+	module.exports = RTChat.Views.WelcomePanel.extend({
+		template: '<h2>Welcome To LiveSLide!</h2>\n\t\tbuilt using the <a href="https://github.com/RTChat/RTChat">RTChat</a> framework!\n\t\t<br><br>\n\t\t<a class="btn btn-default" href="#global-chat">Go To global chat</a>\n\t'
+	});
+
+/***/ },
+/* 27 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+	
+	// load the styles
+	var content = __webpack_require__(28);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(8)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/sass-loader/index.js!./welcome_panel.css", function() {
+				var newContent = require("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/sass-loader/index.js!./welcome_panel.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 28 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(7)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, "", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"welcome_panel.css","sourceRoot":"webpack://"}]);
 	
 	// exports
 

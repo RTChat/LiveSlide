@@ -29,7 +29,8 @@ module.exports = RTChat.Views.Header.extend({
 		var self = this;
 		Backbone.Subviews.add( this );
 		RTChat.RTCWrapper.onStateChange(function(old, newState) {
-			self.scope.extra = RTChat.RTCWrapper.connection.extra
+			if (!self.scope.extra)
+				self.scope.extra = RTChat.RTCWrapper.connection.extra;
 			self.scope.state = newState;
 		});
 		this.scope.noHash = function() {return !window.location.hash}

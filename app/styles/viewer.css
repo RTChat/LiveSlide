@@ -2,6 +2,13 @@
 $ping-size: 45px;
 
 #Viewer {
+	--webkit-user-select: none;
+	--webkit-user-drag: none;
+
+	* {
+		--webkit-user-select: none;
+		--webkit-user-drag: none;
+	}
 
 	img {
 		margin: auto;
