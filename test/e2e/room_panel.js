@@ -29,8 +29,12 @@ describe("RoomPanel", function() {
 		});
 
 		it("should see the same presentation", function() {
+			//TODO: check if images are the same?
+
 			expect(browser.$( '#Viewer img').isPresent()).toBe(false)
+			expect(browser.$( '#RoomPanel .waiting-msg').isDisplayed()).toBe(true);
 			expect(browser2.$('#Viewer img').isPresent()).toBe(false)
+			expect(browser2.$('#RoomPanel .waiting-msg').isDisplayed()).toBe(true);
 
 			// Start
 			browser.$$('#Sidebar .album li').get(1).click();
@@ -38,9 +42,13 @@ describe("RoomPanel", function() {
 				return browser.$('#Viewer img').isPresent() &&
 					browser2.$('#Viewer img').isPresent();
 			});
-			browser.waitConstant(200); //TODO: why?
-			expect(browser.$( '#Viewer img').isDisplayed()).toBe(true);
-			expect(browser2.$('#Viewer img').isDisplayed()).toBe(true);
+			browser.waitConstant(500); //TODO: why?s img loading? use imgs from localhost?
+			expect(browser.$$('#Viewer img').get(0).isDisplayed()).toBe(true);
+			expect(browser.$( '#Header .stop').isDisplayed()).toBe(true);
+			expect(browser.$( '#Header .ping').isDisplayed()).toBe(true);
+			expect(browser2.$$('#Viewer img').get(0).isDisplayed()).toBe(true);
+			expect(browser2.$('#Header .stop').isDisplayed()).toBe(false);
+			expect(browser2.$('#Header .ping').isDisplayed()).toBe(false);
 
 			// Next
 			browser.$('#Viewer .right.carousel-control').click();
@@ -82,7 +90,6 @@ describe("RoomPanel", function() {
 			browser.waitConstant(1200); //animation
 			expect(browser.$( '#Viewer img').isPresent()).toBe(false);
 			expect(browser2.$('#Viewer img').isPresent()).toBe(false);
-
 			expect(browser.$( '#RoomPanel .waiting-msg').isDisplayed()).toBe(true);
 			expect(browser2.$('#RoomPanel .waiting-msg').isDisplayed()).toBe(true);
 

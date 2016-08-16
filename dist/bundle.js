@@ -2046,20 +2046,6 @@
 	
 	module.exports = RTChat.Views.RoomPanel.extend({
 		template: "\n\t\t<div class=\"waiting-msg\" rv-hide=\"scope.rtc_state.slides\">\n\t\t\tWaiting for presentation to start..\n\t\t</div>\n\t\t<div data-subview=\"viewer\"></div>\n\t\t<div rv-show=\"scope.rtc_state.showChat\">\n\t\t\t<div data-subview=\"chat\"></div>\n\t\t</div>\n\t",
-		initialize: function initialize() {
-			console.log("initroomView");
-			Backbone.Subviews.add(this);
-	
-			var self = this;
-			self.scope.rtc_state = {};
-			RTChat.RTCWrapper.onStateChange(function (old, newState) {
-				console.log("StateUpdate", old, newState);
-				// if(self.scope.isAdmin) return; // TODO: Never remove admin?
-				// Become admin if the others think you should be.
-				if (newState.admins) RTChat.RTCWrapper.connection.extra.isAdmin = newState.admins.indexOf(RTChat.RTCWrapper.connection.extra.fullId) >= 0;
-				self.scope.rtc_state = newState;
-			});
-		},
 		subviewCreators: {
 			viewer: function viewer() {
 				return new RTChat.Views.Viewer();
@@ -2069,14 +2055,25 @@
 			}
 		},
 		render: function render() {
+			var self = this;
+			this.scope = { rtc_state: {} };
+	
 			this.$el.html(this.template);
 			RTChat.Rivets.bind(this.$el, { scope: this.scope });
 	
-			//TODO: initialize state?
 			// Make the magic happen~~
 			RTChat.RTCWrapper.joinRoom(window.location.hash, { xVideoContainer: this.$('.video-container') }, function (hasPeers) {
 				//TODO: push on the list of admins
 				if (!hasPeers) RTChat.RTCWrapper.updateState({ admins: [RTChat.RTCWrapper.connection.extra.fullId] });
+			});
+	
+			// self.scope.rtc_state = {};
+			RTChat.RTCWrapper.onStateChange(function (old, newState) {
+				console.log("StateUpdate", old, newState);
+				// if(self.scope.isAdmin) return; // TODO: Never remove admin?
+				// Become admin if the others think you should be.
+				if (newState.admins) RTChat.RTCWrapper.connection.extra.isAdmin = newState.admins.indexOf(RTChat.RTCWrapper.connection.extra.fullId) >= 0;
+				self.scope.rtc_state = newState;
 			});
 	
 			return this;
@@ -13984,7 +13981,7 @@
 	    'click .carousel-indicators > li': function clickCarouselIndicatorsLi(e) {
 	      // if (!(this.scope.user.isAdmin)) return;
 	      RTChat.RTCWrapper.updateState({ currentSlide: $(e.currentTarget).data('slide-to') });
-	      self.renderPing(false); // Stop ping
+	      this.renderPing(false); // Stop ping
 	    },
 	    'click .mouse-crosshair': function clickMouseCrosshair(e) {
 	      // Ping
