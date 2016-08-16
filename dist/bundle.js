@@ -56,7 +56,7 @@
 	_.extend(RTChat.Views, views);
 	
 	// Extend AppConfig
-	_.extend(RTChat.AppConfig, __webpack_require__(20));
+	_.extend(RTChat.AppConfig, __webpack_require__(15));
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ },
@@ -1621,11 +1621,11 @@
 		"./header.js": 3,
 		"./imgur_modal.js": 4,
 		"./layout.js": 5,
-		"./room_panel.js": 10,
-		"./sidebar.js": 11,
-		"./upload_modal.js": 12,
-		"./viewer.js": 21,
-		"./welcome_panel.js": 24
+		"./room_panel.js": 11,
+		"./sidebar.js": 12,
+		"./upload_modal.js": 17,
+		"./viewer.js": 24,
+		"./welcome_panel.js": 27
 	};
 	function webpackContext(req) {
 		return __webpack_require__(webpackContextResolve(req));
@@ -1701,9 +1701,9 @@
 /* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(_) {'use strict';
+	/* WEBPACK VAR INJECTION */(function(_, $) {'use strict';
 	
-	__webpack_require__(6);
+	__webpack_require__(7);
 	
 	var original_events = RTChat.Views.Layout.prototype.events;
 	
@@ -1712,628 +1712,47 @@
 			'click .ping': function clickPing() {
 				this.subviews.room.subviews.viewer.startPing();
 			}
-		})
+		}),
+		initialize: function initialize() {
+			var self = this;
+			Backbone.Subviews.add(this);
+	
+			// Imgur OAuth2 gives us special query-string parameters. Use em then loose em.
+			if (window.location.href.match(/\?state=/)) {
+				var params = paramsToObj();
+				RTChat.UserService.setAppConf({
+					imgur_account_id: params.account_id,
+					imgur_account_name: params.account_username,
+					imgur_refresh_token: params.refresh_token
+				});
+				// The "state" is the previous roomName.
+				return window.location.href = window.location.href.replace(/\?.*$/, "#" + (params.state || ''));
+			}
+	
+			$(window).on('hashchange', function () {
+				self.render();
+			});
+		}
 	});
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
+	
+	function paramsToObj(url) {
+		if (!url) url = window.location.href;
+		var obj = {};
+		//TODO: urldecode
+		url.replace(/(^|\?|&|#)([^\?&=#]+)=([^\?&=#]+)/g, function (m, a, key, value) {
+			// console.log("XX", arguments)
+			obj[key] = value;
+		});
+		return obj;
+	}
+	
+	// console.log("paramsToObject Tests:");
+	// var one = "?thing1=blah&thing2=lame";
+	// console.log(one, "==>", paramsToObj(one));
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(6)))
 
 /***/ },
 /* 6 */
-/***/ function(module, exports, __webpack_require__) {
-
-	// style-loader: Adds some css to the DOM by adding a <style> tag
-	
-	// load the styles
-	var content = __webpack_require__(7);
-	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(9)(content, {});
-	if(content.locals) module.exports = content.locals;
-	// Hot Module Replacement
-	if(false) {
-		// When the styles change, update the <style> tags
-		if(!content.locals) {
-			module.hot.accept("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/sass-loader/index.js!./layout.css", function() {
-				var newContent = require("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/sass-loader/index.js!./layout.css");
-				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-				update(newContent);
-			});
-		}
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
-	}
-
-/***/ },
-/* 7 */
-/***/ function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(8)();
-	// imports
-	
-	
-	// module
-	exports.push([module.id, "/* Overrides styles from RTChat */\n/*TODO*/\n.waiting-msg {\n  width: 100%;\n  margin: 30px 0;\n  padding: 0 5px;\n  font-size: 20px;\n  text-align: center; }\n", "", {"version":3,"sources":["/./app/styles/layout.css"],"names":[],"mappings":"AAAA,kCAAkC;AAClC,QAAQ;AACR;EACE,YAAY;EACZ,eAAe;EACf,eAAe;EACf,gBAAgB;EAChB,mBAAmB,EAAE","file":"layout.css","sourcesContent":["/* Overrides styles from RTChat */\n/*TODO*/\n.waiting-msg {\n  width: 100%;\n  margin: 30px 0;\n  padding: 0 5px;\n  font-size: 20px;\n  text-align: center; }\n"],"sourceRoot":"webpack://"}]);
-	
-	// exports
-
-
-/***/ },
-/* 8 */
-/***/ function(module, exports) {
-
-	/*
-		MIT License http://www.opensource.org/licenses/mit-license.php
-		Author Tobias Koppers @sokra
-	*/
-	// css base code, injected by the css-loader
-	module.exports = function() {
-		var list = [];
-	
-		// return the list of modules as css string
-		list.toString = function toString() {
-			var result = [];
-			for(var i = 0; i < this.length; i++) {
-				var item = this[i];
-				if(item[2]) {
-					result.push("@media " + item[2] + "{" + item[1] + "}");
-				} else {
-					result.push(item[1]);
-				}
-			}
-			return result.join("");
-		};
-	
-		// import a list of modules into the list
-		list.i = function(modules, mediaQuery) {
-			if(typeof modules === "string")
-				modules = [[null, modules, ""]];
-			var alreadyImportedModules = {};
-			for(var i = 0; i < this.length; i++) {
-				var id = this[i][0];
-				if(typeof id === "number")
-					alreadyImportedModules[id] = true;
-			}
-			for(i = 0; i < modules.length; i++) {
-				var item = modules[i];
-				// skip already imported module
-				// this implementation is not 100% perfect for weird media query combinations
-				//  when a module is imported multiple times with different media queries.
-				//  I hope this will never occur (Hey this way we have smaller bundles)
-				if(typeof item[0] !== "number" || !alreadyImportedModules[item[0]]) {
-					if(mediaQuery && !item[2]) {
-						item[2] = mediaQuery;
-					} else if(mediaQuery) {
-						item[2] = "(" + item[2] + ") and (" + mediaQuery + ")";
-					}
-					list.push(item);
-				}
-			}
-		};
-		return list;
-	};
-
-
-/***/ },
-/* 9 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/*
-		MIT License http://www.opensource.org/licenses/mit-license.php
-		Author Tobias Koppers @sokra
-	*/
-	var stylesInDom = {},
-		memoize = function(fn) {
-			var memo;
-			return function () {
-				if (typeof memo === "undefined") memo = fn.apply(this, arguments);
-				return memo;
-			};
-		},
-		isOldIE = memoize(function() {
-			return /msie [6-9]\b/.test(window.navigator.userAgent.toLowerCase());
-		}),
-		getHeadElement = memoize(function () {
-			return document.head || document.getElementsByTagName("head")[0];
-		}),
-		singletonElement = null,
-		singletonCounter = 0,
-		styleElementsInsertedAtTop = [];
-	
-	module.exports = function(list, options) {
-		if(false) {
-			if(typeof document !== "object") throw new Error("The style-loader cannot be used in a non-browser environment");
-		}
-	
-		options = options || {};
-		// Force single-tag solution on IE6-9, which has a hard limit on the # of <style>
-		// tags it will allow on a page
-		if (typeof options.singleton === "undefined") options.singleton = isOldIE();
-	
-		// By default, add <style> tags to the bottom of <head>.
-		if (typeof options.insertAt === "undefined") options.insertAt = "bottom";
-	
-		var styles = listToStyles(list);
-		addStylesToDom(styles, options);
-	
-		return function update(newList) {
-			var mayRemove = [];
-			for(var i = 0; i < styles.length; i++) {
-				var item = styles[i];
-				var domStyle = stylesInDom[item.id];
-				domStyle.refs--;
-				mayRemove.push(domStyle);
-			}
-			if(newList) {
-				var newStyles = listToStyles(newList);
-				addStylesToDom(newStyles, options);
-			}
-			for(var i = 0; i < mayRemove.length; i++) {
-				var domStyle = mayRemove[i];
-				if(domStyle.refs === 0) {
-					for(var j = 0; j < domStyle.parts.length; j++)
-						domStyle.parts[j]();
-					delete stylesInDom[domStyle.id];
-				}
-			}
-		};
-	}
-	
-	function addStylesToDom(styles, options) {
-		for(var i = 0; i < styles.length; i++) {
-			var item = styles[i];
-			var domStyle = stylesInDom[item.id];
-			if(domStyle) {
-				domStyle.refs++;
-				for(var j = 0; j < domStyle.parts.length; j++) {
-					domStyle.parts[j](item.parts[j]);
-				}
-				for(; j < item.parts.length; j++) {
-					domStyle.parts.push(addStyle(item.parts[j], options));
-				}
-			} else {
-				var parts = [];
-				for(var j = 0; j < item.parts.length; j++) {
-					parts.push(addStyle(item.parts[j], options));
-				}
-				stylesInDom[item.id] = {id: item.id, refs: 1, parts: parts};
-			}
-		}
-	}
-	
-	function listToStyles(list) {
-		var styles = [];
-		var newStyles = {};
-		for(var i = 0; i < list.length; i++) {
-			var item = list[i];
-			var id = item[0];
-			var css = item[1];
-			var media = item[2];
-			var sourceMap = item[3];
-			var part = {css: css, media: media, sourceMap: sourceMap};
-			if(!newStyles[id])
-				styles.push(newStyles[id] = {id: id, parts: [part]});
-			else
-				newStyles[id].parts.push(part);
-		}
-		return styles;
-	}
-	
-	function insertStyleElement(options, styleElement) {
-		var head = getHeadElement();
-		var lastStyleElementInsertedAtTop = styleElementsInsertedAtTop[styleElementsInsertedAtTop.length - 1];
-		if (options.insertAt === "top") {
-			if(!lastStyleElementInsertedAtTop) {
-				head.insertBefore(styleElement, head.firstChild);
-			} else if(lastStyleElementInsertedAtTop.nextSibling) {
-				head.insertBefore(styleElement, lastStyleElementInsertedAtTop.nextSibling);
-			} else {
-				head.appendChild(styleElement);
-			}
-			styleElementsInsertedAtTop.push(styleElement);
-		} else if (options.insertAt === "bottom") {
-			head.appendChild(styleElement);
-		} else {
-			throw new Error("Invalid value for parameter 'insertAt'. Must be 'top' or 'bottom'.");
-		}
-	}
-	
-	function removeStyleElement(styleElement) {
-		styleElement.parentNode.removeChild(styleElement);
-		var idx = styleElementsInsertedAtTop.indexOf(styleElement);
-		if(idx >= 0) {
-			styleElementsInsertedAtTop.splice(idx, 1);
-		}
-	}
-	
-	function createStyleElement(options) {
-		var styleElement = document.createElement("style");
-		styleElement.type = "text/css";
-		insertStyleElement(options, styleElement);
-		return styleElement;
-	}
-	
-	function createLinkElement(options) {
-		var linkElement = document.createElement("link");
-		linkElement.rel = "stylesheet";
-		insertStyleElement(options, linkElement);
-		return linkElement;
-	}
-	
-	function addStyle(obj, options) {
-		var styleElement, update, remove;
-	
-		if (options.singleton) {
-			var styleIndex = singletonCounter++;
-			styleElement = singletonElement || (singletonElement = createStyleElement(options));
-			update = applyToSingletonTag.bind(null, styleElement, styleIndex, false);
-			remove = applyToSingletonTag.bind(null, styleElement, styleIndex, true);
-		} else if(obj.sourceMap &&
-			typeof URL === "function" &&
-			typeof URL.createObjectURL === "function" &&
-			typeof URL.revokeObjectURL === "function" &&
-			typeof Blob === "function" &&
-			typeof btoa === "function") {
-			styleElement = createLinkElement(options);
-			update = updateLink.bind(null, styleElement);
-			remove = function() {
-				removeStyleElement(styleElement);
-				if(styleElement.href)
-					URL.revokeObjectURL(styleElement.href);
-			};
-		} else {
-			styleElement = createStyleElement(options);
-			update = applyToTag.bind(null, styleElement);
-			remove = function() {
-				removeStyleElement(styleElement);
-			};
-		}
-	
-		update(obj);
-	
-		return function updateStyle(newObj) {
-			if(newObj) {
-				if(newObj.css === obj.css && newObj.media === obj.media && newObj.sourceMap === obj.sourceMap)
-					return;
-				update(obj = newObj);
-			} else {
-				remove();
-			}
-		};
-	}
-	
-	var replaceText = (function () {
-		var textStore = [];
-	
-		return function (index, replacement) {
-			textStore[index] = replacement;
-			return textStore.filter(Boolean).join('\n');
-		};
-	})();
-	
-	function applyToSingletonTag(styleElement, index, remove, obj) {
-		var css = remove ? "" : obj.css;
-	
-		if (styleElement.styleSheet) {
-			styleElement.styleSheet.cssText = replaceText(index, css);
-		} else {
-			var cssNode = document.createTextNode(css);
-			var childNodes = styleElement.childNodes;
-			if (childNodes[index]) styleElement.removeChild(childNodes[index]);
-			if (childNodes.length) {
-				styleElement.insertBefore(cssNode, childNodes[index]);
-			} else {
-				styleElement.appendChild(cssNode);
-			}
-		}
-	}
-	
-	function applyToTag(styleElement, obj) {
-		var css = obj.css;
-		var media = obj.media;
-	
-		if(media) {
-			styleElement.setAttribute("media", media)
-		}
-	
-		if(styleElement.styleSheet) {
-			styleElement.styleSheet.cssText = css;
-		} else {
-			while(styleElement.firstChild) {
-				styleElement.removeChild(styleElement.firstChild);
-			}
-			styleElement.appendChild(document.createTextNode(css));
-		}
-	}
-	
-	function updateLink(linkElement, obj) {
-		var css = obj.css;
-		var sourceMap = obj.sourceMap;
-	
-		if(sourceMap) {
-			// http://stackoverflow.com/a/26603875
-			css += "\n/*# sourceMappingURL=data:application/json;base64," + btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))) + " */";
-		}
-	
-		var blob = new Blob([css], { type: "text/css" });
-	
-		var oldSrc = linkElement.href;
-	
-		linkElement.href = URL.createObjectURL(blob);
-	
-		if(oldSrc)
-			URL.revokeObjectURL(oldSrc);
-	}
-
-
-/***/ },
-/* 10 */
-/***/ function(module, exports) {
-
-	"use strict";
-	
-	module.exports = RTChat.Views.RoomPanel.extend({
-		template: "\n\t\t<div class=\"waiting-msg\" rv-hide=\"scope.rtc_state.slides\">\n\t\t\tWaiting for presentation to start..\n\t\t</div>\n\t\t<div data-subview=\"viewer\"></div>\n\t\t<div rv-show=\"scope.rtc_state.showChat\">\n\t\t\t<div data-subview=\"chat\"></div>\n\t\t</div>\n\t",
-		subviewCreators: {
-			viewer: function viewer() {
-				return new RTChat.Views.Viewer();
-			},
-			chat: function chat() {
-				return new RTChat.Views.ChatPanel();
-			}
-		},
-		render: function render() {
-			var self = this;
-			this.scope = { rtc_state: {} };
-	
-			this.$el.html(this.template);
-			RTChat.Rivets.bind(this.$el, { scope: this.scope });
-	
-			// Make the magic happen~~
-			RTChat.RTCWrapper.joinRoom(window.location.hash, { xVideoContainer: this.$('.video-container') }, function (hasPeers) {
-				//TODO: push on the list of admins
-				if (!hasPeers) RTChat.RTCWrapper.updateState({ admins: [RTChat.RTCWrapper.connection.extra.fullId] });
-			});
-	
-			// self.scope.rtc_state = {};
-			RTChat.RTCWrapper.onStateChange(function (old, newState) {
-				console.log("StateUpdate", old, newState);
-				// if(self.scope.isAdmin) return; // TODO: Never remove admin?
-				// Become admin if the others think you should be.
-				if (newState.admins) RTChat.RTCWrapper.connection.extra.isAdmin = newState.admins.indexOf(RTChat.RTCWrapper.connection.extra.fullId) >= 0;
-				self.scope.rtc_state = newState;
-			});
-	
-			return this;
-		}
-	});
-
-/***/ },
-/* 11 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(_) {'use strict';
-	
-	__webpack_require__(27);
-	
-	var AppConfig = __webpack_require__(20);
-	// var UploadModal = require('views/upload_modal');
-	var ImgurLoader = __webpack_require__(29);
-	
-	module.exports = RTChat.Views.Sidebar.extend({
-		template: '\n\t\t<a rv-unless="scope.signedIn"\n\t\t\trv-href="\'https://api.imgur.com/oauth2/authorize?client_id=\' |+ scope.clientId |+ \'&response_type=token&state=\' |+ scope.hash">\n\t\t\tSign in to imgur\n\t\t</a>\n\t\t<ul rv-if="scope.signedIn">\n\t\t\t<li rv-each-album="scope.userAlbums" rv-data-path="scope.userName |+ \'/\' |+ album">\n\t\t</ul>\n\t\t<div class="add-acct"> Add  Imgur Account </div>\n\t\t<ul rv-each-user="scope.iaccts" class="album">\n\t\t\t<div class="header">\n\t\t\t\t{ user.name  }\n\t\t\t\t<span class="pull-right fa fa-ellipsis-v"></>\n\t\t\t</div>\n\t\t\t<li rv-each-album="user.albums" rv-data-id="album.id">\n\t\t\t\t{ album.title }\n\t\t\t</li>\n\t\t</ul>\n\t',
-		events: {
-			'click .album > li': function clickAlbumLi(e) {
-				// Load Presentation
-				var target = this.$(e.currentTarget);
-				ImgurLoader.getAlbum(target.data('id'), function (album) {
-					RTChat.RTCWrapper.updateState({
-						albumId: album.id,
-						title: album.title,
-						// slides: _.map(album.images, function(i) {return i.link}),
-						slides: _.map(album.images, function (i) {
-							return i.link.replace(/^http:/, 'https:');
-						}),
-						currentSlide: 0
-					});
-				});
-				// target.addClass("selected"); //TODO: loading?
-			},
-			'click .fa-refresh': function clickFaRefresh() {
-				this.getAlbums();
-			},
-			// 'click .fa-upload': function() {
-			// 	UploadModal.render();
-			// },
-			// 'click .fa-trash': function(e) {
-			// 	var self = this;
-			// 	e.stopImmediatePropagation();
-			// 	PresLoader.delete(this.$(e.currentTarget).parent().data('path'), function() {
-			// 		self.getList();
-			// 	});
-			// }
-			'click .add-acct': function clickAddAcct() {}
-		},
-		initialize: function initialize() {
-			this.scope = {};
-			//TODO: populate from UserService
-			this.savedImgurAccounts = ['thannman', 'deadpoolsupplier'];
-			this.getAlbums();
-	
-			// UploadModal = new UploadModal();
-			// UploadModal.onsuccess = function() { self.getList(); };
-			// this.extra = RTChat.RTCWrapper.connection.extra;
-		},
-		getAlbums: function getAlbums() {
-			var scope = this.scope;
-			scope.iaccts = []; // The list of added users
-	
-			_.forEach(this.savedImgurAccounts, function (a) {
-				var acct = { name: a };
-	
-				// Add it now so it shows up in the GUI, then add the albums asynchronously.
-				scope.iaccts.push(acct);
-	
-				ImgurLoader.listAlbums(a, function (list) {
-					console.log("got list", acct.name, list);
-	
-					_.extend(acct, {
-						name: list[0].account_url,
-						// Remove empty albums
-						albums: _.reject(list, function (o) {
-							return o.images_count == 0;
-						})
-					});
-				});
-			});
-		},
-		// OLD_getList: function() {
-		// 	var self = this;
-		// 	this.scope.folders = null;
-		// 	PresLoader.getList(function(list) {
-		// 		self.scope.folders = list;
-		// 		self.render();
-		// 	});
-		// },
-		render: function render() {
-			this.$el.html(this.template);
-			RTChat.Rivets.bind(this.$el, { scope: this.scope });
-	
-			// start closed.
-			this.$el.removeClass('open');
-	
-			this.scope.hash = window.location.hash;
-			this.scope.clientId = AppConfig['imgur_client_id'];
-	
-			var self = this;
-			RTChat.RTCWrapper.onStateChange(function (old, newState) {
-				// Open or close if starts or ends
-				setTimeout(function () {
-					//HACK: "extra" gets set by an onStateChange handler
-					if (RTChat.RTCWrapper.connection.extra.isAdmin) {
-						if (!newState.albumId && newState.admins) {
-							//HACK: check admins to ensure we are still in a room
-							self.$el.addClass('open');
-						} else {
-							self.$el.removeClass('open');
-						}
-					}
-				});
-	
-				// self.extra = RTChat.RTCWrapper.connection.extra;
-	
-				//TODO: update "selected"
-				// if (old.presentation !== newState.presentation) {
-				// 	self.scope.presentation = newState.presentation;
-				// 	// Keep selection in sync.
-				// 	self.$('.selected').removeClass('selected');
-				// 	if (newState.presentation)
-				// 		self.$('li[data-path="'+newState.presentation+'"]').addClass('selected');
-				// }
-				// if (old.albumId !== newState.albumId) {
-	
-				// if (!newState.albumId && RTChat.RTCWrapper.connection.extra.isAdmin) {
-				// 	self.$el.toggleClass('open', !newState.albumId)
-				// }
-			});
-	
-			// this.$('li[data-path="'+this.scope.presentation+'"]').addClass('selected');
-			return this;
-		},
-		scope: {}
-	});
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
-
-/***/ },
-/* 12 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function($) {'use strict';
-	
-	__webpack_require__(14);
-	
-	var rivets = __webpack_require__(16);
-	
-	var PresLoader = __webpack_require__(19);
-	
-	module.exports = Backbone.View.extend({
-	  className: 'modal fade upload',
-	  template: '\n    <div class="modal-dialog">\n      <div class="modal-content">\n        <div class="modal-header">\n          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>\n          <h4 class="modal-title">Upload Presentation</h4>\n        </div>\n\n        <div class="modal-body">\n          <form class="form-inline">\n            <div class="form-group">\n              <input type="text" placeholder="Presentation Name" name="name" autocomplete="off" class="form-control">\n            </div>\n            <div class="btn-group" data-toggle="buttons">\n              <label class="btn btn-default active">\n                <input type="radio" name="folder" value="user" autocomplete="off" checked>\n                User\n              </label>\n              <label class="btn btn-default">\n                <input type="radio" name="folder" value="global" autocomplete="off">\n                Global\n              </label>\n            </div>\n            <label class="btn btn-default" for="fileSelector">\n              <input id="fileSelector" type="file" name="file" style="display:none;">\n              <span>Select File</span>\n            </label>\n          </form>\n          <div class="alert alert-danger" rv-show="errorMsg">\n            <strong>Error:</strong> { errorMsg }\n          </div>\n        </div>\n\n        <div class="modal-footer">\n          <button type="button" class="btn btn-primary upload">Upload</button>\n          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>\n          <div class="progress" rv-show="progress">\n            <div class="progress-bar progress-bar-striped active" rv-width="progress"></div>\n          </div>\n        </div>\n      </div><!-- /.modal-content -->\n    </div><!-- /.modal-dialog -->\n  ',
-	  events: {
-	    'click .disabled': function clickDisabled(e) {
-	      e.preventDefault();
-	      e.stopImmediatePropagation();
-	    },
-	    'change  #fileSelector': function changeFileSelector(e) {
-	      // Update button text when a file is selected.
-	      $(e.target).next('span').html(e.target.files[0].name);
-	    },
-	    'click button.upload': function clickButtonUpload() {
-	      var self = this;
-	      this.scope.errorMsg = undefined;
-	
-	      // Validate Name.
-	      if (this.$('form [name="name"]').val().length < 1) {
-	        return this.scope.errorMsg = "Must enter a name!";
-	      }
-	
-	      // Validate File.
-	      if (this.$('form [name="file"]')[0].files.length < 1) {
-	        return this.scope.errorMsg = "Must select a file!";
-	      }
-	
-	      // Submit!
-	      PresLoader.upload({
-	        data: new FormData(this.$('form')[0]),
-	        // Enable progress tracking.
-	        xhr: function xhr() {
-	          var xhr = new window.XMLHttpRequest();
-	          xhr.upload.addEventListener("progress", function (e) {
-	            console.log("UPLOAD", e.loaded / e.total);
-	            self.onprogress(e.loaded / e.total);
-	          }, false);
-	          xhr.addEventListener("progress", function (e) {
-	            console.log("DOWNLOAD", e.loaded, '/', e.total);
-	            // self.onprogress(e.loaded / e.total);
-	          }, false);
-	          //TODO: s3_upload progress??
-	          return xhr;
-	        }
-	      }, function () {
-	        // After Upload...
-	        //TODO: display success msg.
-	        self.$el.modal('hide');
-	        self.onsuccess && self.onsuccess();
-	      });
-	
-	      // Disable elements.
-	      this.$('.btn').addClass('disabled');
-	      this.$('input').prop('disabled', true);
-	
-	      // start progress bar.
-	      self.onprogress(0.001);
-	    }
-	  },
-	  initialize: function initialize() {
-	    this.scope = {};
-	  },
-	  render: function render() {
-	    this.onprogress(0);
-	    this.$el.html(this.template);
-	    rivets.bind(this.$el, this.scope);
-	
-	    this.$el.modal('show');
-	    return this;
-	  },
-	  onprogress: function onprogress(percent) {
-	    this.scope.progress = percent;
-	    this.$('.progress-bar').css({ width: percent * 100 + '%' });
-	  },
-	  onsuccess: null,
-	  scope: {}
-	});
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(13)))
-
-/***/ },
-/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -12153,16 +11572,714 @@
 
 
 /***/ },
-/* 14 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(15);
+	var content = __webpack_require__(8);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(9)(content, {});
+	var update = __webpack_require__(10)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/sass-loader/index.js!./layout.css", function() {
+				var newContent = require("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/sass-loader/index.js!./layout.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(9)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, "/* Overrides styles from RTChat */\n/*TODO*/\n.waiting-msg {\n  width: 100%;\n  margin: 30px 0;\n  padding: 0 5px;\n  font-size: 20px;\n  text-align: center; }\n", "", {"version":3,"sources":["/./app/styles/layout.css"],"names":[],"mappings":"AAAA,kCAAkC;AAClC,QAAQ;AACR;EACE,YAAY;EACZ,eAAe;EACf,eAAe;EACf,gBAAgB;EAChB,mBAAmB,EAAE","file":"layout.css","sourcesContent":["/* Overrides styles from RTChat */\n/*TODO*/\n.waiting-msg {\n  width: 100%;\n  margin: 30px 0;\n  padding: 0 5px;\n  font-size: 20px;\n  text-align: center; }\n"],"sourceRoot":"webpack://"}]);
+	
+	// exports
+
+
+/***/ },
+/* 9 */
+/***/ function(module, exports) {
+
+	/*
+		MIT License http://www.opensource.org/licenses/mit-license.php
+		Author Tobias Koppers @sokra
+	*/
+	// css base code, injected by the css-loader
+	module.exports = function() {
+		var list = [];
+	
+		// return the list of modules as css string
+		list.toString = function toString() {
+			var result = [];
+			for(var i = 0; i < this.length; i++) {
+				var item = this[i];
+				if(item[2]) {
+					result.push("@media " + item[2] + "{" + item[1] + "}");
+				} else {
+					result.push(item[1]);
+				}
+			}
+			return result.join("");
+		};
+	
+		// import a list of modules into the list
+		list.i = function(modules, mediaQuery) {
+			if(typeof modules === "string")
+				modules = [[null, modules, ""]];
+			var alreadyImportedModules = {};
+			for(var i = 0; i < this.length; i++) {
+				var id = this[i][0];
+				if(typeof id === "number")
+					alreadyImportedModules[id] = true;
+			}
+			for(i = 0; i < modules.length; i++) {
+				var item = modules[i];
+				// skip already imported module
+				// this implementation is not 100% perfect for weird media query combinations
+				//  when a module is imported multiple times with different media queries.
+				//  I hope this will never occur (Hey this way we have smaller bundles)
+				if(typeof item[0] !== "number" || !alreadyImportedModules[item[0]]) {
+					if(mediaQuery && !item[2]) {
+						item[2] = mediaQuery;
+					} else if(mediaQuery) {
+						item[2] = "(" + item[2] + ") and (" + mediaQuery + ")";
+					}
+					list.push(item);
+				}
+			}
+		};
+		return list;
+	};
+
+
+/***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/*
+		MIT License http://www.opensource.org/licenses/mit-license.php
+		Author Tobias Koppers @sokra
+	*/
+	var stylesInDom = {},
+		memoize = function(fn) {
+			var memo;
+			return function () {
+				if (typeof memo === "undefined") memo = fn.apply(this, arguments);
+				return memo;
+			};
+		},
+		isOldIE = memoize(function() {
+			return /msie [6-9]\b/.test(window.navigator.userAgent.toLowerCase());
+		}),
+		getHeadElement = memoize(function () {
+			return document.head || document.getElementsByTagName("head")[0];
+		}),
+		singletonElement = null,
+		singletonCounter = 0,
+		styleElementsInsertedAtTop = [];
+	
+	module.exports = function(list, options) {
+		if(false) {
+			if(typeof document !== "object") throw new Error("The style-loader cannot be used in a non-browser environment");
+		}
+	
+		options = options || {};
+		// Force single-tag solution on IE6-9, which has a hard limit on the # of <style>
+		// tags it will allow on a page
+		if (typeof options.singleton === "undefined") options.singleton = isOldIE();
+	
+		// By default, add <style> tags to the bottom of <head>.
+		if (typeof options.insertAt === "undefined") options.insertAt = "bottom";
+	
+		var styles = listToStyles(list);
+		addStylesToDom(styles, options);
+	
+		return function update(newList) {
+			var mayRemove = [];
+			for(var i = 0; i < styles.length; i++) {
+				var item = styles[i];
+				var domStyle = stylesInDom[item.id];
+				domStyle.refs--;
+				mayRemove.push(domStyle);
+			}
+			if(newList) {
+				var newStyles = listToStyles(newList);
+				addStylesToDom(newStyles, options);
+			}
+			for(var i = 0; i < mayRemove.length; i++) {
+				var domStyle = mayRemove[i];
+				if(domStyle.refs === 0) {
+					for(var j = 0; j < domStyle.parts.length; j++)
+						domStyle.parts[j]();
+					delete stylesInDom[domStyle.id];
+				}
+			}
+		};
+	}
+	
+	function addStylesToDom(styles, options) {
+		for(var i = 0; i < styles.length; i++) {
+			var item = styles[i];
+			var domStyle = stylesInDom[item.id];
+			if(domStyle) {
+				domStyle.refs++;
+				for(var j = 0; j < domStyle.parts.length; j++) {
+					domStyle.parts[j](item.parts[j]);
+				}
+				for(; j < item.parts.length; j++) {
+					domStyle.parts.push(addStyle(item.parts[j], options));
+				}
+			} else {
+				var parts = [];
+				for(var j = 0; j < item.parts.length; j++) {
+					parts.push(addStyle(item.parts[j], options));
+				}
+				stylesInDom[item.id] = {id: item.id, refs: 1, parts: parts};
+			}
+		}
+	}
+	
+	function listToStyles(list) {
+		var styles = [];
+		var newStyles = {};
+		for(var i = 0; i < list.length; i++) {
+			var item = list[i];
+			var id = item[0];
+			var css = item[1];
+			var media = item[2];
+			var sourceMap = item[3];
+			var part = {css: css, media: media, sourceMap: sourceMap};
+			if(!newStyles[id])
+				styles.push(newStyles[id] = {id: id, parts: [part]});
+			else
+				newStyles[id].parts.push(part);
+		}
+		return styles;
+	}
+	
+	function insertStyleElement(options, styleElement) {
+		var head = getHeadElement();
+		var lastStyleElementInsertedAtTop = styleElementsInsertedAtTop[styleElementsInsertedAtTop.length - 1];
+		if (options.insertAt === "top") {
+			if(!lastStyleElementInsertedAtTop) {
+				head.insertBefore(styleElement, head.firstChild);
+			} else if(lastStyleElementInsertedAtTop.nextSibling) {
+				head.insertBefore(styleElement, lastStyleElementInsertedAtTop.nextSibling);
+			} else {
+				head.appendChild(styleElement);
+			}
+			styleElementsInsertedAtTop.push(styleElement);
+		} else if (options.insertAt === "bottom") {
+			head.appendChild(styleElement);
+		} else {
+			throw new Error("Invalid value for parameter 'insertAt'. Must be 'top' or 'bottom'.");
+		}
+	}
+	
+	function removeStyleElement(styleElement) {
+		styleElement.parentNode.removeChild(styleElement);
+		var idx = styleElementsInsertedAtTop.indexOf(styleElement);
+		if(idx >= 0) {
+			styleElementsInsertedAtTop.splice(idx, 1);
+		}
+	}
+	
+	function createStyleElement(options) {
+		var styleElement = document.createElement("style");
+		styleElement.type = "text/css";
+		insertStyleElement(options, styleElement);
+		return styleElement;
+	}
+	
+	function createLinkElement(options) {
+		var linkElement = document.createElement("link");
+		linkElement.rel = "stylesheet";
+		insertStyleElement(options, linkElement);
+		return linkElement;
+	}
+	
+	function addStyle(obj, options) {
+		var styleElement, update, remove;
+	
+		if (options.singleton) {
+			var styleIndex = singletonCounter++;
+			styleElement = singletonElement || (singletonElement = createStyleElement(options));
+			update = applyToSingletonTag.bind(null, styleElement, styleIndex, false);
+			remove = applyToSingletonTag.bind(null, styleElement, styleIndex, true);
+		} else if(obj.sourceMap &&
+			typeof URL === "function" &&
+			typeof URL.createObjectURL === "function" &&
+			typeof URL.revokeObjectURL === "function" &&
+			typeof Blob === "function" &&
+			typeof btoa === "function") {
+			styleElement = createLinkElement(options);
+			update = updateLink.bind(null, styleElement);
+			remove = function() {
+				removeStyleElement(styleElement);
+				if(styleElement.href)
+					URL.revokeObjectURL(styleElement.href);
+			};
+		} else {
+			styleElement = createStyleElement(options);
+			update = applyToTag.bind(null, styleElement);
+			remove = function() {
+				removeStyleElement(styleElement);
+			};
+		}
+	
+		update(obj);
+	
+		return function updateStyle(newObj) {
+			if(newObj) {
+				if(newObj.css === obj.css && newObj.media === obj.media && newObj.sourceMap === obj.sourceMap)
+					return;
+				update(obj = newObj);
+			} else {
+				remove();
+			}
+		};
+	}
+	
+	var replaceText = (function () {
+		var textStore = [];
+	
+		return function (index, replacement) {
+			textStore[index] = replacement;
+			return textStore.filter(Boolean).join('\n');
+		};
+	})();
+	
+	function applyToSingletonTag(styleElement, index, remove, obj) {
+		var css = remove ? "" : obj.css;
+	
+		if (styleElement.styleSheet) {
+			styleElement.styleSheet.cssText = replaceText(index, css);
+		} else {
+			var cssNode = document.createTextNode(css);
+			var childNodes = styleElement.childNodes;
+			if (childNodes[index]) styleElement.removeChild(childNodes[index]);
+			if (childNodes.length) {
+				styleElement.insertBefore(cssNode, childNodes[index]);
+			} else {
+				styleElement.appendChild(cssNode);
+			}
+		}
+	}
+	
+	function applyToTag(styleElement, obj) {
+		var css = obj.css;
+		var media = obj.media;
+	
+		if(media) {
+			styleElement.setAttribute("media", media)
+		}
+	
+		if(styleElement.styleSheet) {
+			styleElement.styleSheet.cssText = css;
+		} else {
+			while(styleElement.firstChild) {
+				styleElement.removeChild(styleElement.firstChild);
+			}
+			styleElement.appendChild(document.createTextNode(css));
+		}
+	}
+	
+	function updateLink(linkElement, obj) {
+		var css = obj.css;
+		var sourceMap = obj.sourceMap;
+	
+		if(sourceMap) {
+			// http://stackoverflow.com/a/26603875
+			css += "\n/*# sourceMappingURL=data:application/json;base64," + btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))) + " */";
+		}
+	
+		var blob = new Blob([css], { type: "text/css" });
+	
+		var oldSrc = linkElement.href;
+	
+		linkElement.href = URL.createObjectURL(blob);
+	
+		if(oldSrc)
+			URL.revokeObjectURL(oldSrc);
+	}
+
+
+/***/ },
+/* 11 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	module.exports = RTChat.Views.RoomPanel.extend({
+		template: "\n\t\t<div class=\"waiting-msg\" rv-hide=\"scope.rtc_state.slides\">\n\t\t\tWaiting for presentation to start..\n\t\t</div>\n\t\t<div data-subview=\"viewer\"></div>\n\t\t<div rv-show=\"scope.rtc_state.showChat\">\n\t\t\t<div data-subview=\"chat\"></div>\n\t\t</div>\n\t",
+		subviewCreators: {
+			viewer: function viewer() {
+				return new RTChat.Views.Viewer();
+			},
+			chat: function chat() {
+				return new RTChat.Views.ChatPanel();
+			}
+		},
+		render: function render() {
+			var self = this;
+			this.scope = { rtc_state: {} };
+	
+			this.$el.html(this.template);
+			RTChat.Rivets.bind(this.$el, { scope: this.scope });
+	
+			// Make the magic happen~~
+			RTChat.RTCWrapper.joinRoom(window.location.hash, { xVideoContainer: this.$('.video-container') }, function (hasPeers) {
+				//TODO: push on the list of admins
+				if (!hasPeers) RTChat.RTCWrapper.updateState({ admins: [RTChat.RTCWrapper.connection.extra.fullId] });
+			});
+	
+			// self.scope.rtc_state = {};
+			RTChat.RTCWrapper.onStateChange(function (old, newState) {
+				console.log("StateUpdate", old, newState);
+				// if(self.scope.isAdmin) return; // TODO: Never remove admin?
+				// Become admin if the others think you should be.
+				if (newState.admins) RTChat.RTCWrapper.connection.extra.isAdmin = newState.admins.indexOf(RTChat.RTCWrapper.connection.extra.fullId) >= 0;
+				self.scope.rtc_state = newState;
+			});
+	
+			return this;
+		}
+	});
+
+/***/ },
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(_) {'use strict';
+	
+	__webpack_require__(13);
+	
+	var AppConfig = __webpack_require__(15);
+	// var UploadModal = require('views/upload_modal');
+	var ImgurLoader = __webpack_require__(16);
+	
+	module.exports = RTChat.Views.Sidebar.extend({
+		template: '\n\t\t<a rv-unless="scope.signedIn"\n\t\t\trv-href="\'https://api.imgur.com/oauth2/authorize?client_id=\' |+ scope.clientId |+ \'&response_type=token&state=\' |+ scope.hash">\n\t\t\tSign in to imgur\n\t\t</a>\n\t\t<ul rv-if="scope.signedIn">\n\t\t\t<li rv-each-album="scope.userAlbums" rv-data-path="scope.userName |+ \'/\' |+ album">\n\t\t</ul>\n\t\t<div class="add-acct"> Add  Imgur Account </div>\n\t\t<ul rv-each-user="scope.iaccts" class="album">\n\t\t\t<div class="header">\n\t\t\t\t{ user.name  }\n\t\t\t\t<span class="pull-right fa fa-ellipsis-v"></>\n\t\t\t</div>\n\t\t\t<li rv-each-album="user.albums" rv-data-id="album.id">\n\t\t\t\t{ album.title }\n\t\t\t</li>\n\t\t</ul>\n\t',
+		events: {
+			'click .album > li': function clickAlbumLi(e) {
+				// Load Presentation
+				var target = this.$(e.currentTarget);
+				ImgurLoader.getAlbum(target.data('id'), function (album) {
+					RTChat.RTCWrapper.updateState({
+						albumId: album.id,
+						title: album.title,
+						// slides: _.map(album.images, function(i) {return i.link}),
+						slides: _.map(album.images, function (i) {
+							return i.link.replace(/^http:/, 'https:');
+						}),
+						currentSlide: 0
+					});
+				});
+				// target.addClass("selected"); //TODO: loading?
+			},
+			'click .fa-refresh': function clickFaRefresh() {
+				this.getAlbums();
+			},
+			// 'click .fa-upload': function() {
+			// 	UploadModal.render();
+			// },
+			// 'click .fa-trash': function(e) {
+			// 	var self = this;
+			// 	e.stopImmediatePropagation();
+			// 	PresLoader.delete(this.$(e.currentTarget).parent().data('path'), function() {
+			// 		self.getList();
+			// 	});
+			// }
+			'click .add-acct': function clickAddAcct() {}
+		},
+		initialize: function initialize() {
+			this.scope = {};
+			//TODO: populate from UserService
+			this.savedImgurAccounts = ['thannman', 'deadpoolsupplier'];
+			this.getAlbums();
+	
+			// UploadModal = new UploadModal();
+			// UploadModal.onsuccess = function() { self.getList(); };
+			// this.extra = RTChat.RTCWrapper.connection.extra;
+		},
+		getAlbums: function getAlbums() {
+			var scope = this.scope;
+			scope.iaccts = []; // The list of added users
+	
+			_.forEach(this.savedImgurAccounts, function (a) {
+				var acct = { name: a };
+	
+				// Add it now so it shows up in the GUI, then add the albums asynchronously.
+				scope.iaccts.push(acct);
+	
+				ImgurLoader.listAlbums(a, function (list) {
+					console.log("got list", acct.name, list);
+	
+					_.extend(acct, {
+						name: list[0].account_url,
+						// Remove empty albums
+						albums: _.reject(list, function (o) {
+							return o.images_count == 0;
+						})
+					});
+				});
+			});
+		},
+		// OLD_getList: function() {
+		// 	var self = this;
+		// 	this.scope.folders = null;
+		// 	PresLoader.getList(function(list) {
+		// 		self.scope.folders = list;
+		// 		self.render();
+		// 	});
+		// },
+		render: function render() {
+			this.$el.html(this.template);
+			RTChat.Rivets.bind(this.$el, { scope: this.scope });
+	
+			// start closed.
+			this.$el.removeClass('open');
+	
+			this.scope.hash = window.location.hash.substring(1);
+			this.scope.clientId = AppConfig['imgur_client_id'];
+	
+			var self = this;
+			RTChat.RTCWrapper.onStateChange(function (old, newState) {
+				// Open or close if starts or ends
+				setTimeout(function () {
+					//HACK: "extra" gets set by an onStateChange handler
+					if (RTChat.RTCWrapper.connection.extra.isAdmin) {
+						if (!newState.albumId && newState.admins) {
+							//HACK: check admins to ensure we are still in a room
+							self.$el.addClass('open');
+						} else {
+							self.$el.removeClass('open');
+						}
+					}
+				});
+	
+				// self.extra = RTChat.RTCWrapper.connection.extra;
+	
+				//TODO: update "selected"
+				// if (old.presentation !== newState.presentation) {
+				// 	self.scope.presentation = newState.presentation;
+				// 	// Keep selection in sync.
+				// 	self.$('.selected').removeClass('selected');
+				// 	if (newState.presentation)
+				// 		self.$('li[data-path="'+newState.presentation+'"]').addClass('selected');
+				// }
+				// if (old.albumId !== newState.albumId) {
+	
+				// if (!newState.albumId && RTChat.RTCWrapper.connection.extra.isAdmin) {
+				// 	self.$el.toggleClass('open', !newState.albumId)
+				// }
+			});
+	
+			// this.$('li[data-path="'+this.scope.presentation+'"]').addClass('selected');
+			return this;
+		},
+		scope: {}
+	});
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
+
+/***/ },
+/* 13 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+	
+	// load the styles
+	var content = __webpack_require__(14);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(10)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/sass-loader/index.js!./sidebar.css", function() {
+				var newContent = require("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/sass-loader/index.js!./sidebar.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 14 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(9)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, "#Sidebar > * {\n  margin: 0 5px; }\n\n#Sidebar li.selected {\n  color: yellow; }\n", "", {"version":3,"sources":["/./app/styles/sidebar.css"],"names":[],"mappings":"AAAA;EACE,cAAc,EAAE;;AAElB;EACE,cAAc,EAAE","file":"sidebar.css","sourcesContent":["#Sidebar > * {\n  margin: 0 5px; }\n\n#Sidebar li.selected {\n  color: yellow; }\n"],"sourceRoot":"webpack://"}]);
+	
+	// exports
+
+
+/***/ },
+/* 15 */
+/***/ function(module, exports) {
+
+	module.exports = {"AppName":"LiveSlide","imgur_client_id":"f55a248021c48d6"}
+
+/***/ },
+/* 16 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function($) {"use strict";
+	
+	// Wraps Imgur.com API for our use.
+	
+	var AppConfig = __webpack_require__(15);
+	
+	module.exports = {
+		// Lists all albums in an imgur account (excludes empty ones)
+		listAlbums: function listAlbums(account, callback) {
+			$.ajax({
+				url: "https://api.imgur.com/3/account/" + account + "/albums",
+				headers: {
+					"Authorization": "Client-ID " + AppConfig['imgur_client_id']
+				}
+			}).success(function (data) {
+				callback(data.data);
+			});
+		},
+		// Gets a single album by ID
+		getAlbum: function getAlbum(id, callback) {
+			$.ajax({
+				url: "https://api.imgur.com/3/album/" + id,
+				headers: {
+					"Authorization": "Client-ID " + AppConfig['imgur_client_id']
+				}
+			}).success(function (data) {
+				callback(data.data);
+			});
+		}
+	};
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
+
+/***/ },
+/* 17 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function($) {'use strict';
+	
+	__webpack_require__(18);
+	
+	var rivets = __webpack_require__(20);
+	
+	var PresLoader = __webpack_require__(23);
+	
+	module.exports = Backbone.View.extend({
+	  className: 'modal fade upload',
+	  template: '\n    <div class="modal-dialog">\n      <div class="modal-content">\n        <div class="modal-header">\n          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>\n          <h4 class="modal-title">Upload Presentation</h4>\n        </div>\n\n        <div class="modal-body">\n          <form class="form-inline">\n            <div class="form-group">\n              <input type="text" placeholder="Presentation Name" name="name" autocomplete="off" class="form-control">\n            </div>\n            <div class="btn-group" data-toggle="buttons">\n              <label class="btn btn-default active">\n                <input type="radio" name="folder" value="user" autocomplete="off" checked>\n                User\n              </label>\n              <label class="btn btn-default">\n                <input type="radio" name="folder" value="global" autocomplete="off">\n                Global\n              </label>\n            </div>\n            <label class="btn btn-default" for="fileSelector">\n              <input id="fileSelector" type="file" name="file" style="display:none;">\n              <span>Select File</span>\n            </label>\n          </form>\n          <div class="alert alert-danger" rv-show="errorMsg">\n            <strong>Error:</strong> { errorMsg }\n          </div>\n        </div>\n\n        <div class="modal-footer">\n          <button type="button" class="btn btn-primary upload">Upload</button>\n          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>\n          <div class="progress" rv-show="progress">\n            <div class="progress-bar progress-bar-striped active" rv-width="progress"></div>\n          </div>\n        </div>\n      </div><!-- /.modal-content -->\n    </div><!-- /.modal-dialog -->\n  ',
+	  events: {
+	    'click .disabled': function clickDisabled(e) {
+	      e.preventDefault();
+	      e.stopImmediatePropagation();
+	    },
+	    'change  #fileSelector': function changeFileSelector(e) {
+	      // Update button text when a file is selected.
+	      $(e.target).next('span').html(e.target.files[0].name);
+	    },
+	    'click button.upload': function clickButtonUpload() {
+	      var self = this;
+	      this.scope.errorMsg = undefined;
+	
+	      // Validate Name.
+	      if (this.$('form [name="name"]').val().length < 1) {
+	        return this.scope.errorMsg = "Must enter a name!";
+	      }
+	
+	      // Validate File.
+	      if (this.$('form [name="file"]')[0].files.length < 1) {
+	        return this.scope.errorMsg = "Must select a file!";
+	      }
+	
+	      // Submit!
+	      PresLoader.upload({
+	        data: new FormData(this.$('form')[0]),
+	        // Enable progress tracking.
+	        xhr: function xhr() {
+	          var xhr = new window.XMLHttpRequest();
+	          xhr.upload.addEventListener("progress", function (e) {
+	            console.log("UPLOAD", e.loaded / e.total);
+	            self.onprogress(e.loaded / e.total);
+	          }, false);
+	          xhr.addEventListener("progress", function (e) {
+	            console.log("DOWNLOAD", e.loaded, '/', e.total);
+	            // self.onprogress(e.loaded / e.total);
+	          }, false);
+	          //TODO: s3_upload progress??
+	          return xhr;
+	        }
+	      }, function () {
+	        // After Upload...
+	        //TODO: display success msg.
+	        self.$el.modal('hide');
+	        self.onsuccess && self.onsuccess();
+	      });
+	
+	      // Disable elements.
+	      this.$('.btn').addClass('disabled');
+	      this.$('input').prop('disabled', true);
+	
+	      // start progress bar.
+	      self.onprogress(0.001);
+	    }
+	  },
+	  initialize: function initialize() {
+	    this.scope = {};
+	  },
+	  render: function render() {
+	    this.onprogress(0);
+	    this.$el.html(this.template);
+	    rivets.bind(this.$el, this.scope);
+	
+	    this.$el.modal('show');
+	    return this;
+	  },
+	  onprogress: function onprogress(percent) {
+	    this.scope.progress = percent;
+	    this.$('.progress-bar').css({ width: percent * 100 + '%' });
+	  },
+	  onsuccess: null,
+	  scope: {}
+	});
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
+
+/***/ },
+/* 18 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+	
+	// load the styles
+	var content = __webpack_require__(19);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(10)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -12179,10 +12296,10 @@
 	}
 
 /***/ },
-/* 15 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(8)();
+	exports = module.exports = __webpack_require__(9)();
 	// imports
 	
 	
@@ -12193,7 +12310,7 @@
 
 
 /***/ },
-/* 16 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(module) {// Rivets.js
@@ -13571,9 +13688,9 @@
 	  };
 	
 	  if (typeof (typeof module !== "undefined" && module !== null ? module.exports : void 0) === 'object') {
-	    module.exports = Rivets.factory(__webpack_require__(18));
+	    module.exports = Rivets.factory(__webpack_require__(22));
 	  } else if (true) {
-	    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(18)], __WEBPACK_AMD_DEFINE_RESULT__ = function(sightglass) {
+	    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(22)], __WEBPACK_AMD_DEFINE_RESULT__ = function(sightglass) {
 	      return this.rivets = Rivets.factory(sightglass);
 	    }.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 	  } else {
@@ -13582,10 +13699,10 @@
 	
 	}).call(this);
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(17)(module)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(21)(module)))
 
 /***/ },
-/* 17 */
+/* 21 */
 /***/ function(module, exports) {
 
 	module.exports = function(module) {
@@ -13601,7 +13718,7 @@
 
 
 /***/ },
-/* 18 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;(function() {
@@ -13820,14 +13937,14 @@
 
 
 /***/ },
-/* 19 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($, _) {'use strict';
 	
 	// Handles fetching the list of presentations.
 	
-	var AppConfig = __webpack_require__(20);
+	var AppConfig = __webpack_require__(15);
 	
 	// var listing_format_example = {
 	//   "folder_name1": {
@@ -13901,23 +14018,17 @@
 			}).then(callback);
 		}
 	};
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(13), __webpack_require__(1)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6), __webpack_require__(1)))
 
 /***/ },
-/* 20 */
-/***/ function(module, exports) {
-
-	module.exports = {"AppName":"LiveSlide","imgur_client_id":"f55a248021c48d6"}
-
-/***/ },
-/* 21 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($) {'use strict';
 	
 	// A glorified wrapper for bootstrap carousel.
 	
-	__webpack_require__(22);
+	__webpack_require__(25);
 	
 	module.exports = Backbone.View.extend({
 	  id: 'Viewer',
@@ -14000,19 +14111,19 @@
 	  },
 	  scope: {}
 	});
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(13)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
 
 /***/ },
-/* 22 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(23);
+	var content = __webpack_require__(26);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(9)(content, {});
+	var update = __webpack_require__(10)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -14029,10 +14140,10 @@
 	}
 
 /***/ },
-/* 23 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(8)();
+	exports = module.exports = __webpack_require__(9)();
 	// imports
 	
 	
@@ -14043,12 +14154,12 @@
 
 
 /***/ },
-/* 24 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	__webpack_require__(25);
+	__webpack_require__(28);
 	
 	// Extend WelcomePanel
 	module.exports = RTChat.Views.WelcomePanel.extend({
@@ -14056,16 +14167,16 @@
 	});
 
 /***/ },
-/* 25 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(26);
+	var content = __webpack_require__(29);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(9)(content, {});
+	var update = __webpack_require__(10)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -14082,10 +14193,10 @@
 	}
 
 /***/ },
-/* 26 */
+/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(8)();
+	exports = module.exports = __webpack_require__(9)();
 	// imports
 	
 	
@@ -14094,82 +14205,6 @@
 	
 	// exports
 
-
-/***/ },
-/* 27 */
-/***/ function(module, exports, __webpack_require__) {
-
-	// style-loader: Adds some css to the DOM by adding a <style> tag
-	
-	// load the styles
-	var content = __webpack_require__(28);
-	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(9)(content, {});
-	if(content.locals) module.exports = content.locals;
-	// Hot Module Replacement
-	if(false) {
-		// When the styles change, update the <style> tags
-		if(!content.locals) {
-			module.hot.accept("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/sass-loader/index.js!./sidebar.css", function() {
-				var newContent = require("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/sass-loader/index.js!./sidebar.css");
-				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-				update(newContent);
-			});
-		}
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
-	}
-
-/***/ },
-/* 28 */
-/***/ function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(8)();
-	// imports
-	
-	
-	// module
-	exports.push([module.id, "#Sidebar > * {\n  margin: 0 5px; }\n\n#Sidebar li.selected {\n  color: yellow; }\n", "", {"version":3,"sources":["/./app/styles/sidebar.css"],"names":[],"mappings":"AAAA;EACE,cAAc,EAAE;;AAElB;EACE,cAAc,EAAE","file":"sidebar.css","sourcesContent":["#Sidebar > * {\n  margin: 0 5px; }\n\n#Sidebar li.selected {\n  color: yellow; }\n"],"sourceRoot":"webpack://"}]);
-	
-	// exports
-
-
-/***/ },
-/* 29 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function($) {"use strict";
-	
-	// Wraps Imgur.com API for our use.
-	
-	var AppConfig = __webpack_require__(20);
-	
-	module.exports = {
-		// Lists all albums in an imgur account (excludes empty ones)
-		listAlbums: function listAlbums(account, callback) {
-			$.ajax({
-				url: "https://api.imgur.com/3/account/" + account + "/albums",
-				headers: {
-					"Authorization": "Client-ID " + AppConfig['imgur_client_id']
-				}
-			}).success(function (data) {
-				callback(data.data);
-			});
-		},
-		// Gets a single album by ID
-		getAlbum: function getAlbum(id, callback) {
-			$.ajax({
-				url: "https://api.imgur.com/3/album/" + id,
-				headers: {
-					"Authorization": "Client-ID " + AppConfig['imgur_client_id']
-				}
-			}).success(function (data) {
-				callback(data.data);
-			});
-		}
-	};
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(13)))
 
 /***/ }
 /******/ ]);

@@ -103,7 +103,7 @@ module.exports = RTChat.Views.Sidebar.extend({
 		// start closed.
 		this.$el.removeClass('open');
 
-		this.scope.hash = window.location.hash;
+		this.scope.hash = window.location.hash.substring(1);
 		this.scope.clientId = AppConfig['imgur_client_id'];
 
 		var self = this;
