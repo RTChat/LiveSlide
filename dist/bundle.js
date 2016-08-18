@@ -1721,7 +1721,7 @@
 			if (window.location.href.match(/\?state=/)) {
 				var params = paramsToObj();
 				RTChat.UserService.setAppConf({
-					imgur_account_id: params.account_id,
+					// imgur_account_id: params.account_id,
 					imgur_account_name: params.account_username,
 					imgur_refresh_token: params.refresh_token
 				});
@@ -11974,7 +11974,7 @@
 	var ImgurLoader = __webpack_require__(16);
 	
 	module.exports = RTChat.Views.Sidebar.extend({
-		template: '\n\t\t<a rv-unless="scope.signedIn"\n\t\t\trv-href="\'https://api.imgur.com/oauth2/authorize?client_id=\' |+ scope.clientId |+ \'&response_type=token&state=\' |+ scope.hash">\n\t\t\tSign in to imgur\n\t\t</a>\n\t\t<ul rv-if="scope.signedIn">\n\t\t\t<li rv-each-album="scope.userAlbums" rv-data-path="scope.userName |+ \'/\' |+ album">\n\t\t</ul>\n\t\t<div class="add-acct"> Add  Imgur Account </div>\n\t\t<ul rv-each-user="scope.iaccts" class="album">\n\t\t\t<div class="header">\n\t\t\t\t{ user.name  }\n\t\t\t\t<span class="pull-right fa fa-ellipsis-v"></>\n\t\t\t</div>\n\t\t\t<li rv-each-album="user.albums" rv-data-id="album.id">\n\t\t\t\t{ album.title }\n\t\t\t</li>\n\t\t</ul>\n\t',
+		template: '\n\t\t<a rv-unless="scope.imgur_account_name"\n\t\t\trv-href="\'https://api.imgur.com/oauth2/authorize?client_id=\' |+ scope.clientId |+ \'&response_type=token&state=\' |+ scope.hash">\n\t\t\tSign-in with Imgur to upload\n\t\t</a>\n\t\t<ul rv-if="scope.imgur_account_name" class="album">\n\t\t\t<div class="header">\n\t\t\t\t{ scope.imgur_account_name }\n\t\t\t\t<span class="pull-right fa fa-upload"></>\n\t\t\t\t<span class="pull-right fa fa-ellipsis-v"></>\n\t\t\t</div>\n\t\t\t<li rv-each-album="scope.user_albums" rv-data-id="album.id">\n\t\t\t\t{ album.title }\n\t\t\t</li>\n\t\t</ul>\n\t\t<div class="add-acct">\n\t\t\t<span rv-hide="scope.editing">Add  Imgur Account </span>\n\t\t\t<input rv-show="scope.editing" placeholder="Imgur Account Name">\n\t\t</div>\n\t\t<ul rv-each-user="scope.iaccts" class="album">\n\t\t\t<div class="header">\n\t\t\t\t{ user.name  }\n\t\t\t\t<span class="pull-right fa fa-ellipsis-v"></>\n\t\t\t</div>\n\t\t\t<li rv-each-album="user.albums" rv-data-id="album.id">\n\t\t\t\t{ album.title }\n\t\t\t</li>\n\t\t</ul>\n\t',
 		events: {
 			'click .album > li': function clickAlbumLi(e) {
 				// Load Presentation
@@ -11983,7 +11983,6 @@
 					RTChat.RTCWrapper.updateState({
 						albumId: album.id,
 						title: album.title,
-						// slides: _.map(album.images, function(i) {return i.link}),
 						slides: _.map(album.images, function (i) {
 							return i.link.replace(/^http:/, 'https:');
 						}),
@@ -11991,13 +11990,14 @@
 					});
 				});
 				// target.addClass("selected"); //TODO: loading?
+				this.toggle(); // close //TODO: do we want this?
 			},
 			'click .fa-refresh': function clickFaRefresh() {
 				this.getAlbums();
 			},
-			// 'click .fa-upload': function() {
-			// 	UploadModal.render();
-			// },
+			'click .fa-upload': function clickFaUpload() {
+				UploadModal.render();
+			},
 			// 'click .fa-trash': function(e) {
 			// 	var self = this;
 			// 	e.stopImmediatePropagation();
@@ -12005,32 +12005,41 @@
 			// 		self.getList();
 			// 	});
 			// }
-			'click .add-acct': function clickAddAcct() {}
-		},
-		initialize: function initialize() {
-			this.scope = {};
-			//TODO: populate from UserService
-			this.savedImgurAccounts = ['thannman', 'deadpoolsupplier'];
-			this.getAlbums();
+			'click .add-acct': function clickAddAcct(ev) {
+				this.scope.editing = true;
+				this.$(ev.currentTarget).find('input').val("").focus();
+			},
+			'keyup .add-acct input': function keyupAddAcctInput(ev) {
+				if (ev.keyCode != 13) return true;
+				this.scope.editing = false;
+				if (!this.scope.other_imgur_accounts) this.scope.other_imgur_accounts = [];
+				this.scope.other_imgur_accounts.push(this.$(ev.currentTarget).val());
 	
-			// UploadModal = new UploadModal();
-			// UploadModal.onsuccess = function() { self.getList(); };
-			// this.extra = RTChat.RTCWrapper.connection.extra;
-		},
-		getAlbums: function getAlbums() {
-			var scope = this.scope;
-			scope.iaccts = []; // The list of added users
+				RTChat.UserService.setAppConf({
+					other_imgur_accounts: this.scope.other_imgur_accounts
+				});
 	
-			_.forEach(this.savedImgurAccounts, function (a) {
+				this.scope.iaccts = this.getAlbums(this.scope.other_imgur_accounts);
+			},
+			'blur .add-acct input': function blurAddAcctInput(ev) {
+				this.scope.editing = false;
+			}
+		},
+		// Return an array of accounts with albums populated asynchronously.
+		getAlbums: function getAlbums(list_of_account_names) {
+			if (!list_of_account_names) return []; // Don't fail when passed undefined.
+			var accounts = [];
+	
+			_.forEach(list_of_account_names, function (a) {
 				var acct = { name: a };
 	
 				// Add it now so it shows up in the GUI, then add the albums asynchronously.
-				scope.iaccts.push(acct);
+				accounts.push(acct);
 	
 				ImgurLoader.listAlbums(a, function (list) {
 					console.log("got list", acct.name, list);
 	
-					_.extend(acct, {
+					if (list.length) _.extend(acct, {
 						name: list[0].account_url,
 						// Remove empty albums
 						albums: _.reject(list, function (o) {
@@ -12039,24 +12048,21 @@
 					});
 				});
 			});
+	
+			return accounts;
 		},
-		// OLD_getList: function() {
-		// 	var self = this;
-		// 	this.scope.folders = null;
-		// 	PresLoader.getList(function(list) {
-		// 		self.scope.folders = list;
-		// 		self.render();
-		// 	});
-		// },
 		render: function render() {
+			this.scope = RTChat.UserService.getAppConf();
+			this.scope.hash = window.location.hash.substring(1);
+			this.scope.clientId = AppConfig['imgur_client_id'];
+			this.scope.user_albums = this.getAlbums([this.scope.imgur_account_name])[0];
+			this.scope.iaccts = this.getAlbums(this.scope.other_imgur_accounts);
+	
 			this.$el.html(this.template);
 			RTChat.Rivets.bind(this.$el, { scope: this.scope });
 	
 			// start closed.
 			this.$el.removeClass('open');
-	
-			this.scope.hash = window.location.hash.substring(1);
-			this.scope.clientId = AppConfig['imgur_client_id'];
 	
 			var self = this;
 			RTChat.RTCWrapper.onStateChange(function (old, newState) {
@@ -12067,8 +12073,6 @@
 						if (!newState.albumId && newState.admins) {
 							//HACK: check admins to ensure we are still in a room
 							self.$el.addClass('open');
-						} else {
-							self.$el.removeClass('open');
 						}
 					}
 				});
@@ -14031,85 +14035,88 @@
 	__webpack_require__(25);
 	
 	module.exports = Backbone.View.extend({
-	  id: 'Viewer',
-	  template: '\n    <div class="carousel slide" rv-show="scope.state.slides | length | gt 0" rv-class-mouse-crosshair="scope.capturePing">\n      <!-- Indicators -->\n      <ol class="carousel-indicators" rv-show="scope.extra.isAdmin">\n        <li rv-each-item="scope.state.slides" rv-data-slide-to="index" data-target="#Viewer .carousel"></li>\n      </ol>\n\n      <!-- Wrapper for slides -->\n      <div class="carousel-inner" role="listbox">\n        <div rv-each-url="scope.state.slides" class="item">\n          <img rv-src="url" alt="...">\n        </div>\n      </div>\n\n      <!-- Controls -->\n      <div class="left carousel-control" rv-show="scope.extra.isAdmin" href="#Viewer .carousel" role="button" data-slide="prev">\n        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>\n        <span class="sr-only">Previous</span>\n      </div>\n      <div class="right carousel-control" rv-show="scope.extra.isAdmin" href="#Viewer .carousel" role="button" data-slide="next">\n        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>\n        <span class="sr-only">Next</span>\n      </div>\n\n      <!-- Ping -->\n      <div class="ping fa fa-circle-thin hidden"></div>\n    </div>\n  ',
-	  events: {
-	    'click .carousel-control': function clickCarouselControl(e) {
-	      // if (!(this.scope.extra.isAdmin)) return;
-	      var self = this;
-	      var dir = this.$(e.currentTarget).data('slide');
-	      setTimeout(function () {
-	        // HACK: wait for bootstrap to do its thing
-	        var cur = $('.carousel-inner > .item.' + dir).index('.item');
-	        RTChat.RTCWrapper.updateState({ currentSlide: cur });
-	        self.renderPing(false); // Stop ping
-	      });
-	    },
-	    'click .carousel-indicators > li': function clickCarouselIndicatorsLi(e) {
-	      // if (!(this.scope.user.isAdmin)) return;
-	      RTChat.RTCWrapper.updateState({ currentSlide: $(e.currentTarget).data('slide-to') });
-	      this.renderPing(false); // Stop ping
-	    },
-	    'click .mouse-crosshair': function clickMouseCrosshair(e) {
-	      // Ping
-	      this.scope.capturePing = false;
-	      var viewer = $(e.currentTarget);
-	      var offset = viewer.offset();
-	      RTChat.RTCWrapper.updateState({ ping: {
-	          left: (e.pageX - offset.left) / viewer.width(),
-	          top: (e.pageY - offset.top) / viewer.height()
-	        } });
-	    }
-	  },
-	  initialize: function initialize() {
-	    var self = this;
-	    this.scope.state = {};
-	    RTChat.RTCWrapper.onStateChange(function (prevState, state) {
-	      self.scope.state = state;
-	      if (prevState.albumId != state.albumId) {
-	        self.render(); //TODO: why is a full render necessary? (the carousel doesnt load images otherwise)
-	      } else if (prevState.currentSlide != state.currentSlide) {
-	        self.$('.carousel').carousel(state.currentSlide);
-	        self.renderPing(false);
-	      } else if (prevState.ping != state.ping) {
-	        self.renderPing(state.ping);
-	      }
-	    });
+		id: 'Viewer',
+		template: '\n\t\t<div class="carousel slide" rv-show="scope.state.slides | length | gt 0" rv-class-mouse-crosshair="scope.capturePing">\n\t\t\t<!-- Indicators -->\n\t\t\t<ol class="carousel-indicators" rv-show="scope.extra.isAdmin">\n\t\t\t\t<li rv-each-item="scope.state.slides" rv-data-slide-to="index" data-target="#Viewer .carousel"></li>\n\t\t\t</ol>\n\n\t\t\t<!-- Wrapper for slides -->\n\t\t\t<div class="carousel-inner" role="listbox">\n\t\t\t\t<div rv-each-url="scope.state.slides" class="item">\n\t\t\t\t\t<img rv-src="url" alt="...">\n\t\t\t\t</div>\n\t\t\t</div>\n\n\t\t\t<!-- Controls -->\n\t\t\t<div class="left carousel-control" rv-show="scope.extra.isAdmin" href="#Viewer .carousel" role="button" data-slide="prev">\n\t\t\t\t<span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>\n\t\t\t\t<span class="sr-only">Previous</span>\n\t\t\t</div>\n\t\t\t<div class="right carousel-control" rv-show="scope.extra.isAdmin" href="#Viewer .carousel" role="button" data-slide="next">\n\t\t\t\t<span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>\n\t\t\t\t<span class="sr-only">Next</span>\n\t\t\t</div>\n\n\t\t\t<!-- Ping -->\n\t\t\t<div class="ping fa fa-circle-thin hidden"></div>\n\t\t</div>\n\t',
+		events: {
+			'click .carousel-control': function clickCarouselControl(e) {
+				// if (!(this.scope.extra.isAdmin)) return;
+				var self = this;
+				var dir = this.$(e.currentTarget).data('slide');
+				setTimeout(function () {
+					// HACK: wait for bootstrap to do its thing
+					var cur = $('.carousel-inner > .item.' + dir).index('.item');
+					RTChat.RTCWrapper.updateState({ currentSlide: cur });
+					self.renderPing(false); // Stop ping
+				});
+			},
+			'click .carousel-indicators > li': function clickCarouselIndicatorsLi(e) {
+				// if (!(this.scope.user.isAdmin)) return;
+				RTChat.RTCWrapper.updateState({ currentSlide: $(e.currentTarget).data('slide-to') });
+				this.renderPing(false); // Stop ping
+			},
+			'click .mouse-crosshair': function clickMouseCrosshair(e) {
+				// Ping
+				this.scope.capturePing = false;
+				var viewer = $(e.currentTarget);
+				var offset = viewer.offset();
+				RTChat.RTCWrapper.updateState({ ping: {
+						left: (e.pageX - offset.left) / viewer.width(),
+						top: (e.pageY - offset.top) / viewer.height()
+					} });
+			}
+		},
+		initialize: function initialize() {
+			var self = this;
+			this.scope.state = {};
+			RTChat.RTCWrapper.onStateChange(function (prevState, state) {
+				self.scope.state = state;
+				if (prevState.albumId != state.albumId) {
+					self.render(); //TODO: why is a full render necessary? (the carousel doesnt load images otherwise)
+				} else if (prevState.currentSlide != state.currentSlide) {
+					self.$('.carousel').carousel(state.currentSlide);
+					self.renderPing(false);
+				} else if (prevState.ping != state.ping) {
+					self.renderPing(state.ping);
+				}
+			});
 	
-	    this.scope.extra = RTChat.RTCWrapper.connection.extra;
-	  },
-	  render: function render() {
-	    this.$el.html(this.template);
-	    RTChat.Rivets.bind(this.$el, { scope: this.scope });
+			this.scope.extra = RTChat.RTCWrapper.connection.extra;
+		},
+		render: function render() {
+			this.$el.html(this.template);
+			RTChat.Rivets.bind(this.$el, { scope: this.scope });
 	
-	    // Make the proper slide active.
-	    var active = this.scope.state.currentSlide || 0;
-	    this.$('.item').eq(active).addClass('active');
-	    this.$('.carousel-indicators > li').eq(active).addClass('active');
+			// Make the proper slide active.
+			var active = this.scope.state.currentSlide || 0;
+			this.$('.item').eq(active).addClass('active');
+			this.$('.carousel-indicators > li').eq(active).addClass('active');
 	
-	    // Prevent autoslide.
-	    this.$('.carousel').carousel({ interval: false });
+			// Prevent autoslide.
+			this.$('.carousel').carousel({ interval: false });
 	
-	    return this;
-	  },
-	  startPing: function startPing() {
-	    this.scope.capturePing = true;
-	  },
-	  renderPing: function renderPing(ping_state) {
-	    this.scope.capturePing == false;
+			//TODO: re-render ping on resize. (events dont work)
+			// this.$el.resize(function() { self.renderPing() });
 	
-	    if (!ping_state) ping_state = { top: 0, left: -100 }; // Render off screen.
-	    var viewer = this.$('.active img');
-	    var offset = parseInt(viewer.css('marginLeft'), 10); // for when the screen is wider than the image.
-	    var ping = this.$('.ping').removeClass('hidden');
-	    ping.css({
-	      top: ping_state.top * viewer.height() - ping.height() / 2,
-	      left: ping_state.left * viewer.width() - ping.width() / 2 + offset
-	    });
-	    window.getComputedStyle(ping[0]); // Force opacity render.
-	    ping.addClass('hidden');
-	  },
-	  scope: {}
+			return this;
+		},
+		startPing: function startPing() {
+			this.scope.capturePing = true;
+		},
+		renderPing: function renderPing(ping_state) {
+			this.scope.capturePing == false;
+	
+			if (!ping_state) ping_state = { top: 0, left: -100 }; // Render off screen.
+			var viewer = this.$('.active img');
+			var ping = this.$('.ping').removeClass('hidden');
+			viewer = { width: viewer.width(), height: viewer.height() };
+			ping.css({
+				top: (ping_state.top - (viewer.height / (viewer.height - ping.height()) - 1) / 2) * 100 + '%',
+				left: (ping_state.left - (viewer.width / (viewer.width - ping.width()) - 1) / 2) * 100 + '%'
+			});
+			window.getComputedStyle(ping[0]); // Force opacity render.
+			ping.addClass('hidden');
+		},
+		scope: {}
 	});
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
 
@@ -14148,7 +14155,7 @@
 	
 	
 	// module
-	exports.push([module.id, "#Viewer {\n  --webkit-user-select: none;\n  --webkit-user-drag: none; }\n  #Viewer * {\n    --webkit-user-select: none;\n    --webkit-user-drag: none; }\n  #Viewer img {\n    margin: auto; }\n  #Viewer .ping {\n    top: 0;\n    color: red;\n    opacity: 1;\n    position: absolute;\n    width: 45px;\n    height: 45px;\n    line-height: 45px;\n    text-align: center;\n    pointer-events: none; }\n    #Viewer .ping.hidden {\n      opacity: 0;\n      display: block !important;\n      transition: opacity 5s cubic-bezier(0.6, 0.04, 0.98, 0.335);\n      /* easeOutCirc */\n      animation-name: ping;\n      animation-duration: 1s;\n      animation-direction: alternate;\n      animation-iteration-count: infinite; }\n  #Viewer .mouse-crosshair {\n    pointer-events: none;\n    /* Ignore clicks while pinging. */ }\n    #Viewer .mouse-crosshair img {\n      pointer-events: auto;\n      cursor: crosshair !important; }\n\n@keyframes ping {\n  from {\n    font-size: 1; }\n  to {\n    font-size: 45px; } }\n", "", {"version":3,"sources":["/./app/styles/viewer.css"],"names":[],"mappings":"AAAA;EACE,2BAA2B;EAC3B,yBAAyB,EAAE;EAC3B;IACE,2BAA2B;IAC3B,yBAAyB,EAAE;EAC7B;IACE,aAAa,EAAE;EACjB;IACE,OAAO;IACP,WAAW;IACX,WAAW;IACX,mBAAmB;IACnB,YAAY;IACZ,aAAa;IACb,kBAAkB;IAClB,mBAAmB;IACnB,qBAAqB,EAAE;IACvB;MACE,WAAW;MACX,0BAA0B;MAC1B,4DAA4D;MAC5D,iBAAiB;MACjB,qBAAqB;MACrB,uBAAuB;MACvB,+BAA+B;MAC/B,oCAAoC,EAAE;EAC1C;IACE,qBAAqB;IACrB,kCAAkC,EAAE;IACpC;MACE,qBAAqB;MACrB,6BAA6B,EAAE;;AAErC;EACE;IACE,aAAa,EAAE;EACjB;IACE,gBAAgB,EAAE,EAAE","file":"viewer.css","sourcesContent":["#Viewer {\n  --webkit-user-select: none;\n  --webkit-user-drag: none; }\n  #Viewer * {\n    --webkit-user-select: none;\n    --webkit-user-drag: none; }\n  #Viewer img {\n    margin: auto; }\n  #Viewer .ping {\n    top: 0;\n    color: red;\n    opacity: 1;\n    position: absolute;\n    width: 45px;\n    height: 45px;\n    line-height: 45px;\n    text-align: center;\n    pointer-events: none; }\n    #Viewer .ping.hidden {\n      opacity: 0;\n      display: block !important;\n      transition: opacity 5s cubic-bezier(0.6, 0.04, 0.98, 0.335);\n      /* easeOutCirc */\n      animation-name: ping;\n      animation-duration: 1s;\n      animation-direction: alternate;\n      animation-iteration-count: infinite; }\n  #Viewer .mouse-crosshair {\n    pointer-events: none;\n    /* Ignore clicks while pinging. */ }\n    #Viewer .mouse-crosshair img {\n      pointer-events: auto;\n      cursor: crosshair !important; }\n\n@keyframes ping {\n  from {\n    font-size: 1; }\n  to {\n    font-size: 45px; } }\n"],"sourceRoot":"webpack://"}]);
+	exports.push([module.id, "#Viewer {\n  --webkit-user-select: none;\n  --webkit-user-drag: none; }\n  #Viewer * {\n    --webkit-user-select: none;\n    --webkit-user-drag: none; }\n  #Viewer img {\n    margin: auto; }\n  #Viewer .ping {\n    top: 0;\n    color: red;\n    opacity: 1;\n    position: absolute;\n    width: 45px;\n    height: 45px;\n    line-height: 45px;\n    text-align: center;\n    pointer-events: none;\n    /*border: 1px solid blue;*/ }\n    #Viewer .ping.hidden {\n      opacity: 0;\n      display: block !important;\n      transition: opacity 5s cubic-bezier(0.6, 0.04, 0.98, 0.335);\n      /* easeOutCirc */\n      animation-name: ping;\n      animation-duration: 1s;\n      animation-direction: alternate;\n      animation-iteration-count: infinite; }\n  #Viewer .mouse-crosshair {\n    pointer-events: none;\n    /* Ignore clicks while pinging. */ }\n    #Viewer .mouse-crosshair img {\n      pointer-events: auto;\n      cursor: crosshair !important; }\n\n@keyframes ping {\n  from {\n    font-size: 1; }\n  to {\n    font-size: 45px; } }\n", "", {"version":3,"sources":["/./app/styles/viewer.css"],"names":[],"mappings":"AAAA;EACE,2BAA2B;EAC3B,yBAAyB,EAAE;EAC3B;IACE,2BAA2B;IAC3B,yBAAyB,EAAE;EAC7B;IACE,aAAa,EAAE;EACjB;IACE,OAAO;IACP,WAAW;IACX,WAAW;IACX,mBAAmB;IACnB,YAAY;IACZ,aAAa;IACb,kBAAkB;IAClB,mBAAmB;IACnB,qBAAqB;IACrB,2BAA2B,EAAE;IAC7B;MACE,WAAW;MACX,0BAA0B;MAC1B,4DAA4D;MAC5D,iBAAiB;MACjB,qBAAqB;MACrB,uBAAuB;MACvB,+BAA+B;MAC/B,oCAAoC,EAAE;EAC1C;IACE,qBAAqB;IACrB,kCAAkC,EAAE;IACpC;MACE,qBAAqB;MACrB,6BAA6B,EAAE;;AAErC;EACE;IACE,aAAa,EAAE;EACjB;IACE,gBAAgB,EAAE,EAAE","file":"viewer.css","sourcesContent":["#Viewer {\n  --webkit-user-select: none;\n  --webkit-user-drag: none; }\n  #Viewer * {\n    --webkit-user-select: none;\n    --webkit-user-drag: none; }\n  #Viewer img {\n    margin: auto; }\n  #Viewer .ping {\n    top: 0;\n    color: red;\n    opacity: 1;\n    position: absolute;\n    width: 45px;\n    height: 45px;\n    line-height: 45px;\n    text-align: center;\n    pointer-events: none;\n    /*border: 1px solid blue;*/ }\n    #Viewer .ping.hidden {\n      opacity: 0;\n      display: block !important;\n      transition: opacity 5s cubic-bezier(0.6, 0.04, 0.98, 0.335);\n      /* easeOutCirc */\n      animation-name: ping;\n      animation-duration: 1s;\n      animation-direction: alternate;\n      animation-iteration-count: infinite; }\n  #Viewer .mouse-crosshair {\n    pointer-events: none;\n    /* Ignore clicks while pinging. */ }\n    #Viewer .mouse-crosshair img {\n      pointer-events: auto;\n      cursor: crosshair !important; }\n\n@keyframes ping {\n  from {\n    font-size: 1; }\n  to {\n    font-size: 45px; } }\n"],"sourceRoot":"webpack://"}]);
 	
 	// exports
 

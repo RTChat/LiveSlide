@@ -17,7 +17,7 @@ module.exports = RTChat.Views.Layout.extend({
 		if (window.location.href.match(/\?state=/)) {
 			var params = paramsToObj();
 			RTChat.UserService.setAppConf({
-				imgur_account_id: params.account_id,
+				// imgur_account_id: params.account_id,
 				imgur_account_name: params.account_username,
 				imgur_refresh_token: params.refresh_token
 			});
