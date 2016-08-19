@@ -15,11 +15,17 @@ module.exports = {
 		utils: 'app/utils',
 		styles: 'app/styles',
 	} },
+	externals: {
+		// Use the jquery from RTChat so it's has bootstrap, etc.
+		'jquery': "RTChat.jQuery",
+		'rivets': "RTChat.Rivets",
+	},
 	plugins: [
 		new webpack.ProvidePlugin({
 			// These become available to all files.
 			$: "jquery",
 			_: "underscore",
+			Rivets: "rivets",
 		}),
 	],
 	module: {
