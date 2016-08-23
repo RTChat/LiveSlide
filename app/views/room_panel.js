@@ -19,7 +19,7 @@ module.exports = RTChat.Views.RoomPanel.extend({
 		this.scope = {rtc_state: {}}
 
 		this.$el.html(this.template);
-		RTChat.Rivets.bind(this.$el, { scope: this.scope });
+		Rivets.bind(this.$el, { scope: this.scope });
 
 		// Make the magic happen~~
 		RTChat.RTCWrapper.joinRoom(window.location.hash, { xVideoContainer: this.$('.video-container') }, function(hasPeers) {

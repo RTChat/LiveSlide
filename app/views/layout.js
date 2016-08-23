@@ -7,7 +7,12 @@ module.exports = RTChat.Views.Layout.extend({
 	events: _.extend(original_events, {
 		'click .ping': function() {
 			this.subviews.room.subviews.viewer.startPing()
-		}
+		},
+		// 'click': function(ev) {
+		// 	console.log("fffff", ev)
+		// 	// Close all popovers
+		// 	// $('.popover').popover('hide');
+		// }
 	}),
 	initialize: function() {
 		var self = this;
@@ -21,8 +26,8 @@ module.exports = RTChat.Views.Layout.extend({
 				imgur_account_name: params.account_username,
 				imgur_refresh_token: params.refresh_token
 			});
-			// The "state" is the previous roomName.
-			return window.location.href = window.location.href.replace(/\?.*$/, "#"+(params.state||''));
+			// The "state" is the previous roomName; navigate there.
+			return window.location.href.replace(/\?.*$/, "#"+(params.state||''));
 		}
 
 		$(window).on('hashchange', function() { self.render(); });

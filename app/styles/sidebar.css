@@ -1,11 +1,35 @@
 
 #Sidebar {
+	font-size: 18;
+
+	&.open {flex-basis: 260px;}
 
 	> * {
 		margin: 0 5px;
 	}
 
-	li.selected {
-		color: yellow;
+	> .dropdown {
+		position: static; /* Bootstrap Override */
+
+		> div {
+
+			> .fa {
+				width: 20px;
+				margin: 0 2px;
+				line-height: inherit;
+				text-align: center;
+			}
+		}
+
+		/*> ul {}*/
 	}
+
+	#ContextMenu {
+		border: 1px solid red;
+
+	}
+
+/*	li.selected {
+		color: yellow;
+	}*/
 }

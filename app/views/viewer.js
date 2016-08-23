@@ -77,7 +77,7 @@ module.exports = Backbone.View.extend({
 	},
 	render: function() {
 		this.$el.html(this.template);
-		RTChat.Rivets.bind(this.$el, {scope: this.scope});
+		Rivets.bind(this.$el, {scope: this.scope});
 
 		// Make the proper slide active.
 		var active = this.scope.state.currentSlide || 0;
