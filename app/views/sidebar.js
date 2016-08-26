@@ -2,8 +2,10 @@ require('styles/sidebar.css');
 require('utils/context_menu.js');
 
 var AppConfig = require('app/config');
-// var UploadModal = require('views/upload_modal');
+var UploadModal = require('views/upload_modal');
 var ImgurLoader = require('utils/imgur_loader.js');
+
+console.log("upload_modal", UploadModal)
 
 module.exports = RTChat.Views.Sidebar.extend({
 	template: `
@@ -39,11 +41,10 @@ module.exports = RTChat.Views.Sidebar.extend({
 			</ul>
 		</div>
 		<div data-subview="context_menu"></div>
+		<div data-subview="upload_modal"></div>
 	`,
 	contextMenuTemplate: `
-		<ul>
-			<li class="delete"> Remove </li>
-		</ul>
+			<li class="delete"><a> Remove </a></li>
 	`,
 	events: {
 		'click .album > li': function(e) {
@@ -58,8 +59,15 @@ module.exports = RTChat.Views.Sidebar.extend({
 				});
 			});
 			// target.addClass("selected"); //TODO: loading?
-			this.toggle(); // close //TODO: do we want this?
+			this.toggle(); // close //TODO: UX: do we want this?
 		},
+		'click .fa-upload': function() {
+			// UploadModal.render();
+			this.subviews.upload_modal.show();
+		},
+		// 'click .fa-refresh': function() {
+		// 	this.getAlbums();
+		// },
 		'click .add-acct': function(ev) {
 			this.scope.editing = true;
 			this.$(ev.currentTarget).find('input').val("").focus();
@@ -68,73 +76,71 @@ module.exports = RTChat.Views.Sidebar.extend({
 			if (ev.keyCode != 13) return true;
 			this.scope.editing = false;
 			if (!this.scope.other_imgur_accounts) this.scope.other_imgur_accounts = [];
-			this.scope.other_imgur_accounts.push(this.$(ev.currentTarget).val());
+			var name = this.$(ev.currentTarget).val();
 
-			RTChat.UserService.setAppConf({
-				other_imgur_accounts: this.scope.other_imgur_accounts
-			});
-
-			this.scope.iaccts = this.getAlbums(this.scope.other_imgur_accounts, function(accts) {
-				var woot =  _.map(accts, function(a) {return a.name;})
-				console.log("Woot",accts, woot)
-				// this.scope.other_imgur_accounts =;
-			});
+			var self = this;
+			// Add the acct to iaccts instantly because it will be populated asynchronously.
+			this.scope.iaccts.push(this.getAlbums([name], function(acct) {
+				// Now that we have the exact acct name, add it to the list.
+				self.scope.other_imgur_accounts.push(acct.name);
+				RTChat.UserService.setAppConf({
+					other_imgur_accounts: self.scope.other_imgur_accounts
+				});
+			})[0]);
 		},
 		'blur .add-acct input': function(ev) {
 			this.scope.editing = false;
 		},
-		'click .fa-upload': function() {
-			UploadModal.render();
-		},
 		// == ContextMenu == //
-		// 'click .fa-refresh': function() {
-		// 	this.getAlbums();
-		// },
-		'click .fa-ellipsis-v': function(ev) {
-			this.subviews.context_menu.show(ev.currentTarget);
-			this.menu_target = $(ev.currentTarget).parent('[data-acct-name]').data("acct-name");
-			ev.stopPropagation();
-		},
-
-		// 'click .fa-trash': function(e) {
-		// 	var self = this;
-		// 	e.stopImmediatePropagation();
-		// 	PresLoader.delete(this.$(e.currentTarget).parent().data('path'), function() {
-		// 		self.getList();
-		// 	});
-		// }
-		'scroll': function() {
-			this.subviews.context_menu.hide();
-		},
 		'click #ContextMenu li.delete': function() {
-			console.log("GGGG", this, this.menu_target)
 			if (this.menu_target == this.scope.imgur_account_name) {
+				// Remove user account info. this.scope.
 				RTChat.UserService.setAppConf({
 					imgur_account_name: undefined,
 					imgur_refresh_token: undefined
 				});
 			} else {
-
-				console.log("OO", this.scope.other_imgur_accounts)
+				// Remove from other_imgur_accounts
 				var ii = this.scope.other_imgur_accounts.indexOf(this.menu_target)
-				console.log("YY", ii)
-				// RTChat.UserService.setAppConf({
-				// 	other_imgur_accounts: this.scope.other_imgur_accounts
-				// });
-			}
+				if (ii >= 0) {
+					//TODO: only calling setAppConf is needed.
+					this.scope.other_imgur_accounts.splice(ii, 1);
+					RTChat.UserService.setAppConf({
+						other_imgur_accounts: this.scope.other_imgur_accounts
+						// other_imgur_accounts: []
+					});
+				}
 
+				// Remove from iaccts
+				ii = _.findIndex(this.scope.iaccts, {name: this.menu_target});
+				if (ii >= 0) this.scope.iaccts.splice(ii, 1);
+			}
+		},
+		'click .fa-ellipsis-v': function(ev) {
+			this.subviews.context_menu.toggle(ev.currentTarget);
+			this.menu_target = $(ev.currentTarget).parent('[data-acct-name]').data("acct-name");
+			ev.stopPropagation(); // Needed or else the body listener hack will close it immediately.
+		},
+		'scroll': function() {
+			this.subviews.context_menu.hide();
 		},
 	},
 	initialize: function() {
+		var self = this;
 		Backbone.Subviews.add( this );
+		//HACK: close context_menu on click anywhere.
+		$('body').on('click', function() { self.subviews.context_menu.hide(); });
 	},
 	subviewCreators: {
 		// Extend ContextMenu
 		context_menu: function() { return new (RTChat.Views.ContextMenu.extend({
+			className: 'dropdown-menu', // Use Bootstrap styling
 			template: this.contextMenuTemplate,
-		}))() }
+		}))() },
+		upload_modal: function() { return new UploadModal(); }
 	},
-	// Return an array of accounts with albums populated asynchronously.
+	// Returns an array of accounts with albums populated asynchronously.
+	// Callback gets called once for every acct when populated.
 	getAlbums: function(list_of_account_names, callback) {
 		if (!list_of_account_names) return []; // Don't fail when passed undefined.
 		var accounts = [];
@@ -156,11 +162,14 @@ module.exports = RTChat.Views.Sidebar.extend({
 					albums: _.reject(list, function(o) { return o.images_count == 0 })
 				});
 
-				if (callback) callback.apply(this, acct);
+				if (callback) callback.call(this, acct);
 			});
 		});
 
 		return accounts;
+	},
+	getAllAlbums: function() {
+
 	},
 	render: function() {
 		this.scope = RTChat.UserService.getAppConf()
@@ -174,11 +183,8 @@ module.exports = RTChat.Views.Sidebar.extend({
 
 		// start closed.
 		this.$el.removeClass('open');
+
 		var self = this;
-
-		//HACK: close context_menu on click anywhere.
-		$('body').on('click', function() { self.subviews.context_menu.hide(); });
-
 		RTChat.RTCWrapper.onStateChange(function(old, newState) {
 			// Open or close if starts or ends
 			setTimeout(function() { //HACK: "extra" gets set by an onStateChange handler

@@ -24,5 +24,24 @@ module.exports = {
 		}).success(function(data) {
 			callback(data.data);
 		});
+	},
+	upload: function(options, callback) {
+		// console.log("UPLOAD", path);
+		$.ajax(_.extend({
+				type: 'POST',
+				url: "/imgur_upload",
+				cache: false,
+				contentType: false,
+				processData: false,
+			}, options)
+		).then(callback);
+	},
+	delete: function(path, callback) {
+		console.log("DELETE", path)
+		$.ajax({
+			type: 'DELETE',
+			url: '/imgur_upload',
+			data: path,
+		}).then(callback);
 	}
 }

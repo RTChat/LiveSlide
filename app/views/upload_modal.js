@@ -1,9 +1,7 @@
 
 require('styles/upload_modal.css');
 
-var rivets = require('rivets');
-
-var PresLoader = require('utils/presentation_loader.js');
+var ImgurLoader = require('utils/imgur_loader.js');
 
 module.exports = Backbone.View.extend({
   className: 'modal fade upload',
@@ -12,23 +10,13 @@ module.exports = Backbone.View.extend({
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title">Upload Presentation</h4>
+          <h4 class="modal-title">Upload Presentation to Imgur</h4>
         </div>
 
         <div class="modal-body">
           <form class="form-inline">
             <div class="form-group">
               <input type="text" placeholder="Presentation Name" name="name" autocomplete="off" class="form-control">
-            </div>
-            <div class="btn-group" data-toggle="buttons">
-              <label class="btn btn-default active">
-                <input type="radio" name="folder" value="user" autocomplete="off" checked>
-                User
-              </label>
-              <label class="btn btn-default">
-                <input type="radio" name="folder" value="global" autocomplete="off">
-                Global
-              </label>
             </div>
             <label class="btn btn-default" for="fileSelector">
               <input id="fileSelector" type="file" name="file" style="display:none;">
@@ -61,21 +49,27 @@ module.exports = Backbone.View.extend({
     },
     'click button.upload': function() {
       var self = this;
-      this.scope.errorMsg = undefined;
-
-      // Validate Name.
-      if (this.$('form [name="name"]').val().length < 1) {
-        return this.scope.errorMsg = "Must enter a name!";
-      }
+      this.scope.errorMsg = undefined; //TODO: error array
 
       // Validate File.
       if (this.$('form [name="file"]')[0].files.length < 1) {
         return this.scope.errorMsg = "Must select a file!";
       }
 
+      var user_conf = RTChat.UserService.getAppConf();
+      var data = (new FormData(this.$('form')[0]));
+      data.set("username", user_conf.imgur_account_name);
+      data.set("refresh_token", user_conf.imgur_refresh_token);
+
+      // Validate Name.
+      if (this.$('form [name="name"]').val().length < 1) {
+        // return this.scope.errorMsg = "Must enter a name!";
+        data.set("name", this.$('form [name="file"]')[0].files[0].name)
+      }
+
       // Submit!
-      PresLoader.upload({
-        data:  (new FormData(this.$('form')[0])),
+      ImgurLoader.upload({
+        data:  data,
         // Enable progress tracking.
         xhr: function() {
           var xhr = new window.XMLHttpRequest();
@@ -87,12 +81,12 @@ module.exports = Backbone.View.extend({
             console.log("DOWNLOAD", e.loaded, '/', e.total)
             // self.onprogress(e.loaded / e.total);
           }, false);
-          //TODO: s3_upload progress??
+          //TODO: imgur_upload progress??
           return xhr;
         },
       }, function() { // After Upload...
         //TODO: display success msg.
-        self.$el.modal('hide');
+        self.hide();
         self.onsuccess && self.onsuccess();
       });
 
@@ -107,18 +101,18 @@ module.exports = Backbone.View.extend({
   initialize: function() {
     this.scope = {};
   },
-  render: function() {
-    this.onprogress(0);
-    this.$el.html(this.template);
-    rivets.bind(this.$el, this.scope);
-
-    this.$el.modal('show');
-    return this;
-  },
   onprogress: function(percent) {
     this.scope.progress = percent;
     this.$('.progress-bar').css({width: percent*100+'%'});
   },
   onsuccess: null,
-  scope: {},
+  render: function() {
+    this.onprogress(0);
+    this.$el.html(this.template);
+    Rivets.bind(this.$el, this.scope);
+
+    return this;
+  },
+  show: function() { this.render().$el.modal('show'); },
+  hide: function() { this.$el.modal('hide'); },
 });

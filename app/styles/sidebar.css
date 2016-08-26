@@ -25,11 +25,14 @@
 	}
 
 	#ContextMenu {
-		border: 1px solid red;
+		margin: 0; /* Override RTChat */
 
+		> li {
+			padding: 0; /* Override Bootstrap */
+		}
 	}
 
-/*	li.selected {
+	li.selected {
 		color: yellow;
-	}*/
+	}
 }

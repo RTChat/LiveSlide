@@ -56,7 +56,7 @@
 	_.extend(RTChat.Views, views);
 	
 	// Extend AppConfig
-	_.extend(RTChat.AppConfig, __webpack_require__(18));
+	_.extend(RTChat.AppConfig, __webpack_require__(17));
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ },
@@ -1623,9 +1623,9 @@
 		"./layout.js": 5,
 		"./room_panel.js": 11,
 		"./sidebar.js": 13,
-		"./upload_modal.js": 14,
-		"./viewer.js": 19,
-		"./welcome_panel.js": 22
+		"./upload_modal.js": 18,
+		"./viewer.js": 22,
+		"./welcome_panel.js": 25
 	};
 	function webpackContext(req) {
 		return __webpack_require__(webpackContextResolve(req));
@@ -2160,16 +2160,18 @@
 
 	/* WEBPACK VAR INJECTION */(function(_, $, Rivets) {'use strict';
 	
-	__webpack_require__(25);
-	__webpack_require__(27);
+	__webpack_require__(14);
+	__webpack_require__(16);
 	
-	var AppConfig = __webpack_require__(18);
-	// var UploadModal = require('views/upload_modal');
-	var ImgurLoader = __webpack_require__(28);
+	var AppConfig = __webpack_require__(17);
+	var UploadModal = __webpack_require__(18);
+	var ImgurLoader = __webpack_require__(21);
+	
+	console.log("upload_modal", UploadModal);
 	
 	module.exports = RTChat.Views.Sidebar.extend({
-		template: '\n\t\t<a rv-unless="scope.imgur_account_name"\n\t\t\trv-href="\'https://api.imgur.com/oauth2/authorize?client_id=\' |+ scope.clientId |+ \'&response_type=token&state=\' |+ scope.hash">\n\t\t\tSign-in with Imgur to upload\n\t\t</a>\n\t\t<div rv-if="scope.imgur_account_name" class="dropdown" >\n\t\t\t<div rv-data-acct-name="scope.imgur_account_name">\n\t\t\t\t\t{ scope.imgur_account_name }\n\t\t\t\t\t<span class="pull-right fa fa-ellipsis-v"></span>\n\t\t\t\t\t<span class="pull-right fa fa-upload"></span>\n\t\t\t</div>\n\t\t\t<ul class="album">\n\t\t\t\t<li rv-each-album="scope.user_albums" rv-data-id="album.id">\n\t\t\t\t\t{ album.title }\n\t\t\t\t</li>\n\t\t\t</ul>\n\t\t</div>\n\t\t<div class="add-acct">\n\t\t\t<span rv-hide="scope.editing">Add  Imgur Account </span>\n\t\t\t<input rv-show="scope.editing" placeholder="Imgur Account Name">\n\t\t</div>\n\t\t<div rv-each-user="scope.iaccts" class="dropdown" >\n\t\t\t<div rv-data-acct-name="user.name">\n\t\t\t\t{ user.name  }\n\t\t\t\t<span class="pull-right fa fa-ellipsis-v"></span>\n\t\t\t</div>\n\t\t\t<ul class="album">\n\t\t\t\t<li rv-each-album="user.albums" rv-data-id="album.id">\n\t\t\t\t\t{ album.title }\n\t\t\t\t</li>\n\t\t\t</ul>\n\t\t</div>\n\t\t<div data-subview="context_menu"></div>\n\t',
-		contextMenuTemplate: '\n\t\t<ul>\n\t\t\t<li class="delete"> Remove </li>\n\t\t</ul>\n\t',
+		template: '\n\t\t<a rv-unless="scope.imgur_account_name"\n\t\t\trv-href="\'https://api.imgur.com/oauth2/authorize?client_id=\' |+ scope.clientId |+ \'&response_type=token&state=\' |+ scope.hash">\n\t\t\tSign-in with Imgur to upload\n\t\t</a>\n\t\t<div rv-if="scope.imgur_account_name" class="dropdown" >\n\t\t\t<div rv-data-acct-name="scope.imgur_account_name">\n\t\t\t\t\t{ scope.imgur_account_name }\n\t\t\t\t\t<span class="pull-right fa fa-ellipsis-v"></span>\n\t\t\t\t\t<span class="pull-right fa fa-upload"></span>\n\t\t\t</div>\n\t\t\t<ul class="album">\n\t\t\t\t<li rv-each-album="scope.user_albums" rv-data-id="album.id">\n\t\t\t\t\t{ album.title }\n\t\t\t\t</li>\n\t\t\t</ul>\n\t\t</div>\n\t\t<div class="add-acct">\n\t\t\t<span rv-hide="scope.editing">Add  Imgur Account </span>\n\t\t\t<input rv-show="scope.editing" placeholder="Imgur Account Name">\n\t\t</div>\n\t\t<div rv-each-user="scope.iaccts" class="dropdown" >\n\t\t\t<div rv-data-acct-name="user.name">\n\t\t\t\t{ user.name  }\n\t\t\t\t<span class="pull-right fa fa-ellipsis-v"></span>\n\t\t\t</div>\n\t\t\t<ul class="album">\n\t\t\t\t<li rv-each-album="user.albums" rv-data-id="album.id">\n\t\t\t\t\t{ album.title }\n\t\t\t\t</li>\n\t\t\t</ul>\n\t\t</div>\n\t\t<div data-subview="context_menu"></div>\n\t\t<div data-subview="upload_modal"></div>\n\t',
+		contextMenuTemplate: '\n\t\t\t<li class="delete"><a> Remove </a></li>\n\t',
 		events: {
 			'click .album > li': function clickAlbumLi(e) {
 				// Load Presentation
@@ -2185,8 +2187,15 @@
 					});
 				});
 				// target.addClass("selected"); //TODO: loading?
-				this.toggle(); // close //TODO: do we want this?
+				this.toggle(); // close //TODO: UX: do we want this?
 			},
+			'click .fa-upload': function clickFaUpload() {
+				// UploadModal.render();
+				this.subviews.upload_modal.show();
+			},
+			// 'click .fa-refresh': function() {
+			// 	this.getAlbums();
+			// },
 			'click .add-acct': function clickAddAcct(ev) {
 				this.scope.editing = true;
 				this.$(ev.currentTarget).find('input').val("").focus();
@@ -2195,76 +2204,77 @@
 				if (ev.keyCode != 13) return true;
 				this.scope.editing = false;
 				if (!this.scope.other_imgur_accounts) this.scope.other_imgur_accounts = [];
-				this.scope.other_imgur_accounts.push(this.$(ev.currentTarget).val());
+				var name = this.$(ev.currentTarget).val();
 	
-				RTChat.UserService.setAppConf({
-					other_imgur_accounts: this.scope.other_imgur_accounts
-				});
-	
-				this.scope.iaccts = this.getAlbums(this.scope.other_imgur_accounts, function (accts) {
-					var woot = _.map(accts, function (a) {
-						return a.name;
+				var self = this;
+				// Add the acct to iaccts instantly because it will be populated asynchronously.
+				this.scope.iaccts.push(this.getAlbums([name], function (acct) {
+					// Now that we have the exact acct name, add it to the list.
+					self.scope.other_imgur_accounts.push(acct.name);
+					RTChat.UserService.setAppConf({
+						other_imgur_accounts: self.scope.other_imgur_accounts
 					});
-					console.log("Woot", accts, woot);
-					// this.scope.other_imgur_accounts =;
-				});
+				})[0]);
 			},
 			'blur .add-acct input': function blurAddAcctInput(ev) {
 				this.scope.editing = false;
 			},
-			'click .fa-upload': function clickFaUpload() {
-				UploadModal.render();
-			},
 			// == ContextMenu == //
-			// 'click .fa-refresh': function() {
-			// 	this.getAlbums();
-			// },
-			'click .fa-ellipsis-v': function clickFaEllipsisV(ev) {
-				this.subviews.context_menu.show(ev.currentTarget);
-				this.menu_target = $(ev.currentTarget).parent('[data-acct-name]').data("acct-name");
-				ev.stopPropagation();
-			},
-	
-			// 'click .fa-trash': function(e) {
-			// 	var self = this;
-			// 	e.stopImmediatePropagation();
-			// 	PresLoader.delete(this.$(e.currentTarget).parent().data('path'), function() {
-			// 		self.getList();
-			// 	});
-			// }
-			'scroll': function scroll() {
-				this.subviews.context_menu.hide();
-			},
 			'click #ContextMenu li.delete': function clickContextMenuLiDelete() {
-				console.log("GGGG", this, this.menu_target);
 				if (this.menu_target == this.scope.imgur_account_name) {
+					// Remove user account info. this.scope.
 					RTChat.UserService.setAppConf({
 						imgur_account_name: undefined,
 						imgur_refresh_token: undefined
 					});
 				} else {
-	
-					console.log("OO", this.scope.other_imgur_accounts);
+					// Remove from other_imgur_accounts
 					var ii = this.scope.other_imgur_accounts.indexOf(this.menu_target);
-					console.log("YY", ii);
-					// RTChat.UserService.setAppConf({
-					// 	other_imgur_accounts: this.scope.other_imgur_accounts
-					// });
+					if (ii >= 0) {
+						//TODO: only calling setAppConf is needed.
+						this.scope.other_imgur_accounts.splice(ii, 1);
+						RTChat.UserService.setAppConf({
+							other_imgur_accounts: this.scope.other_imgur_accounts
+							// other_imgur_accounts: []
+						});
+					}
+	
+					// Remove from iaccts
+					ii = _.findIndex(this.scope.iaccts, { name: this.menu_target });
+					if (ii >= 0) this.scope.iaccts.splice(ii, 1);
 				}
+			},
+			'click .fa-ellipsis-v': function clickFaEllipsisV(ev) {
+				this.subviews.context_menu.toggle(ev.currentTarget);
+				this.menu_target = $(ev.currentTarget).parent('[data-acct-name]').data("acct-name");
+				ev.stopPropagation(); // Needed or else the body listener hack will close it immediately.
+			},
+			'scroll': function scroll() {
+				this.subviews.context_menu.hide();
 			}
 		},
 		initialize: function initialize() {
+			var self = this;
 			Backbone.Subviews.add(this);
+			//HACK: close context_menu on click anywhere.
+			$('body').on('click', function () {
+				self.subviews.context_menu.hide();
+			});
 		},
 		subviewCreators: {
 			// Extend ContextMenu
 			context_menu: function context_menu() {
 				return new (RTChat.Views.ContextMenu.extend({
+					className: 'dropdown-menu', // Use Bootstrap styling
 					template: this.contextMenuTemplate
 				}))();
+			},
+			upload_modal: function upload_modal() {
+				return new UploadModal();
 			}
 		},
-		// Return an array of accounts with albums populated asynchronously.
+		// Returns an array of accounts with albums populated asynchronously.
+		// Callback gets called once for every acct when populated.
 		getAlbums: function getAlbums(list_of_account_names, callback) {
 			if (!list_of_account_names) return []; // Don't fail when passed undefined.
 			var accounts = [];
@@ -2287,12 +2297,13 @@
 						})
 					});
 	
-					if (callback) callback.apply(this, acct);
+					if (callback) callback.call(this, acct);
 				});
 			});
 	
 			return accounts;
 		},
+		getAllAlbums: function getAllAlbums() {},
 		render: function render() {
 			this.scope = RTChat.UserService.getAppConf();
 			this.scope.hash = window.location.hash.substring(1);
@@ -2305,13 +2316,8 @@
 	
 			// start closed.
 			this.$el.removeClass('open');
+	
 			var self = this;
-	
-			//HACK: close context_menu on click anywhere.
-			$('body').on('click', function () {
-				self.subviews.context_menu.hide();
-			});
-	
 			RTChat.RTCWrapper.onStateChange(function (old, newState) {
 				// Open or close if starts or ends
 				setTimeout(function () {
@@ -2352,17 +2358,88 @@
 /* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function($) {'use strict';
+	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
-	__webpack_require__(15);
+	// load the styles
+	var content = __webpack_require__(15);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(10)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/sass-loader/index.js!./sidebar.css", function() {
+				var newContent = require("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/sass-loader/index.js!./sidebar.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 15 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(9)();
+	// imports
 	
-	var rivets = __webpack_require__(12);
 	
-	var PresLoader = __webpack_require__(17);
+	// module
+	exports.push([module.id, "#Sidebar {\n  font-size: 18; }\n  #Sidebar.open {\n    flex-basis: 260px; }\n  #Sidebar > * {\n    margin: 0 5px; }\n  #Sidebar > .dropdown {\n    position: static;\n    /* Bootstrap Override */\n    /*> ul {}*/ }\n    #Sidebar > .dropdown > div > .fa {\n      width: 20px;\n      margin: 0 2px;\n      line-height: inherit;\n      text-align: center; }\n  #Sidebar #ContextMenu {\n    margin: 0;\n    /* Override RTChat */ }\n    #Sidebar #ContextMenu > li {\n      padding: 0;\n      /* Override Bootstrap */ }\n  #Sidebar li.selected {\n    color: yellow; }\n", "", {"version":3,"sources":["/./app/styles/sidebar.css"],"names":[],"mappings":"AAAA;EACE,cAAc,EAAE;EAChB;IACE,kBAAkB,EAAE;EACtB;IACE,cAAc,EAAE;EAClB;IACE,iBAAiB;IACjB,wBAAwB;IACxB,WAAW,EAAE;IACb;MACE,YAAY;MACZ,cAAc;MACd,qBAAqB;MACrB,mBAAmB,EAAE;EACzB;IACE,UAAU;IACV,qBAAqB,EAAE;IACvB;MACE,WAAW;MACX,wBAAwB,EAAE;EAC9B;IACE,cAAc,EAAE","file":"sidebar.css","sourcesContent":["#Sidebar {\n  font-size: 18; }\n  #Sidebar.open {\n    flex-basis: 260px; }\n  #Sidebar > * {\n    margin: 0 5px; }\n  #Sidebar > .dropdown {\n    position: static;\n    /* Bootstrap Override */\n    /*> ul {}*/ }\n    #Sidebar > .dropdown > div > .fa {\n      width: 20px;\n      margin: 0 2px;\n      line-height: inherit;\n      text-align: center; }\n  #Sidebar #ContextMenu {\n    margin: 0;\n    /* Override RTChat */ }\n    #Sidebar #ContextMenu > li {\n      padding: 0;\n      /* Override Bootstrap */ }\n  #Sidebar li.selected {\n    color: yellow; }\n"],"sourceRoot":"webpack://"}]);
+	
+	// exports
+
+
+/***/ },
+/* 16 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function($, _) {'use strict';
+	
+	// jQuery pluguin for ContextMenus (better popovers)
+	
+	$.fn.context_menu = function (options) {
+	
+		console.log("CContextMenu", this, options);
+	
+		var el = $(options.template || '<div></div>');
+		this.append(el);
+		el.hide();
+		el.css({
+			position: 'absoute',
+			top: 0,
+			left: 0
+		});
+	
+		_.each(options.events || {}, function (fn, key) {
+			console.log("ECECEC", arguments);
+		});
+	};
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6), __webpack_require__(1)))
+
+/***/ },
+/* 17 */
+/***/ function(module, exports) {
+
+	module.exports = {"AppName":"LiveSlide","imgur_client_id":"f55a248021c48d6"}
+
+/***/ },
+/* 18 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function($, Rivets) {'use strict';
+	
+	__webpack_require__(19);
+	
+	var ImgurLoader = __webpack_require__(21);
 	
 	module.exports = Backbone.View.extend({
 	  className: 'modal fade upload',
-	  template: '\n    <div class="modal-dialog">\n      <div class="modal-content">\n        <div class="modal-header">\n          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>\n          <h4 class="modal-title">Upload Presentation</h4>\n        </div>\n\n        <div class="modal-body">\n          <form class="form-inline">\n            <div class="form-group">\n              <input type="text" placeholder="Presentation Name" name="name" autocomplete="off" class="form-control">\n            </div>\n            <div class="btn-group" data-toggle="buttons">\n              <label class="btn btn-default active">\n                <input type="radio" name="folder" value="user" autocomplete="off" checked>\n                User\n              </label>\n              <label class="btn btn-default">\n                <input type="radio" name="folder" value="global" autocomplete="off">\n                Global\n              </label>\n            </div>\n            <label class="btn btn-default" for="fileSelector">\n              <input id="fileSelector" type="file" name="file" style="display:none;">\n              <span>Select File</span>\n            </label>\n          </form>\n          <div class="alert alert-danger" rv-show="errorMsg">\n            <strong>Error:</strong> { errorMsg }\n          </div>\n        </div>\n\n        <div class="modal-footer">\n          <button type="button" class="btn btn-primary upload">Upload</button>\n          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>\n          <div class="progress" rv-show="progress">\n            <div class="progress-bar progress-bar-striped active" rv-width="progress"></div>\n          </div>\n        </div>\n      </div><!-- /.modal-content -->\n    </div><!-- /.modal-dialog -->\n  ',
+	  template: '\n    <div class="modal-dialog">\n      <div class="modal-content">\n        <div class="modal-header">\n          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>\n          <h4 class="modal-title">Upload Presentation to Imgur</h4>\n        </div>\n\n        <div class="modal-body">\n          <form class="form-inline">\n            <div class="form-group">\n              <input type="text" placeholder="Presentation Name" name="name" autocomplete="off" class="form-control">\n            </div>\n            <label class="btn btn-default" for="fileSelector">\n              <input id="fileSelector" type="file" name="file" style="display:none;">\n              <span>Select File</span>\n            </label>\n          </form>\n          <div class="alert alert-danger" rv-show="errorMsg">\n            <strong>Error:</strong> { errorMsg }\n          </div>\n        </div>\n\n        <div class="modal-footer">\n          <button type="button" class="btn btn-primary upload">Upload</button>\n          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>\n          <div class="progress" rv-show="progress">\n            <div class="progress-bar progress-bar-striped active" rv-width="progress"></div>\n          </div>\n        </div>\n      </div><!-- /.modal-content -->\n    </div><!-- /.modal-dialog -->\n  ',
 	  events: {
 	    'click .disabled': function clickDisabled(e) {
 	      e.preventDefault();
@@ -2374,21 +2451,27 @@
 	    },
 	    'click button.upload': function clickButtonUpload() {
 	      var self = this;
-	      this.scope.errorMsg = undefined;
-	
-	      // Validate Name.
-	      if (this.$('form [name="name"]').val().length < 1) {
-	        return this.scope.errorMsg = "Must enter a name!";
-	      }
+	      this.scope.errorMsg = undefined; //TODO: error array
 	
 	      // Validate File.
 	      if (this.$('form [name="file"]')[0].files.length < 1) {
 	        return this.scope.errorMsg = "Must select a file!";
 	      }
 	
+	      var user_conf = RTChat.UserService.getAppConf();
+	      var data = new FormData(this.$('form')[0]);
+	      data.set("username", user_conf.imgur_account_name);
+	      data.set("refresh_token", user_conf.imgur_refresh_token);
+	
+	      // Validate Name.
+	      if (this.$('form [name="name"]').val().length < 1) {
+	        // return this.scope.errorMsg = "Must enter a name!";
+	        data.set("name", this.$('form [name="file"]')[0].files[0].name);
+	      }
+	
 	      // Submit!
-	      PresLoader.upload({
-	        data: new FormData(this.$('form')[0]),
+	      ImgurLoader.upload({
+	        data: data,
 	        // Enable progress tracking.
 	        xhr: function xhr() {
 	          var xhr = new window.XMLHttpRequest();
@@ -2400,13 +2483,13 @@
 	            console.log("DOWNLOAD", e.loaded, '/', e.total);
 	            // self.onprogress(e.loaded / e.total);
 	          }, false);
-	          //TODO: s3_upload progress??
+	          //TODO: imgur_upload progress??
 	          return xhr;
 	        }
 	      }, function () {
 	        // After Upload...
 	        //TODO: display success msg.
-	        self.$el.modal('hide');
+	        self.hide();
 	        self.onsuccess && self.onsuccess();
 	      });
 	
@@ -2421,31 +2504,35 @@
 	  initialize: function initialize() {
 	    this.scope = {};
 	  },
-	  render: function render() {
-	    this.onprogress(0);
-	    this.$el.html(this.template);
-	    rivets.bind(this.$el, this.scope);
-	
-	    this.$el.modal('show');
-	    return this;
-	  },
 	  onprogress: function onprogress(percent) {
 	    this.scope.progress = percent;
 	    this.$('.progress-bar').css({ width: percent * 100 + '%' });
 	  },
 	  onsuccess: null,
-	  scope: {}
+	  render: function render() {
+	    this.onprogress(0);
+	    this.$el.html(this.template);
+	    Rivets.bind(this.$el, this.scope);
+	
+	    return this;
+	  },
+	  show: function show() {
+	    this.render().$el.modal('show');
+	  },
+	  hide: function hide() {
+	    this.$el.modal('hide');
+	  }
 	});
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6), __webpack_require__(12)))
 
 /***/ },
-/* 15 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(16);
+	var content = __webpack_require__(20);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(10)(content, {});
@@ -2465,7 +2552,7 @@
 	}
 
 /***/ },
-/* 16 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(9)();
@@ -2479,73 +2566,43 @@
 
 
 /***/ },
-/* 17 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function($, _) {'use strict';
+	/* WEBPACK VAR INJECTION */(function($, _) {"use strict";
 	
-	// Handles fetching the list of presentations.
+	// Wraps Imgur.com API for our use.
 	
-	var AppConfig = __webpack_require__(18);
-	
-	// var listing_format_example = {
-	//   "folder_name1": {
-	//     "pres_name1": ["https://i.imgur.com/ZynM9HQ.jpg",
-	//                    "https://i.imgur.com/UcqFyTh.jpg"],
-	//     "pres_name2": ["url3", "url4"],
-	//   },
-	//   "folder_name2": {
-	//     "pres_name3": ["url5", "url6"],
-	//     "pres_name4": ["url7", "url8"],
-	//   }
-	// }
-	
-	var master_list;
-	var url = 'https://s3.amazonaws.com/' + AppConfig["s3_bucket"];
+	var AppConfig = __webpack_require__(17);
 	
 	module.exports = {
-		getList: function getList(callback) {
-			$.ajax(url).success(function (data) {
-				// build listing.
-				var listing = {};
-				$(data).find('Contents').each(function (i, entry) {
-					var key = $(entry).find('Key').text().split('/');
-					if (key.length === 3 && key[2] !== "") {
-						var tmp = listing[key[0]];
-						if (listing[key[0]] === undefined) listing[key[0]] = {};
-						tmp = listing[key[0]];
-						if (tmp[key[1]] === undefined) tmp[key[1]] = [];
-						tmp[key[1]].push(url + '/' + key.join('/'));
-					}
-				});
-				master_list = listing;
-				callback.call(null, listing);
+		// Lists all albums in an imgur account (excludes empty ones)
+		listAlbums: function listAlbums(account, callback) {
+			$.ajax({
+				url: "https://api.imgur.com/3/account/" + account + "/albums",
+				headers: {
+					"Authorization": "Client-ID " + AppConfig['imgur_client_id']
+				}
+			}).success(function (data) {
+				callback(data.data);
 			});
 		},
-		getSlides: function getSlides(path, callback) {
-			var self = this;
-			var tid = setInterval(function () {
-				// Block return until getList has resolved once.
-				if (master_list) {
-					clearInterval(tid);
-					if (!path) return callback.call(undefined, []);
-					path = path.split('/');
-					// Refresh the list if the presentation is not present.
-					if (master_list[path[0]][path[1]]) {
-						callback.call(undefined, master_list[path[0]][path[1]]);
-					} else {
-						self.getList(function (ml) {
-							callback.call(undefined, ml[path[0]][path[1]]);
-						});
-					}
+		// Gets a single album by ID
+		getAlbum: function getAlbum(id, callback) {
+			$.ajax({
+				url: "https://api.imgur.com/3/album/" + id,
+				headers: {
+					"Authorization": "Client-ID " + AppConfig['imgur_client_id']
 				}
-			}, 100);
+			}).success(function (data) {
+				callback(data.data);
+			});
 		},
 		upload: function upload(options, callback) {
 			// console.log("UPLOAD", path);
 			$.ajax(_.extend({
 				type: 'POST',
-				url: "/s3_upload",
+				url: "/imgur_upload",
 				cache: false,
 				contentType: false,
 				processData: false
@@ -2555,7 +2612,7 @@
 			console.log("DELETE", path);
 			$.ajax({
 				type: 'DELETE',
-				url: '/s3_upload',
+				url: '/imgur_upload',
 				data: path
 			}).then(callback);
 		}
@@ -2563,20 +2620,14 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6), __webpack_require__(1)))
 
 /***/ },
-/* 18 */
-/***/ function(module, exports) {
-
-	module.exports = {"AppName":"LiveSlide","imgur_client_id":"f55a248021c48d6"}
-
-/***/ },
-/* 19 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($, Rivets) {'use strict';
 	
 	// A glorified wrapper for bootstrap carousel.
 	
-	__webpack_require__(20);
+	__webpack_require__(23);
 	
 	module.exports = Backbone.View.extend({
 		id: 'Viewer',
@@ -2665,13 +2716,13 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6), __webpack_require__(12)))
 
 /***/ },
-/* 20 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(21);
+	var content = __webpack_require__(24);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(10)(content, {});
@@ -2691,7 +2742,7 @@
 	}
 
 /***/ },
-/* 21 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(9)();
@@ -2705,12 +2756,12 @@
 
 
 /***/ },
-/* 22 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	__webpack_require__(23);
+	__webpack_require__(26);
 	
 	// Extend WelcomePanel
 	module.exports = RTChat.Views.WelcomePanel.extend({
@@ -2718,13 +2769,13 @@
 	});
 
 /***/ },
-/* 23 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(24);
+	var content = __webpack_require__(27);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(10)(content, {});
@@ -2744,7 +2795,7 @@
 	}
 
 /***/ },
-/* 24 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(9)();
@@ -2756,109 +2807,6 @@
 	
 	// exports
 
-
-/***/ },
-/* 25 */
-/***/ function(module, exports, __webpack_require__) {
-
-	// style-loader: Adds some css to the DOM by adding a <style> tag
-	
-	// load the styles
-	var content = __webpack_require__(26);
-	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(10)(content, {});
-	if(content.locals) module.exports = content.locals;
-	// Hot Module Replacement
-	if(false) {
-		// When the styles change, update the <style> tags
-		if(!content.locals) {
-			module.hot.accept("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/sass-loader/index.js!./sidebar.css", function() {
-				var newContent = require("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/sass-loader/index.js!./sidebar.css");
-				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-				update(newContent);
-			});
-		}
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
-	}
-
-/***/ },
-/* 26 */
-/***/ function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(9)();
-	// imports
-	
-	
-	// module
-	exports.push([module.id, "#Sidebar {\n  font-size: 18;\n  /*\tli.selected {\n\t\tcolor: yellow;\n\t}*/ }\n  #Sidebar.open {\n    flex-basis: 260px; }\n  #Sidebar > * {\n    margin: 0 5px; }\n  #Sidebar > .dropdown {\n    position: static;\n    /* Bootstrap Override */\n    /*> ul {}*/ }\n    #Sidebar > .dropdown > div > .fa {\n      width: 20px;\n      margin: 0 2px;\n      line-height: inherit;\n      text-align: center; }\n  #Sidebar #ContextMenu {\n    border: 1px solid red; }\n", "", {"version":3,"sources":["/./app/styles/sidebar.css"],"names":[],"mappings":"AAAA;EACE,cAAc;EACd;;IAEE,EAAE;EACJ;IACE,kBAAkB,EAAE;EACtB;IACE,cAAc,EAAE;EAClB;IACE,iBAAiB;IACjB,wBAAwB;IACxB,WAAW,EAAE;IACb;MACE,YAAY;MACZ,cAAc;MACd,qBAAqB;MACrB,mBAAmB,EAAE;EACzB;IACE,sBAAsB,EAAE","file":"sidebar.css","sourcesContent":["#Sidebar {\n  font-size: 18;\n  /*\tli.selected {\n\t\tcolor: yellow;\n\t}*/ }\n  #Sidebar.open {\n    flex-basis: 260px; }\n  #Sidebar > * {\n    margin: 0 5px; }\n  #Sidebar > .dropdown {\n    position: static;\n    /* Bootstrap Override */\n    /*> ul {}*/ }\n    #Sidebar > .dropdown > div > .fa {\n      width: 20px;\n      margin: 0 2px;\n      line-height: inherit;\n      text-align: center; }\n  #Sidebar #ContextMenu {\n    border: 1px solid red; }\n"],"sourceRoot":"webpack://"}]);
-	
-	// exports
-
-
-/***/ },
-/* 27 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function($, _) {'use strict';
-	
-	// jQuery pluguin for ContextMenus (better popovers)
-	
-	$.fn.context_menu = function (options) {
-	
-		console.log("CContextMenu", this, options);
-	
-		var el = $(options.template || '<div></div>');
-		this.append(el);
-		el.hide();
-		el.css({
-			position: 'absoute',
-			top: 0,
-			left: 0
-		});
-	
-		_.each(options.events || {}, function (fn, key) {
-			console.log("ECECEC", arguments);
-		});
-	};
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6), __webpack_require__(1)))
-
-/***/ },
-/* 28 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function($) {"use strict";
-	
-	// Wraps Imgur.com API for our use.
-	
-	var AppConfig = __webpack_require__(18);
-	
-	module.exports = {
-		// Lists all albums in an imgur account (excludes empty ones)
-		listAlbums: function listAlbums(account, callback) {
-			$.ajax({
-				url: "https://api.imgur.com/3/account/" + account + "/albums",
-				headers: {
-					"Authorization": "Client-ID " + AppConfig['imgur_client_id']
-				}
-			}).success(function (data) {
-				callback(data.data);
-			});
-		},
-		// Gets a single album by ID
-		getAlbum: function getAlbum(id, callback) {
-			$.ajax({
-				url: "https://api.imgur.com/3/album/" + id,
-				headers: {
-					"Authorization": "Client-ID " + AppConfig['imgur_client_id']
-				}
-			}).success(function (data) {
-				callback(data.data);
-			});
-		}
-	};
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
 
 /***/ }
 /******/ ]);
