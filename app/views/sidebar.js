@@ -9,18 +9,18 @@ console.log("upload_modal", UploadModal)
 
 module.exports = RTChat.Views.Sidebar.extend({
 	template: `
-		<a rv-unless="scope.imgur_account_name"
+		<a rv-unless="scope.user.imgur_account_name"
 			rv-href="'https://api.imgur.com/oauth2/authorize?client_id=' |+ scope.clientId |+ '&response_type=token&state=' |+ scope.hash">
 			Sign-in with Imgur to upload
 		</a>
-		<div rv-if="scope.imgur_account_name" class="dropdown" >
-			<div rv-data-acct-name="scope.imgur_account_name">
-					{ scope.imgur_account_name }
-					<span class="pull-right fa fa-ellipsis-v"></span>
-					<span class="pull-right fa fa-upload"></span>
+		<div rv-each-user="scope.signed_in_accounts" class="dropdown" >
+			<div rv-data-acct-name="user.name">
+				{ user.name }
+				<span class="pull-right fa fa-ellipsis-v"></span>
+				<span class="pull-right fa fa-upload"></span>
 			</div>
 			<ul class="album">
-				<li rv-each-album="scope.user_albums" rv-data-id="album.id">
+				<li rv-each-album="user.albums" rv-data-id="album.id">
 					{ album.title }
 				</li>
 			</ul>
@@ -29,9 +29,9 @@ module.exports = RTChat.Views.Sidebar.extend({
 			<span rv-hide="scope.editing">Add  Imgur Account </span>
 			<input rv-show="scope.editing" placeholder="Imgur Account Name">
 		</div>
-		<div rv-each-user="scope.iaccts" class="dropdown" >
+		<div rv-each-user="scope.other_accounts" class="dropdown" >
 			<div rv-data-acct-name="user.name">
-				{ user.name  }
+				{ user.name }
 				<span class="pull-right fa fa-ellipsis-v"></span>
 			</div>
 			<ul class="album">
@@ -44,7 +44,8 @@ module.exports = RTChat.Views.Sidebar.extend({
 		<div data-subview="upload_modal"></div>
 	`,
 	contextMenuTemplate: `
-			<li class="delete"><a> Remove </a></li>
+		<li class="imgur"><a> View & Edit on Imgur </a></li>
+		<li class="delete"><a> Remove </a></li>
 	`,
 	events: {
 		'click .album > li': function(e) {
@@ -72,19 +73,21 @@ module.exports = RTChat.Views.Sidebar.extend({
 			this.scope.editing = true;
 			this.$(ev.currentTarget).find('input').val("").focus();
 		},
+		// Add new account
 		'keyup .add-acct input': function(ev) {
 			if (ev.keyCode != 13) return true;
 			this.scope.editing = false;
-			if (!this.scope.other_imgur_accounts) this.scope.other_imgur_accounts = [];
+			if (!this.scope.user.other_imgur_accounts) this.scope.user.other_imgur_accounts = [];
 			var name = this.$(ev.currentTarget).val();
 
 			var self = this;
-			// Add the acct to iaccts instantly because it will be populated asynchronously.
-			this.scope.iaccts.push(this.getAlbums([name], function(acct) {
+			// Add the acct to the array instantly because it will be populated asynchronously.
+			this.scope.other_accounts.push(this.getAlbums([name], function(acct) {
 				// Now that we have the exact acct name, add it to the list.
-				self.scope.other_imgur_accounts.push(acct.name);
+				self.scope.user.other_imgur_accounts.push(acct.name);
 				RTChat.UserService.setAppConf({
-					other_imgur_accounts: self.scope.other_imgur_accounts
+					//TODO: use id in addition to "name"?
+					other_imgur_accounts: self.scope.user.other_imgur_accounts
 				});
 			})[0]);
 		},
@@ -93,28 +96,31 @@ module.exports = RTChat.Views.Sidebar.extend({
 		},
 		// == ContextMenu == //
 		'click #ContextMenu li.delete': function() {
-			if (this.menu_target == this.scope.imgur_account_name) {
+			if (this.menu_target == this.scope.user.imgur_account_name) {
 				// Remove user account info. this.scope.
 				RTChat.UserService.setAppConf({
+					imgur_account_id: undefined,
 					imgur_account_name: undefined,
 					imgur_refresh_token: undefined
 				});
 			} else {
-				// Remove from other_imgur_accounts
-				var ii = this.scope.other_imgur_accounts.indexOf(this.menu_target)
+				// Remove from user.other_imgur_accounts
+				var ii = this.scope.user.other_imgur_accounts.indexOf(this.menu_target);
 				if (ii >= 0) {
 					//TODO: only calling setAppConf is needed.
-					this.scope.other_imgur_accounts.splice(ii, 1);
+					this.scope.user.other_imgur_accounts.splice(ii, 1);
 					RTChat.UserService.setAppConf({
-						other_imgur_accounts: this.scope.other_imgur_accounts
-						// other_imgur_accounts: []
+						other_imgur_accounts: this.scope.user.other_imgur_accounts
 					});
 				}
 
-				// Remove from iaccts
-				ii = _.findIndex(this.scope.iaccts, {name: this.menu_target});
-				if (ii >= 0) this.scope.iaccts.splice(ii, 1);
+				// Remove from scope.other_accounts
+				ii = _.findIndex(this.scope.other_accounts, {name: this.menu_target});
+				if (ii >= 0) this.scope.other_accounts.splice(ii, 1);
 			}
+		},
+		'click #ContextMenu li.imgur': function() { // open imgur in a new tab
+			window.open("https://" +this.menu_target + ".imgur.com/", "_blank");
 		},
 		'click .fa-ellipsis-v': function(ev) {
 			this.subviews.context_menu.toggle(ev.currentTarget);
@@ -136,8 +142,19 @@ module.exports = RTChat.Views.Sidebar.extend({
 		context_menu: function() { return new (RTChat.Views.ContextMenu.extend({
 			className: 'dropdown-menu', // Use Bootstrap styling
 			template: this.contextMenuTemplate,
-		}))() },
-		upload_modal: function() { return new UploadModal(); }
+		}))(); },
+		// upload_modal: function() { return new UploadModal(); }
+		upload_modal: function() {
+			var self = this;
+			var m = new UploadModal();
+			m.on('hide', function() {
+				// Refresh users albums.
+				// TODO: caching messes this up.
+				self.scope.signed_in_accounts = self.getAlbums(
+					[self.scope.user.imgur_account_name]);
+			});
+			return m;
+		}
 	},
 	// Returns an array of accounts with albums populated asynchronously.
 	// Callback gets called once for every acct when populated.
@@ -153,11 +170,12 @@ module.exports = RTChat.Views.Sidebar.extend({
 			accounts.push(acct);
 
 			ImgurLoader.listAlbums(a, function(list) {
-				console.log("got list", acct.name, list)
+				// console.log("got list", acct.name, list)
 
 				if (list.length)
 				_.extend(acct, {
-					name: list[0].account_url,
+					id: list[0].account_url, // Update to the exact capitalization name.
+					name: list[0].account_url, // Update to the exact capitalization name.
 					// Remove empty albums
 					albums: _.reject(list, function(o) { return o.images_count == 0 })
 				});
@@ -168,15 +186,14 @@ module.exports = RTChat.Views.Sidebar.extend({
 
 		return accounts;
 	},
-	getAllAlbums: function() {
-
-	},
 	render: function() {
-		this.scope = RTChat.UserService.getAppConf()
+		var self = this;
+		this.scope = {};
+		this.scope.user = RTChat.UserService.getAppConf();
 		this.scope.hash = window.location.hash.substring(1);
-		this.scope.clientId = AppConfig['imgur_client_id'];
-		this.scope.user_albums = this.getAlbums([this.scope.imgur_account_name])[0]
-		this.scope.iaccts = this.getAlbums(this.scope.other_imgur_accounts);
+		this.scope.clientId = AppConfig.imgur_client_id;
+		this.scope.signed_in_accounts = this.getAlbums([this.scope.user.imgur_account_name]);
+		this.scope.other_accounts = this.getAlbums(this.scope.user.other_imgur_accounts);
 
 		this.$el.html(this.template);
 		Rivets.bind(this.$el, {scope: this.scope});
@@ -184,7 +201,6 @@ module.exports = RTChat.Views.Sidebar.extend({
 		// start closed.
 		this.$el.removeClass('open');
 
-		var self = this;
 		RTChat.RTCWrapper.onStateChange(function(old, newState) {
 			// Open or close if starts or ends
 			setTimeout(function() { //HACK: "extra" gets set by an onStateChange handler

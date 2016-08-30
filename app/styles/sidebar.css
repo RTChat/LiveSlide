@@ -11,7 +11,8 @@
 	> .dropdown {
 		position: static; /* Bootstrap Override */
 
-		> div {
+		/* List Items */
+		> div, > ul > li {
 
 			> .fa {
 				width: 20px;
@@ -20,8 +21,6 @@
 				text-align: center;
 			}
 		}
-
-		/*> ul {}*/
 	}
 
 	#ContextMenu {

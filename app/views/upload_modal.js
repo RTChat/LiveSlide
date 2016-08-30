@@ -113,6 +113,12 @@ module.exports = Backbone.View.extend({
 
     return this;
   },
-  show: function() { this.render().$el.modal('show'); },
-  hide: function() { this.$el.modal('hide'); },
+  show: function() {
+    this.render().$el.modal('show');
+    this.trigger('show');
+  },
+  hide: function() {
+    this.$el.modal('hide');
+    this.trigger('hide');
+  },
 });
