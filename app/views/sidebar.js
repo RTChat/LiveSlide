@@ -7,7 +7,7 @@ var ImgurLoader = require('utils/imgur_loader.js');
 
 module.exports = RTChat.Views.Sidebar.extend({
 	template: `
-		<a rv-unless="scope.user.signedin_imgur_accounts"
+		<a rv-if="scope.signed_in_accounts |length |eq 0"
 			rv-href="'https://api.imgur.com/oauth2/authorize?client_id=' |+ scope.clientId |+ '&response_type=token&state=' |+ scope.hash">
 			Sign-in with Imgur to upload
 		</a>
@@ -93,16 +93,15 @@ module.exports = RTChat.Views.Sidebar.extend({
 		},
 		// == ContextMenu == //
 		'click #ContextMenu li.delete': function() {
-			var ii = _.indexOf(this.scope.user.signedin_imgur_accounts, {name: this.menu_target})
-			if (ii >= 0) {
+			if (_.findWhere(this.scope.user.signedin_imgur_accounts, {name: this.menu_target})) {
 				// Remove user account info. this.scope.
+				this.scope.signed_in_accounts = [];
 				RTChat.UserService.setAppData({
-					signedin_imgur_accounts: undefined
+					signedin_imgur_accounts: []
 				});
 			} else {
 				// Remove from user.other_imgur_accounts
-				// ii = this.scope.user.other_imgur_accounts.indexOf(this.menu_target);
-				ii = _.indexOf(this.scope.user.other_imgur_accounts, this.menu_target);
+				var ii = _.indexOf(this.scope.user.other_imgur_accounts, this.menu_target);
 				if (ii >= 0) {
 					//TODO: only calling setAppData is needed.
 					this.scope.user.other_imgur_accounts.splice(ii, 1);

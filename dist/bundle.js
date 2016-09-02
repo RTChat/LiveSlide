@@ -2171,7 +2171,7 @@
 	var ImgurLoader = __webpack_require__(21);
 	
 	module.exports = RTChat.Views.Sidebar.extend({
-		template: '\n\t\t<a rv-unless="scope.user.signedin_imgur_accounts"\n\t\t\trv-href="\'https://api.imgur.com/oauth2/authorize?client_id=\' |+ scope.clientId |+ \'&response_type=token&state=\' |+ scope.hash">\n\t\t\tSign-in with Imgur to upload\n\t\t</a>\n\t\t<div rv-each-user="scope.signed_in_accounts" class="dropdown" >\n\t\t\t<div rv-data-acct-name="user.name">\n\t\t\t\t{ user.name }\n\t\t\t\t<span class="pull-right fa fa-ellipsis-v"></span>\n\t\t\t\t<span class="pull-right fa fa-upload"></span>\n\t\t\t</div>\n\t\t\t<ul class="album">\n\t\t\t\t<li rv-each-album="user.albums" rv-data-id="album.id">\n\t\t\t\t\t{ album.title }\n\t\t\t\t</li>\n\t\t\t</ul>\n\t\t</div>\n\t\t<div class="add-acct">\n\t\t\t<span rv-hide="scope.editing">Add  Imgur Account </span>\n\t\t\t<input rv-show="scope.editing" placeholder="Imgur Account Name">\n\t\t</div>\n\t\t<div rv-each-user="scope.other_accounts" class="dropdown" >\n\t\t\t<div rv-data-acct-name="user.name">\n\t\t\t\t{ user.name }\n\t\t\t\t<span class="pull-right fa fa-ellipsis-v"></span>\n\t\t\t</div>\n\t\t\t<ul class="album">\n\t\t\t\t<li rv-each-album="user.albums" rv-data-id="album.id">\n\t\t\t\t\t{ album.title }\n\t\t\t\t</li>\n\t\t\t</ul>\n\t\t</div>\n\t\t<div data-subview="context_menu"></div>\n\t\t<div data-subview="upload_modal"></div>\n\t',
+		template: '\n\t\t<a rv-if="scope.signed_in_accounts |length |eq 0"\n\t\t\trv-href="\'https://api.imgur.com/oauth2/authorize?client_id=\' |+ scope.clientId |+ \'&response_type=token&state=\' |+ scope.hash">\n\t\t\tSign-in with Imgur to upload\n\t\t</a>\n\t\t<div rv-each-user="scope.signed_in_accounts" class="dropdown" >\n\t\t\t<div rv-data-acct-name="user.name">\n\t\t\t\t{ user.name }\n\t\t\t\t<span class="pull-right fa fa-ellipsis-v"></span>\n\t\t\t\t<span class="pull-right fa fa-upload"></span>\n\t\t\t</div>\n\t\t\t<ul class="album">\n\t\t\t\t<li rv-each-album="user.albums" rv-data-id="album.id">\n\t\t\t\t\t{ album.title }\n\t\t\t\t</li>\n\t\t\t</ul>\n\t\t</div>\n\t\t<div class="add-acct">\n\t\t\t<span rv-hide="scope.editing">Add  Imgur Account </span>\n\t\t\t<input rv-show="scope.editing" placeholder="Imgur Account Name">\n\t\t</div>\n\t\t<div rv-each-user="scope.other_accounts" class="dropdown" >\n\t\t\t<div rv-data-acct-name="user.name">\n\t\t\t\t{ user.name }\n\t\t\t\t<span class="pull-right fa fa-ellipsis-v"></span>\n\t\t\t</div>\n\t\t\t<ul class="album">\n\t\t\t\t<li rv-each-album="user.albums" rv-data-id="album.id">\n\t\t\t\t\t{ album.title }\n\t\t\t\t</li>\n\t\t\t</ul>\n\t\t</div>\n\t\t<div data-subview="context_menu"></div>\n\t\t<div data-subview="upload_modal"></div>\n\t',
 		contextMenuTemplate: '\n\t\t<li class="imgur"><a> View & Edit on Imgur </a></li>\n\t\t<li class="delete"><a> Remove </a></li>\n\t',
 		events: {
 			'click .album > li': function clickAlbumLi(e) {
@@ -2223,16 +2223,15 @@
 			},
 			// == ContextMenu == //
 			'click #ContextMenu li.delete': function clickContextMenuLiDelete() {
-				var ii = _.indexOf(this.scope.user.signedin_imgur_accounts, { name: this.menu_target });
-				if (ii >= 0) {
+				if (_.findWhere(this.scope.user.signedin_imgur_accounts, { name: this.menu_target })) {
 					// Remove user account info. this.scope.
+					this.scope.signed_in_accounts = [];
 					RTChat.UserService.setAppData({
-						signedin_imgur_accounts: undefined
+						signedin_imgur_accounts: []
 					});
 				} else {
 					// Remove from user.other_imgur_accounts
-					// ii = this.scope.user.other_imgur_accounts.indexOf(this.menu_target);
-					ii = _.indexOf(this.scope.user.other_imgur_accounts, this.menu_target);
+					var ii = _.indexOf(this.scope.user.other_imgur_accounts, this.menu_target);
 					if (ii >= 0) {
 						//TODO: only calling setAppData is needed.
 						this.scope.user.other_imgur_accounts.splice(ii, 1);
