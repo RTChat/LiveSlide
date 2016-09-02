@@ -47,18 +47,31 @@ module.exports = RTChat.Views.Sidebar.extend({
 	`,
 	events: {
 		'click .album > li': function(e) {
-			// Load Presentation
-			var target = this.$(e.currentTarget)
-			ImgurLoader.getAlbum(target.data('id'), function(album) {
-				RTChat.RTCWrapper.updateState({
-					albumId: album.id,
-					title: album.title,
-					slides: _.map(album.images, function(i) {return i.link.replace(/^http:/,'https:')}),
-					currentSlide: 0,
+			var self = this;
+			var target = this.$(e.currentTarget);
+
+			if (!RTChat.RTCWrapper.connection) {
+				// Go to a random room then load selected presentation.
+				window.location.href = '#'+RTChat.Random.shortid();
+			}
+
+			// Wait for url change...
+			setTimeout(function() {
+				// Load Presentation
+				ImgurLoader.getAlbum(target.data('id'), function(album) {
+					RTChat.RTCWrapper.updateState({
+						albumId: album.id,
+						title: album.title,
+						slides: _.map(album.images, function(i) {return i.link.replace(/^http:/,'https:')}),
+						currentSlide: 0,
+					});
+
+					// Close sidebar
+					setTimeout(function() { self.toggle(); });
 				});
 			});
+
 			// target.addClass("selected"); //TODO: loading?
-			this.toggle(); // close //TODO: UX: do we want this?
 		},
 		'click .fa-upload': function() {
 			this.subviews.upload_modal.show();
