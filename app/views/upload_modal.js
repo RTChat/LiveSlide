@@ -56,7 +56,7 @@ module.exports = Backbone.View.extend({
         return this.scope.errorMsg = "Must select a file!";
       }
 
-      var user_conf = RTChat.UserService.getAppConf();
+      var user_conf = RTChat.UserService.getAppData();
       var data = (new FormData(this.$('form')[0]));
       data.set("username", user_conf.imgur_account_name);
       data.set("refresh_token", user_conf.imgur_refresh_token);

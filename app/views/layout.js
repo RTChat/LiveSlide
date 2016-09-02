@@ -22,10 +22,12 @@ module.exports = RTChat.Views.Layout.extend({
 		if (window.location.href.match(/\?state=/)) {
 			var params = paramsToObj();
 			//TODO: validate params. multiple accts?
- 			RTChat.UserService.setAppConf({
-				imgur_account_id: params.account_id,
-				imgur_account_name: params.account_username,
-				imgur_refresh_token: params.refresh_token
+ 			RTChat.UserService.setAppData({
+ 				signedin_imgur_accounts: [{
+					id: params.account_id,
+					name: params.account_username,
+					refresh_token: params.refresh_token
+ 				}]
 			});
 			// The "state" is the previous roomName; navigate there.
 			return window.location.href = window.location.href.replace(/\?.*$/, "#"+(params.state||''));

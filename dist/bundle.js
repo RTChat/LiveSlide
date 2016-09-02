@@ -1721,10 +1721,12 @@
 			if (window.location.href.match(/\?state=/)) {
 				var params = paramsToObj();
 				//TODO: validate params. multiple accts?
-				RTChat.UserService.setAppConf({
-					imgur_account_id: params.account_id,
-					imgur_account_name: params.account_username,
-					imgur_refresh_token: params.refresh_token
+				RTChat.UserService.setAppData({
+					signedin_imgur_accounts: [{
+						id: params.account_id,
+						name: params.account_username,
+						refresh_token: params.refresh_token
+					}]
 				});
 				// The "state" is the previous roomName; navigate there.
 				return window.location.href = window.location.href.replace(/\?.*$/, "#" + (params.state || ''));
@@ -2168,10 +2170,8 @@
 	var UploadModal = __webpack_require__(18);
 	var ImgurLoader = __webpack_require__(21);
 	
-	console.log("upload_modal", UploadModal);
-	
 	module.exports = RTChat.Views.Sidebar.extend({
-		template: '\n\t\t<a rv-unless="scope.user.imgur_account_name"\n\t\t\trv-href="\'https://api.imgur.com/oauth2/authorize?client_id=\' |+ scope.clientId |+ \'&response_type=token&state=\' |+ scope.hash">\n\t\t\tSign-in with Imgur to upload\n\t\t</a>\n\t\t<div rv-each-user="scope.signed_in_accounts" class="dropdown" >\n\t\t\t<div rv-data-acct-name="user.name">\n\t\t\t\t{ user.name }\n\t\t\t\t<span class="pull-right fa fa-ellipsis-v"></span>\n\t\t\t\t<span class="pull-right fa fa-upload"></span>\n\t\t\t</div>\n\t\t\t<ul class="album">\n\t\t\t\t<li rv-each-album="user.albums" rv-data-id="album.id">\n\t\t\t\t\t{ album.title }\n\t\t\t\t</li>\n\t\t\t</ul>\n\t\t</div>\n\t\t<div class="add-acct">\n\t\t\t<span rv-hide="scope.editing">Add  Imgur Account </span>\n\t\t\t<input rv-show="scope.editing" placeholder="Imgur Account Name">\n\t\t</div>\n\t\t<div rv-each-user="scope.other_accounts" class="dropdown" >\n\t\t\t<div rv-data-acct-name="user.name">\n\t\t\t\t{ user.name }\n\t\t\t\t<span class="pull-right fa fa-ellipsis-v"></span>\n\t\t\t</div>\n\t\t\t<ul class="album">\n\t\t\t\t<li rv-each-album="user.albums" rv-data-id="album.id">\n\t\t\t\t\t{ album.title }\n\t\t\t\t</li>\n\t\t\t</ul>\n\t\t</div>\n\t\t<div data-subview="context_menu"></div>\n\t\t<div data-subview="upload_modal"></div>\n\t',
+		template: '\n\t\t<a rv-unless="scope.user.signedin_imgur_accounts"\n\t\t\trv-href="\'https://api.imgur.com/oauth2/authorize?client_id=\' |+ scope.clientId |+ \'&response_type=token&state=\' |+ scope.hash">\n\t\t\tSign-in with Imgur to upload\n\t\t</a>\n\t\t<div rv-each-user="scope.signed_in_accounts" class="dropdown" >\n\t\t\t<div rv-data-acct-name="user.name">\n\t\t\t\t{ user.name }\n\t\t\t\t<span class="pull-right fa fa-ellipsis-v"></span>\n\t\t\t\t<span class="pull-right fa fa-upload"></span>\n\t\t\t</div>\n\t\t\t<ul class="album">\n\t\t\t\t<li rv-each-album="user.albums" rv-data-id="album.id">\n\t\t\t\t\t{ album.title }\n\t\t\t\t</li>\n\t\t\t</ul>\n\t\t</div>\n\t\t<div class="add-acct">\n\t\t\t<span rv-hide="scope.editing">Add  Imgur Account </span>\n\t\t\t<input rv-show="scope.editing" placeholder="Imgur Account Name">\n\t\t</div>\n\t\t<div rv-each-user="scope.other_accounts" class="dropdown" >\n\t\t\t<div rv-data-acct-name="user.name">\n\t\t\t\t{ user.name }\n\t\t\t\t<span class="pull-right fa fa-ellipsis-v"></span>\n\t\t\t</div>\n\t\t\t<ul class="album">\n\t\t\t\t<li rv-each-album="user.albums" rv-data-id="album.id">\n\t\t\t\t\t{ album.title }\n\t\t\t\t</li>\n\t\t\t</ul>\n\t\t</div>\n\t\t<div data-subview="context_menu"></div>\n\t\t<div data-subview="upload_modal"></div>\n\t',
 		contextMenuTemplate: '\n\t\t<li class="imgur"><a> View & Edit on Imgur </a></li>\n\t\t<li class="delete"><a> Remove </a></li>\n\t',
 		events: {
 			'click .album > li': function clickAlbumLi(e) {
@@ -2191,7 +2191,6 @@
 				this.toggle(); // close //TODO: UX: do we want this?
 			},
 			'click .fa-upload': function clickFaUpload() {
-				// UploadModal.render();
 				this.subviews.upload_modal.show();
 			},
 			// 'click .fa-refresh': function() {
@@ -2213,7 +2212,7 @@
 				this.scope.other_accounts.push(this.getAlbums([name], function (acct) {
 					// Now that we have the exact acct name, add it to the list.
 					self.scope.user.other_imgur_accounts.push(acct.name);
-					RTChat.UserService.setAppConf({
+					RTChat.UserService.setAppData({
 						//TODO: use id in addition to "name"?
 						other_imgur_accounts: self.scope.user.other_imgur_accounts
 					});
@@ -2224,20 +2223,20 @@
 			},
 			// == ContextMenu == //
 			'click #ContextMenu li.delete': function clickContextMenuLiDelete() {
-				if (this.menu_target == this.scope.user.imgur_account_name) {
+				var ii = _.indexOf(this.scope.user.signedin_imgur_accounts, { name: this.menu_target });
+				if (ii >= 0) {
 					// Remove user account info. this.scope.
-					RTChat.UserService.setAppConf({
-						imgur_account_id: undefined,
-						imgur_account_name: undefined,
-						imgur_refresh_token: undefined
+					RTChat.UserService.setAppData({
+						signedin_imgur_accounts: undefined
 					});
 				} else {
 					// Remove from user.other_imgur_accounts
-					var ii = this.scope.user.other_imgur_accounts.indexOf(this.menu_target);
+					// ii = this.scope.user.other_imgur_accounts.indexOf(this.menu_target);
+					ii = _.indexOf(this.scope.user.other_imgur_accounts, this.menu_target);
 					if (ii >= 0) {
-						//TODO: only calling setAppConf is needed.
+						//TODO: only calling setAppData is needed.
 						this.scope.user.other_imgur_accounts.splice(ii, 1);
-						RTChat.UserService.setAppConf({
+						RTChat.UserService.setAppData({
 							other_imgur_accounts: this.scope.user.other_imgur_accounts
 						});
 					}
@@ -2296,12 +2295,13 @@
 	
 			var self = this;
 			_.forEach(list_of_account_names, function (a) {
-				var acct = { name: a };
+				var acct = a;
+				if (!a.name) acct = { name: a };
 	
 				// Add it now so it shows up in the GUI, then add the albums asynchronously.
 				accounts.push(acct);
 	
-				ImgurLoader.listAlbums(a, function (list) {
+				ImgurLoader.listAlbums(acct.name, function (list) {
 					// console.log("got list", acct.name, list)
 	
 					if (list.length) _.extend(acct, {
@@ -2322,10 +2322,10 @@
 		render: function render() {
 			var self = this;
 			this.scope = {};
-			this.scope.user = RTChat.UserService.getAppConf();
+			this.scope.user = RTChat.UserService.getAppData();
 			this.scope.hash = window.location.hash.substring(1);
 			this.scope.clientId = AppConfig.imgur_client_id;
-			this.scope.signed_in_accounts = this.getAlbums([this.scope.user.imgur_account_name]);
+			this.scope.signed_in_accounts = this.getAlbums(this.scope.user.signedin_imgur_accounts);
 			this.scope.other_accounts = this.getAlbums(this.scope.user.other_imgur_accounts);
 	
 			this.$el.html(this.template);
@@ -2405,7 +2405,7 @@
 	
 	
 	// module
-	exports.push([module.id, "#Sidebar {\n  font-size: 18; }\n  #Sidebar.open {\n    flex-basis: 260px; }\n  #Sidebar > * {\n    margin: 0 5px; }\n  #Sidebar > .dropdown {\n    position: static;\n    /* Bootstrap Override */\n    /* List Items */ }\n    #Sidebar > .dropdown > div > .fa, #Sidebar > .dropdown > ul > li > .fa {\n      width: 20px;\n      margin: 0 2px;\n      line-height: inherit;\n      text-align: center; }\n  #Sidebar #ContextMenu {\n    margin: 0;\n    /* Override RTChat */ }\n    #Sidebar #ContextMenu > li {\n      padding: 0;\n      /* Override Bootstrap */ }\n  #Sidebar li.selected {\n    color: yellow; }\n", "", {"version":3,"sources":["/./app/styles/sidebar.css"],"names":[],"mappings":"AAAA;EACE,cAAc,EAAE;EAChB;IACE,kBAAkB,EAAE;EACtB;IACE,cAAc,EAAE;EAClB;IACE,iBAAiB;IACjB,wBAAwB;IACxB,gBAAgB,EAAE;IAClB;MACE,YAAY;MACZ,cAAc;MACd,qBAAqB;MACrB,mBAAmB,EAAE;EACzB;IACE,UAAU;IACV,qBAAqB,EAAE;IACvB;MACE,WAAW;MACX,wBAAwB,EAAE;EAC9B;IACE,cAAc,EAAE","file":"sidebar.css","sourcesContent":["#Sidebar {\n  font-size: 18; }\n  #Sidebar.open {\n    flex-basis: 260px; }\n  #Sidebar > * {\n    margin: 0 5px; }\n  #Sidebar > .dropdown {\n    position: static;\n    /* Bootstrap Override */\n    /* List Items */ }\n    #Sidebar > .dropdown > div > .fa, #Sidebar > .dropdown > ul > li > .fa {\n      width: 20px;\n      margin: 0 2px;\n      line-height: inherit;\n      text-align: center; }\n  #Sidebar #ContextMenu {\n    margin: 0;\n    /* Override RTChat */ }\n    #Sidebar #ContextMenu > li {\n      padding: 0;\n      /* Override Bootstrap */ }\n  #Sidebar li.selected {\n    color: yellow; }\n"],"sourceRoot":"webpack://"}]);
+	exports.push([module.id, "#Sidebar {\n  font-size: 18; }\n  #Sidebar.open {\n    flex-basis: 260px; }\n  #Sidebar > * {\n    margin: 0 5px; }\n  #Sidebar > a {\n    color: blue; }\n  #Sidebar > .dropdown {\n    position: static;\n    /* Bootstrap Override */\n    /* List Items */ }\n    #Sidebar > .dropdown > div > .fa, #Sidebar > .dropdown > ul > li > .fa {\n      width: 20px;\n      margin: 0 2px;\n      line-height: inherit;\n      text-align: center; }\n  #Sidebar #ContextMenu {\n    margin: 0;\n    /* Override RTChat */ }\n    #Sidebar #ContextMenu > li {\n      padding: 0;\n      /* Override Bootstrap */ }\n  #Sidebar li.selected {\n    color: yellow; }\n", "", {"version":3,"sources":["/./app/styles/sidebar.css"],"names":[],"mappings":"AAAA;EACE,cAAc,EAAE;EAChB;IACE,kBAAkB,EAAE;EACtB;IACE,cAAc,EAAE;EAClB;IACE,YAAY,EAAE;EAChB;IACE,iBAAiB;IACjB,wBAAwB;IACxB,gBAAgB,EAAE;IAClB;MACE,YAAY;MACZ,cAAc;MACd,qBAAqB;MACrB,mBAAmB,EAAE;EACzB;IACE,UAAU;IACV,qBAAqB,EAAE;IACvB;MACE,WAAW;MACX,wBAAwB,EAAE;EAC9B;IACE,cAAc,EAAE","file":"sidebar.css","sourcesContent":["#Sidebar {\n  font-size: 18; }\n  #Sidebar.open {\n    flex-basis: 260px; }\n  #Sidebar > * {\n    margin: 0 5px; }\n  #Sidebar > a {\n    color: blue; }\n  #Sidebar > .dropdown {\n    position: static;\n    /* Bootstrap Override */\n    /* List Items */ }\n    #Sidebar > .dropdown > div > .fa, #Sidebar > .dropdown > ul > li > .fa {\n      width: 20px;\n      margin: 0 2px;\n      line-height: inherit;\n      text-align: center; }\n  #Sidebar #ContextMenu {\n    margin: 0;\n    /* Override RTChat */ }\n    #Sidebar #ContextMenu > li {\n      padding: 0;\n      /* Override Bootstrap */ }\n  #Sidebar li.selected {\n    color: yellow; }\n"],"sourceRoot":"webpack://"}]);
 	
 	// exports
 
@@ -2474,7 +2474,7 @@
 	        return this.scope.errorMsg = "Must select a file!";
 	      }
 	
-	      var user_conf = RTChat.UserService.getAppConf();
+	      var user_conf = RTChat.UserService.getAppData();
 	      var data = new FormData(this.$('form')[0]);
 	      data.set("username", user_conf.imgur_account_name);
 	      data.set("refresh_token", user_conf.imgur_refresh_token);

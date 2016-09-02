@@ -5,11 +5,9 @@ var AppConfig = require('app/config');
 var UploadModal = require('views/upload_modal');
 var ImgurLoader = require('utils/imgur_loader.js');
 
-console.log("upload_modal", UploadModal)
-
 module.exports = RTChat.Views.Sidebar.extend({
 	template: `
-		<a rv-unless="scope.user.imgur_account_name"
+		<a rv-unless="scope.user.signedin_imgur_accounts"
 			rv-href="'https://api.imgur.com/oauth2/authorize?client_id=' |+ scope.clientId |+ '&response_type=token&state=' |+ scope.hash">
 			Sign-in with Imgur to upload
 		</a>
@@ -63,7 +61,6 @@ module.exports = RTChat.Views.Sidebar.extend({
 			this.toggle(); // close //TODO: UX: do we want this?
 		},
 		'click .fa-upload': function() {
-			// UploadModal.render();
 			this.subviews.upload_modal.show();
 		},
 		// 'click .fa-refresh': function() {
@@ -85,7 +82,7 @@ module.exports = RTChat.Views.Sidebar.extend({
 			this.scope.other_accounts.push(this.getAlbums([name], function(acct) {
 				// Now that we have the exact acct name, add it to the list.
 				self.scope.user.other_imgur_accounts.push(acct.name);
-				RTChat.UserService.setAppConf({
+				RTChat.UserService.setAppData({
 					//TODO: use id in addition to "name"?
 					other_imgur_accounts: self.scope.user.other_imgur_accounts
 				});
@@ -96,20 +93,20 @@ module.exports = RTChat.Views.Sidebar.extend({
 		},
 		// == ContextMenu == //
 		'click #ContextMenu li.delete': function() {
-			if (this.menu_target == this.scope.user.imgur_account_name) {
+			var ii = _.indexOf(this.scope.user.signedin_imgur_accounts, {name: this.menu_target})
+			if (ii >= 0) {
 				// Remove user account info. this.scope.
-				RTChat.UserService.setAppConf({
-					imgur_account_id: undefined,
-					imgur_account_name: undefined,
-					imgur_refresh_token: undefined
+				RTChat.UserService.setAppData({
+					signedin_imgur_accounts: undefined
 				});
 			} else {
 				// Remove from user.other_imgur_accounts
-				var ii = this.scope.user.other_imgur_accounts.indexOf(this.menu_target);
+				// ii = this.scope.user.other_imgur_accounts.indexOf(this.menu_target);
+				ii = _.indexOf(this.scope.user.other_imgur_accounts, this.menu_target);
 				if (ii >= 0) {
-					//TODO: only calling setAppConf is needed.
+					//TODO: only calling setAppData is needed.
 					this.scope.user.other_imgur_accounts.splice(ii, 1);
-					RTChat.UserService.setAppConf({
+					RTChat.UserService.setAppData({
 						other_imgur_accounts: this.scope.user.other_imgur_accounts
 					});
 				}
@@ -164,12 +161,13 @@ module.exports = RTChat.Views.Sidebar.extend({
 
 		var self = this;
 		_.forEach(list_of_account_names, function(a) {
-			var acct = { name: a };
+			var acct = a;
+			if (!a.name) acct = { name: a };
 
 			// Add it now so it shows up in the GUI, then add the albums asynchronously.
 			accounts.push(acct);
 
-			ImgurLoader.listAlbums(a, function(list) {
+			ImgurLoader.listAlbums(acct.name, function(list) {
 				// console.log("got list", acct.name, list)
 
 				if (list.length)
@@ -189,10 +187,10 @@ module.exports = RTChat.Views.Sidebar.extend({
 	render: function() {
 		var self = this;
 		this.scope = {};
-		this.scope.user = RTChat.UserService.getAppConf();
+		this.scope.user = RTChat.UserService.getAppData();
 		this.scope.hash = window.location.hash.substring(1);
 		this.scope.clientId = AppConfig.imgur_client_id;
-		this.scope.signed_in_accounts = this.getAlbums([this.scope.user.imgur_account_name]);
+		this.scope.signed_in_accounts = this.getAlbums(this.scope.user.signedin_imgur_accounts);
 		this.scope.other_accounts = this.getAlbums(this.scope.user.other_imgur_accounts);
 
 		this.$el.html(this.template);

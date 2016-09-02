@@ -8,6 +8,8 @@
 		margin: 0 5px;
 	}
 
+	> a { color: blue; }
+
 	> .dropdown {
 		position: static; /* Bootstrap Override */
 
