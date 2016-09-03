@@ -24,10 +24,10 @@ module.exports = {
 		});
 	},
 	upload: function(options, callback) {
-		// console.log("UPLOAD", path);
+		console.log("UPLOAD", (RTChat.AppConfig.SocketHost||'')+"/imgur_upload");
 		$.ajax(_.extend({
 				type: 'POST',
-				url: RTChat.AppConfig.SocketHost||''+"/imgur_upload",
+				url: (RTChat.AppConfig.SocketHost||'')+"/imgur_upload",
 				cache: false,
 				contentType: false,
 				processData: false,
