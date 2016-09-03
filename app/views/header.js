@@ -21,7 +21,7 @@ module.exports = RTChat.Views.Header.extend({
 		// <span> Copy Invite Link </span>
 	events: {
 		'click .stop': function(e) {
-			RTChat.RTCWrapper.updateState({albumId: null, slides: null})
+			RTChat.RTCWrapper.updateState({albumId: null, slides: null});
 		},
 		// 'click .ping': function(e) { // Handled by "layout" view
 	},
@@ -33,6 +33,6 @@ module.exports = RTChat.Views.Header.extend({
 				self.scope.extra = RTChat.RTCWrapper.connection.extra;
 			self.scope.state = newState;
 		});
-		this.scope.noHash = function() {return !window.location.hash}
+		this.scope.noHash = function() { return !window.location.hash; };
 	},
 });

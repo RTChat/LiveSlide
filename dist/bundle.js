@@ -56,7 +56,7 @@
 	_.extend(RTChat.Views, views);
 	
 	// Extend AppConfig
-	_.extend(RTChat.AppConfig, __webpack_require__(17));
+	_.extend(RTChat.AppConfig, __webpack_require__(16));
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ },
@@ -1623,9 +1623,9 @@
 		"./layout.js": 5,
 		"./room_panel.js": 11,
 		"./sidebar.js": 13,
-		"./upload_modal.js": 18,
-		"./viewer.js": 22,
-		"./welcome_panel.js": 25
+		"./upload_modal.js": 17,
+		"./viewer.js": 21,
+		"./welcome_panel.js": 24
 	};
 	function webpackContext(req) {
 		return __webpack_require__(webpackContextResolve(req));
@@ -1729,7 +1729,8 @@
 					}]
 				});
 				// The "state" is the previous roomName; navigate there.
-				return window.location.href = window.location.href.replace(/\?.*$/, "#" + (params.state || ''));
+				window.location.href = window.location.href.replace(/\?.*$/, "#" + (params.state || ''));
+				return;
 			}
 	
 			$(window).on('hashchange', function () {
@@ -2164,11 +2165,10 @@
 	/* WEBPACK VAR INJECTION */(function(_, $, Rivets) {'use strict';
 	
 	__webpack_require__(14);
-	__webpack_require__(16);
 	
-	var AppConfig = __webpack_require__(17);
-	var UploadModal = __webpack_require__(18);
-	var ImgurLoader = __webpack_require__(21);
+	var AppConfig = __webpack_require__(16);
+	var UploadModal = __webpack_require__(17);
+	var ImgurLoader = __webpack_require__(20);
 	
 	module.exports = RTChat.Views.Sidebar.extend({
 		template: '\n\t\t<a rv-if="scope.signed_in_accounts |length |eq 0"\n\t\t\trv-href="\'https://api.imgur.com/oauth2/authorize?client_id=\' |+ scope.clientId |+ \'&response_type=token&state=\' |+ scope.hash">\n\t\t\tSign-in with Imgur to upload\n\t\t</a>\n\t\t<div rv-each-user="scope.signed_in_accounts" class="dropdown" >\n\t\t\t<div rv-data-acct-name="user.name">\n\t\t\t\t{ user.name }\n\t\t\t\t<span class="pull-right fa fa-ellipsis-v"></span>\n\t\t\t\t<span class="pull-right fa fa-upload"></span>\n\t\t\t</div>\n\t\t\t<ul class="album">\n\t\t\t\t<li rv-each-album="user.albums" rv-data-id="album.id">\n\t\t\t\t\t{ album.title }\n\t\t\t\t</li>\n\t\t\t</ul>\n\t\t</div>\n\t\t<div class="add-acct">\n\t\t\t<span rv-hide="scope.editing">Add  Imgur Account </span>\n\t\t\t<input rv-show="scope.editing" placeholder="Imgur Account Name">\n\t\t</div>\n\t\t<div rv-each-user="scope.other_accounts" class="dropdown" >\n\t\t\t<div rv-data-acct-name="user.name">\n\t\t\t\t{ user.name }\n\t\t\t\t<span class="pull-right fa fa-ellipsis-v"></span>\n\t\t\t</div>\n\t\t\t<ul class="album">\n\t\t\t\t<li rv-each-album="user.albums" rv-data-id="album.id">\n\t\t\t\t\t{ album.title }\n\t\t\t\t</li>\n\t\t\t</ul>\n\t\t</div>\n\t\t<div data-subview="context_menu"></div>\n\t\t<div data-subview="upload_modal"></div>\n\t',
@@ -2323,7 +2323,7 @@
 						name: list[0].account_url, // Update to the exact capitalization name.
 						// Remove empty albums
 						albums: _.reject(list, function (o) {
-							return o.images_count == 0;
+							return o.images_count === 0;
 						})
 					});
 	
@@ -2424,46 +2424,19 @@
 
 /***/ },
 /* 16 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function($, _) {'use strict';
-	
-	// jQuery pluguin for ContextMenus (better popovers)
-	
-	$.fn.context_menu = function (options) {
-	
-		console.log("CContextMenu", this, options);
-	
-		var el = $(options.template || '<div></div>');
-		this.append(el);
-		el.hide();
-		el.css({
-			position: 'absoute',
-			top: 0,
-			left: 0
-		});
-	
-		_.each(options.events || {}, function (fn, key) {
-			console.log("ECECEC", arguments);
-		});
-	};
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6), __webpack_require__(1)))
-
-/***/ },
-/* 17 */
 /***/ function(module, exports) {
 
 	module.exports = {"AppName":"LiveSlide","imgur_client_id":"f55a248021c48d6"}
 
 /***/ },
-/* 18 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($, Rivets) {'use strict';
 	
-	__webpack_require__(19);
+	__webpack_require__(18);
 	
-	var ImgurLoader = __webpack_require__(21);
+	var ImgurLoader = __webpack_require__(20);
 	
 	module.exports = Backbone.View.extend({
 	  className: 'modal fade upload',
@@ -2504,11 +2477,11 @@
 	        xhr: function xhr() {
 	          var xhr = new window.XMLHttpRequest();
 	          xhr.upload.addEventListener("progress", function (e) {
-	            console.log("UPLOAD", e.loaded / e.total);
+	            // console.log("UPLOAD", e.loaded / e.total)
 	            self.onprogress(e.loaded / e.total);
 	          }, false);
 	          xhr.addEventListener("progress", function (e) {
-	            console.log("DOWNLOAD", e.loaded, '/', e.total);
+	            // console.log("DOWNLOAD", e.loaded, '/', e.total)
 	            // self.onprogress(e.loaded / e.total);
 	          }, false);
 	          //TODO: imgur_upload progress??
@@ -2518,7 +2491,7 @@
 	        // After Upload...
 	        //TODO: display success msg.
 	        self.hide();
-	        self.onsuccess && self.onsuccess();
+	        if (self.onsuccess) self.onsuccess();
 	      });
 	
 	      // Disable elements.
@@ -2556,13 +2529,13 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6), __webpack_require__(12)))
 
 /***/ },
-/* 19 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(20);
+	var content = __webpack_require__(19);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(10)(content, {});
@@ -2582,7 +2555,7 @@
 	}
 
 /***/ },
-/* 20 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(9)();
@@ -2596,14 +2569,14 @@
 
 
 /***/ },
-/* 21 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($, _) {"use strict";
 	
 	// Wraps Imgur.com API for our use.
 	
-	var AppConfig = __webpack_require__(17);
+	var AppConfig = __webpack_require__(16);
 	
 	module.exports = {
 		// Lists all albums in an imgur account (excludes empty ones)
@@ -2611,7 +2584,7 @@
 			$.ajax({
 				url: "https://api.imgur.com/3/account/" + account + "/albums",
 				headers: {
-					"Authorization": "Client-ID " + AppConfig['imgur_client_id']
+					"Authorization": "Client-ID " + AppConfig.imgur_client_id
 				}
 			}).success(function (data) {
 				callback(data.data);
@@ -2622,7 +2595,7 @@
 			$.ajax({
 				url: "https://api.imgur.com/3/album/" + id,
 				headers: {
-					"Authorization": "Client-ID " + AppConfig['imgur_client_id']
+					"Authorization": "Client-ID " + AppConfig.imgur_client_id
 				}
 			}).success(function (data) {
 				callback(data.data);
@@ -2637,27 +2610,19 @@
 				contentType: false,
 				processData: false
 			}, options)).then(callback);
-		},
-		delete: function _delete(path, callback) {
-			console.log("DELETE", path);
-			$.ajax({
-				type: 'DELETE',
-				url: '/imgur_upload',
-				data: path
-			}).then(callback);
 		}
 	};
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6), __webpack_require__(1)))
 
 /***/ },
-/* 22 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($, Rivets) {'use strict';
 	
 	// A glorified wrapper for bootstrap carousel.
 	
-	__webpack_require__(23);
+	__webpack_require__(22);
 	
 	module.exports = Backbone.View.extend({
 		id: 'Viewer',
@@ -2729,7 +2694,7 @@
 			this.scope.capturePing = true;
 		},
 		renderPing: function renderPing(ping_state) {
-			this.scope.capturePing == false;
+			this.scope.capturePing = false;
 	
 			if (!ping_state) ping_state = { top: 0, left: -100 }; // Render off screen.
 			var viewer = this.$('.active img');
@@ -2747,13 +2712,13 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6), __webpack_require__(12)))
 
 /***/ },
-/* 23 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(24);
+	var content = __webpack_require__(23);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(10)(content, {});
@@ -2773,7 +2738,7 @@
 	}
 
 /***/ },
-/* 24 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(9)();
@@ -2787,12 +2752,12 @@
 
 
 /***/ },
-/* 25 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	__webpack_require__(26);
+	__webpack_require__(25);
 	
 	// Extend WelcomePanel
 	module.exports = RTChat.Views.WelcomePanel.extend({
@@ -2800,13 +2765,13 @@
 	});
 
 /***/ },
-/* 26 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(27);
+	var content = __webpack_require__(26);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(10)(content, {});
@@ -2826,7 +2791,7 @@
 	}
 
 /***/ },
-/* 27 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(9)();

@@ -16,7 +16,7 @@ module.exports = RTChat.Views.RoomPanel.extend({
 	},
 	render: function() {
 		var self = this;
-		this.scope = {rtc_state: {}}
+		this.scope = {rtc_state: {}};
 
 		this.$el.html(this.template);
 		Rivets.bind(this.$el, { scope: this.scope });

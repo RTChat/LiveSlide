@@ -53,7 +53,7 @@ module.exports = Backbone.View.extend({
 
       // Validate File.
       if (this.$('form [name="file"]')[0].files.length < 1) {
-        return this.scope.errorMsg = "Must select a file!";
+        return (this.scope.errorMsg = "Must select a file!");
       }
 
       var user_conf = RTChat.UserService.getAppData();
@@ -64,7 +64,7 @@ module.exports = Backbone.View.extend({
       // Validate Name.
       if (this.$('form [name="name"]').val().length < 1) {
         // return this.scope.errorMsg = "Must enter a name!";
-        data.set("name", this.$('form [name="file"]')[0].files[0].name)
+        data.set("name", this.$('form [name="file"]')[0].files[0].name);
       }
 
       // Submit!
@@ -74,11 +74,11 @@ module.exports = Backbone.View.extend({
         xhr: function() {
           var xhr = new window.XMLHttpRequest();
           xhr.upload.addEventListener("progress", function (e) {
-            console.log("UPLOAD", e.loaded / e.total)
+            // console.log("UPLOAD", e.loaded / e.total)
             self.onprogress(e.loaded / e.total);
           }, false);
           xhr.addEventListener("progress", function (e) {
-            console.log("DOWNLOAD", e.loaded, '/', e.total)
+            // console.log("DOWNLOAD", e.loaded, '/', e.total)
             // self.onprogress(e.loaded / e.total);
           }, false);
           //TODO: imgur_upload progress??
@@ -87,7 +87,7 @@ module.exports = Backbone.View.extend({
       }, function() { // After Upload...
         //TODO: display success msg.
         self.hide();
-        self.onsuccess && self.onsuccess();
+        if (self.onsuccess) self.onsuccess();
       });
 
       // Disable elements.

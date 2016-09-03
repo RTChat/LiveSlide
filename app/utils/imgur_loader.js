@@ -8,7 +8,7 @@ module.exports = {
 		$.ajax({
 			url: "https://api.imgur.com/3/account/"+account+"/albums",
 			headers: {
-				"Authorization": "Client-ID "+AppConfig['imgur_client_id']
+				"Authorization": "Client-ID "+AppConfig.imgur_client_id
 			}
 		}).success(function(data) {
 			callback(data.data);
@@ -19,7 +19,7 @@ module.exports = {
 		$.ajax({
 			url: "https://api.imgur.com/3/album/"+id,
 			headers: {
-				"Authorization": "Client-ID "+AppConfig['imgur_client_id']
+				"Authorization": "Client-ID "+AppConfig.imgur_client_id
 			}
 		}).success(function(data) {
 			callback(data.data);
@@ -36,12 +36,4 @@ module.exports = {
 			}, options)
 		).then(callback);
 	},
-	delete: function(path, callback) {
-		console.log("DELETE", path)
-		$.ajax({
-			type: 'DELETE',
-			url: '/imgur_upload',
-			data: path,
-		}).then(callback);
-	}
-}
+};

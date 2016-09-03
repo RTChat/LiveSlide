@@ -96,7 +96,7 @@ module.exports = Backbone.View.extend({
 		this.scope.capturePing = true;
 	},
 	renderPing: function(ping_state) {
-		this.scope.capturePing == false;
+		this.scope.capturePing = false;
 
 		if (!ping_state) ping_state = {top: 0, left: -100}; // Render off screen.
 		var viewer = this.$('.active img');

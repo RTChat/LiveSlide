@@ -1,5 +1,4 @@
 require('styles/sidebar.css');
-require('utils/context_menu.js');
 
 var AppConfig = require('app/config');
 var UploadModal = require('views/upload_modal');
@@ -63,7 +62,7 @@ module.exports = RTChat.Views.Sidebar.extend({
 					RTChat.RTCWrapper.updateState({
 						albumId: album.id,
 						title: album.title,
-						slides: _.map(album.images, function(i) {return i.link.replace(/^http:/,'https:')}),
+						slides: _.map(album.images, function(i) {return i.link.replace(/^http:/,'https:');}),
 						currentSlide: 0,
 					});
 
@@ -189,7 +188,7 @@ module.exports = RTChat.Views.Sidebar.extend({
 					id: list[0].account_url, // Update to the exact capitalization name.
 					name: list[0].account_url, // Update to the exact capitalization name.
 					// Remove empty albums
-					albums: _.reject(list, function(o) { return o.images_count == 0 })
+					albums: _.reject(list, function(o) { return o.images_count === 0; })
 				});
 
 				if (callback) callback.call(this, acct);
@@ -216,8 +215,8 @@ module.exports = RTChat.Views.Sidebar.extend({
 		RTChat.RTCWrapper.onStateChange(function(old, newState) {
 			// Open or close if starts or ends
 			setTimeout(function() { //HACK: "extra" gets set by an onStateChange handler
-				if (RTChat.RTCWrapper.connection.extra.isAdmin && !newState.albumId
-						&& newState.admins && !self.inhibitAutoOpen) {
+				if (RTChat.RTCWrapper.connection.extra.isAdmin && !newState.albumId &&
+						newState.admins && !self.inhibitAutoOpen) {
 						//HACK: check admins to ensure we are still in a room
 					self.$el.addClass('open');
 				}
