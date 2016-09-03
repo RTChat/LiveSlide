@@ -2180,6 +2180,7 @@
 	
 				if (!RTChat.RTCWrapper.connection) {
 					// Go to a random room then load selected presentation.
+					this.inhibitAutoOpen = true;
 					window.location.href = '#' + RTChat.Random.shortid();
 				}
 	
@@ -2197,9 +2198,8 @@
 						});
 	
 						// Close sidebar
-						setTimeout(function () {
-							self.toggle();
-						});
+						self.toggle(false);
+						self.inhibitAutoOpen = false;
 					});
 				});
 	
@@ -2352,11 +2352,9 @@
 				// Open or close if starts or ends
 				setTimeout(function () {
 					//HACK: "extra" gets set by an onStateChange handler
-					if (RTChat.RTCWrapper.connection.extra.isAdmin) {
-						if (!newState.albumId && newState.admins) {
-							//HACK: check admins to ensure we are still in a room
-							self.$el.addClass('open');
-						}
+					if (RTChat.RTCWrapper.connection.extra.isAdmin && !newState.albumId && newState.admins && !self.inhibitAutoOpen) {
+						//HACK: check admins to ensure we are still in a room
+						self.$el.addClass('open');
 					}
 				});
 	
