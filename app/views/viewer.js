@@ -58,13 +58,16 @@ module.exports = Backbone.View.extend({
 			}});
 		},
 	},
-	initialize: function() {
+	render: function() {
+		this.scope = {state: {}};
+		this.$el.html(this.template);
+		Rivets.bind(this.$el, {scope: this.scope});
+
 		var self = this;
-		this.scope.state = {};
 		RTChat.RTCWrapper.onStateChange(function(prevState, state) {
 			self.scope.state = state;
 			if (prevState.albumId != state.albumId) {
-				self.render(); //TODO: why is a full render necessary? (the carousel doesnt load images otherwise)
+				self.renderCarousel();
 			} else if (prevState.currentSlide != state.currentSlide) {
 				self.$('.carousel').carousel(state.currentSlide);
 				self.renderPing(false);
@@ -72,13 +75,15 @@ module.exports = Backbone.View.extend({
 				self.renderPing(state.ping);
 			}
 		});
-
 		this.scope.extra = RTChat.RTCWrapper.connection.extra;
-	},
-	render: function() {
-		this.$el.html(this.template);
-		Rivets.bind(this.$el, {scope: this.scope});
 
+		//TODO: re-render ping on resize. (events dont work)
+		// this.$el.resize(function() { self.renderPing() });
+
+		this.renderCarousel();
+		return this;
+	},
+	renderCarousel: function() { // Do Bootstrap things
 		// Make the proper slide active.
 		var active = this.scope.state.currentSlide || 0;
 		this.$('.item').eq(active).addClass('active');
@@ -86,11 +91,6 @@ module.exports = Backbone.View.extend({
 
 		// Prevent autoslide.
 		this.$('.carousel').carousel({ interval: false });
-
-		//TODO: re-render ping on resize. (events dont work)
-		// this.$el.resize(function() { self.renderPing() });
-
-		return this;
 	},
 	startPing: function() {
 		this.scope.capturePing = true;
