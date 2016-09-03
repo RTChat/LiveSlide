@@ -7,7 +7,8 @@ module.exports = {
 			url: "https://api.imgur.com/3/account/"+account+"/albums",
 			headers: {
 				"Authorization": "Client-ID "+RTChat.AppConfig.imgur_client_id
-			}
+			},
+			cache: false,
 		}).success(function(data) {
 			callback(data.data);
 		});
