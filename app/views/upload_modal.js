@@ -14,6 +14,9 @@ module.exports = Backbone.View.extend({
         </div>
 
         <div class="modal-body">
+          <label>
+            Turn any image, pdf, or powerpoint presentation into an album
+          </label>
           <form class="form-inline">
             <div class="form-group">
               <input type="text" placeholder="Presentation Name" name="name" autocomplete="off" class="form-control">
@@ -56,10 +59,10 @@ module.exports = Backbone.View.extend({
         return (this.scope.errorMsg = "Must select a file!");
       }
 
-      var user_conf = RTChat.UserService.getAppData();
+      var user_conf = RTChat.UserService.getAppData().signedin_imgur_accounts[0];
       var data = (new FormData(this.$('form')[0]));
-      data.set("username", user_conf.imgur_account_name);
-      data.set("refresh_token", user_conf.imgur_refresh_token);
+      data.set("username", user_conf.name);
+      data.set("refresh_token", user_conf.refresh_token);
 
       // Validate Name.
       if (this.$('form [name="name"]').val().length < 1) {
@@ -87,7 +90,6 @@ module.exports = Backbone.View.extend({
       }, function() { // After Upload...
         //TODO: display success msg.
         self.hide();
-        if (self.onsuccess) self.onsuccess();
       });
 
       // Disable elements.
@@ -105,7 +107,6 @@ module.exports = Backbone.View.extend({
     this.scope.progress = percent;
     this.$('.progress-bar').css({width: percent*100+'%'});
   },
-  onsuccess: null,
   render: function() {
     this.onprogress(0);
     this.$el.html(this.template);

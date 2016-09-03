@@ -160,8 +160,7 @@ module.exports = RTChat.Views.Sidebar.extend({
 			m.on('hide', function() {
 				// Refresh users albums.
 				// TODO: caching messes this up.
-				self.scope.signed_in_accounts = self.getAlbums(
-					[self.scope.user.imgur_account_name]);
+				self.scope.signed_in_accounts = self.getAlbums(self.scope.user.signedin_imgur_accounts);
 			});
 			return m;
 		}
