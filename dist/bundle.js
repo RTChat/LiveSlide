@@ -5695,8 +5695,7 @@
 	
 	// Extend WelcomePanel
 	module.exports = RTChat.Views.WelcomePanel.extend({
-		template: '<h2>Welcome To LiveSlide!</h2>\n\t\t<h4>\n\t\t\tA free and <a href="https://github.com/RTChat/LiveSlide" target="_open" rel="nofollow">open source</a>\n\t\t\tlive slideshow presentation app built using the <a href="https://rtchat.github.io" target="_open" rel="nofollow">RTChat</a> framework! </h4>\n\t\t<br>\n\t\t<a class="btn btn-default" rv-href="\'#\' |+ scope.random_rooms |index 0">Get started by creating a new room</a>\n\t'
-	
+		template: '<h2>Welcome To LiveSlide!</h2>\n\t\t<h4>\n\t\t\tA free and <a href="https://github.com/RTChat/LiveSlide" target="_open" rel="nofollow">open source</a>\n\t\t\tlive slideshow presentation app built using the <a href="https://rtchat.github.io" target="_open" rel="nofollow">RTChat</a> framework! </h4>\n\t\t<br>\n\t\t<a class="btn btn-default" rv-href="\'#\' |+ scope.random_rooms |index 0">Get started by creating a new room</a>\n\n\t\t<br> <br>\n\t\t<p>\n\t\t\t&nbsp;\n\t\t\t<span class="fa fa-reddit-alien"></span>\n\t\t\t<a href="https://reddit.com/r/RTChat">Discuss on reddit</a>\n\n\t\t\t&nbsp;\n\t\t\t<span class="fa fa-bug"></span>\n\t\t\t<a href="https://github.com/RTChat/LiveSlide/issues/new">Report a bug</a>\n\t\t</p>\n\t'
 	});
 
 /***/ },
@@ -5734,7 +5733,7 @@
 	
 	
 	// module
-	exports.push([module.id, "", "", {"version":3,"sources":[],"names":[],"mappings":"","file":"welcome_panel.css","sourceRoot":"webpack://"}]);
+	exports.push([module.id, "#WelcomePanel {\n  max-width: 600px;\n  margin: 12px auto;\n  text-align: center; }\n", "", {"version":3,"sources":["/./app/styles/welcome_panel.css"],"names":[],"mappings":"AAAA;EACE,iBAAiB;EACjB,kBAAkB;EAClB,mBAAmB,EAAE","file":"welcome_panel.css","sourcesContent":["#WelcomePanel {\n  max-width: 600px;\n  margin: 12px auto;\n  text-align: center; }\n"],"sourceRoot":"webpack://"}]);
 	
 	// exports
 

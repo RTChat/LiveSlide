@@ -9,8 +9,16 @@ module.exports = RTChat.Views.WelcomePanel.extend({
 			live slideshow presentation app built using the <a href="https://rtchat.github.io" target="_open" rel="nofollow">RTChat</a> framework! </h4>
 		<br>
 		<a class="btn btn-default" rv-href="'#' |+ scope.random_rooms |index 0">Get started by creating a new room</a>
-	`,
 
-	//TODO:
-		// <a class="btn btn-default" href="#global-chat">Go To a Random Room</a>
+		<br> <br>
+		<p>
+			&nbsp;
+			<span class="fa fa-reddit-alien"></span>
+			<a href="https://reddit.com/r/RTChat">Discuss on reddit</a>
+
+			&nbsp;
+			<span class="fa fa-bug"></span>
+			<a href="https://github.com/RTChat/LiveSlide/issues/new">Report a bug</a>
+		</p>
+	`,
 });
