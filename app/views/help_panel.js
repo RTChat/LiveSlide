@@ -14,6 +14,7 @@ module.exports = Backbone.View.extend({
 			<li><span class="invite"> Invite people to view your live presentation. </span></li>
 			<li><span class="start disabled"> Start presentation by clicking it in the sidebar. </span></li>
 		</ol>
+		<a href="https://github.com/RTChat/LiveSlide/issues/new">report a bug</a>
 	`,
 	//NOTE: this is extremely hacky as it relies on, and manipulates other views ☠
 	events: {
@@ -41,6 +42,11 @@ module.exports = Backbone.View.extend({
 	render: function() {
 		this.$el.html(this.template);
 		this.$('li > span').addClass("btn btn-default");
+
+		// Disable "sign in" button when signed in.
+		if (RTChat.UserService.getAppData().signedin_imgur_accounts)
+			this.$('.signin').addClass("disabled");
+
 		return this;
 	}
 });

@@ -4844,7 +4844,7 @@
 	
 	module.exports = Backbone.View.extend({
 		id: 'HelpPanel',
-		template: '\n\t\t<h4>\n\t\t\tGetting Started is simple:\n\t\t\t<span class="pull-right fa fa-times toggle-help"></span>\n\t\t</h4>\n\t\t<ol>\n\t\t\t<li><span class="signin"> Sign-in with Imgur </span> or\n\t\t\t\t<span class="add-acct"> add anothers account. </span></li>\n\t\t\t<li><span class="upload"> Upload presentation to imgur. </span></li>\n\t\t\t<li><span class="invite"> Invite people to view your live presentation. </span></li>\n\t\t\t<li><span class="start disabled"> Start presentation by clicking it in the sidebar. </span></li>\n\t\t</ol>\n\t',
+		template: '\n\t\t<h4>\n\t\t\tGetting Started is simple:\n\t\t\t<span class="pull-right fa fa-times toggle-help"></span>\n\t\t</h4>\n\t\t<ol>\n\t\t\t<li><span class="signin"> Sign-in with Imgur </span> or\n\t\t\t\t<span class="add-acct"> add anothers account. </span></li>\n\t\t\t<li><span class="upload"> Upload presentation to imgur. </span></li>\n\t\t\t<li><span class="invite"> Invite people to view your live presentation. </span></li>\n\t\t\t<li><span class="start disabled"> Start presentation by clicking it in the sidebar. </span></li>\n\t\t</ol>\n\t\t<a href="https://github.com/RTChat/LiveSlide/issues/new">report a bug</a>\n\t',
 		//NOTE: this is extremely hacky as it relies on, and manipulates other views ☠
 		events: {
 			'click .signin': function clickSignin(ev) {
@@ -4868,6 +4868,10 @@
 		render: function render() {
 			this.$el.html(this.template);
 			this.$('li > span').addClass("btn btn-default");
+	
+			// Disable "sign in" button when signed in.
+			if (RTChat.UserService.getAppData().signedin_imgur_accounts) this.$('.signin').addClass("disabled");
+	
 			return this;
 		}
 	});
@@ -5302,24 +5306,13 @@
 					}
 				});
 	
-				// self.extra = RTChat.RTCWrapper.connection.extra;
-	
-				//TODO: update "selected"
-				// if (old.presentation !== newState.presentation) {
-				// 	self.scope.presentation = newState.presentation;
-				// 	// Keep selection in sync.
-				// 	self.$('.selected').removeClass('selected');
-				// 	if (newState.presentation)
-				// 		self.$('li[data-path="'+newState.presentation+'"]').addClass('selected');
-				// }
-				// if (old.albumId !== newState.albumId) {
-	
-				// if (!newState.albumId && RTChat.RTCWrapper.connection.extra.isAdmin) {
-				// 	self.$el.toggleClass('open', !newState.albumId)
-				// }
+				// Keep selection in sync.
+				if (old.albumId !== newState.albumId) {
+					self.$('.selected').removeClass('selected');
+					self.$('li[data-id="' + newState.albumId + '"]').addClass('selected');
+				}
 			});
 	
-			// this.$('li[data-path="'+this.scope.presentation+'"]').addClass('selected');
 			return this;
 		},
 		scope: {}

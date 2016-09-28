@@ -231,25 +231,14 @@ module.exports = RTChat.Views.Sidebar.extend({
 				}
 			});
 
-			// self.extra = RTChat.RTCWrapper.connection.extra;
-
-			//TODO: update "selected"
-			// if (old.presentation !== newState.presentation) {
-			// 	self.scope.presentation = newState.presentation;
-			// 	// Keep selection in sync.
-			// 	self.$('.selected').removeClass('selected');
-			// 	if (newState.presentation)
-			// 		self.$('li[data-path="'+newState.presentation+'"]').addClass('selected');
-			// }
-			// if (old.albumId !== newState.albumId) {
-
-			// if (!newState.albumId && RTChat.RTCWrapper.connection.extra.isAdmin) {
-			// 	self.$el.toggleClass('open', !newState.albumId)
-			// }
+			// Keep selection in sync.
+			if (old.albumId !== newState.albumId) {
+				self.$('.selected').removeClass('selected');
+				self.$('li[data-id="'+newState.albumId+'"]').addClass('selected');
+			}
 
 		});
 
-		// this.$('li[data-path="'+this.scope.presentation+'"]').addClass('selected');
 		return this;
 	},
 	scope: {}
