@@ -1,15 +1,12 @@
 /* Overrides styles from RTChat */
 
-body.end-user {
+
+/* HACK: Fix issues with mobile OpenTips */
+@media (max-width: 600px) {
+
+	.opentip-container {
+		max-width: 30%;
+		text-align: center;
+	}
 
 }
-
- /*TODO*/
-.waiting-msg {
-	width: 100%;
-	margin: 30px 0;
-	padding: 0 5px;
-	font-size: 20px;
-	text-align: center;
-}
-

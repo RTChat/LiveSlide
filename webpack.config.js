@@ -14,6 +14,7 @@ module.exports = {
 		views: 'app/views',
 		utils: 'app/utils',
 		styles: 'app/styles',
+		node_modules: __dirname +'/node_modules',
 	} },
 	externals: {
 		// Use the jquery from RTChat so it's has bootstrap, etc.

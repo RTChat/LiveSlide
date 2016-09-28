@@ -1,0 +1,42 @@
+
+$box-padding: 25px;
+
+#RoomPanel {
+	.waiting-box {
+		padding: 0 $box-padding;
+		padding-bottom: $box-padding;
+		text-align: center;
+
+		> * {
+			margin-top: $box-padding;
+		}
+
+		.waiting-msg {
+			display: inline-block;
+			padding: 25px 25px;
+			font-size: 20px;
+
+			background-color: #bcbcbc;
+			border: 1px solid grey;
+			border-radius: 15px;
+		}
+
+		ol {
+			text-align: initial;
+			padding-left: 15px;
+		}
+
+		.fa {
+			cursor: pointer;
+		}
+
+		a {
+			color: blue;
+		}
+
+		.help li {
+
+		}
+
+	}
+}

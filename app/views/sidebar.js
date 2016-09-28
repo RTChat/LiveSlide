@@ -6,11 +6,15 @@ var ImgurLoader = require('utils/imgur_loader.js');
 
 module.exports = RTChat.Views.Sidebar.extend({
 	template: `
-		<a rv-if="scope.signed_in_accounts |length |eq 0"
-			rv-href="'https://api.imgur.com/oauth2/authorize?client_id=' |+ scope.clientId |+ '&response_type=token&state=' |+ scope.hash">
-			Sign-in with Imgur to upload
-		</a>
-		<div rv-each-user="scope.signed_in_accounts" class="dropdown" >
+		<div rv-if="scope.signed_in_accounts |length |eq 0" class="signin">
+			<a rv-href="'https://api.imgur.com/oauth2/authorize?client_id=' |+ scope.clientId |+ '&response_type=token&state=' |+ scope.hash">
+				Sign-in with Imgur to upload
+			</a>
+			<span class="pull-right fa fa-question-circle"
+				tooltip="Imgur is a free image hosting site that liveslide uses to store the presentations you upload">
+			</span>
+		</div>
+		<div rv-each-user="scope.signed_in_accounts" class="dropdown">
 			<div rv-data-acct-name="user.name">
 				{ user.name }
 				<span class="pull-right fa fa-ellipsis-v"></span>
@@ -24,6 +28,9 @@ module.exports = RTChat.Views.Sidebar.extend({
 		</div>
 		<div class="add-acct">
 			<span rv-hide="scope.editing">Add  Imgur Account </span>
+			<span class="pull-right fa fa-question-circle"
+				tooltip="You can add any imgur account and view its albums as presentations">
+			</span>
 			<input rv-show="scope.editing" placeholder="Imgur Account Name">
 		</div>
 		<div rv-each-user="scope.other_accounts" class="dropdown" >
@@ -77,12 +84,12 @@ module.exports = RTChat.Views.Sidebar.extend({
 		'click .fa-upload': function() {
 			this.subviews.upload_modal.show();
 		},
-		// 'click .fa-refresh': function() {
-		// 	this.getAlbums();
-		// },
 		'click .add-acct': function(ev) {
-			this.scope.editing = true;
-			this.$(ev.currentTarget).find('input').val("").focus();
+			if (!this.scope.editing) {
+				this.scope.editing = true;
+				this.$(ev.currentTarget).find('input').val("").focus();
+				ev.stopPropagation();
+			}
 		},
 		// Add new account
 		'keyup .add-acct input': function(ev) {
@@ -93,17 +100,14 @@ module.exports = RTChat.Views.Sidebar.extend({
 
 			var self = this;
 			// Add the acct to the array instantly because it will be populated asynchronously.
-			this.scope.other_accounts.push(this.getAlbums([name], function(acct) {
-				// Now that we have the exact acct name, add it to the list.
-				self.scope.user.other_imgur_accounts.push(acct.name);
+			this.scope.other_accounts.unshift(this.getAlbums([name], function(acct) {
+				// Now that we have the exact acct name, insert it into the list.
+				self.scope.user.other_imgur_accounts.unshift(acct.name);
 				RTChat.UserService.setAppData({
 					//TODO: use id in addition to "name"?
 					other_imgur_accounts: self.scope.user.other_imgur_accounts
 				});
 			})[0]);
-		},
-		'blur .add-acct input': function(ev) {
-			this.scope.editing = false;
 		},
 		// == ContextMenu == //
 		'click #ContextMenu li.delete': function() {
@@ -144,8 +148,11 @@ module.exports = RTChat.Views.Sidebar.extend({
 	initialize: function() {
 		var self = this;
 		Backbone.Subviews.add( this );
-		//HACK: close context_menu on click anywhere.
-		$('body').on('click', function() { self.subviews.context_menu.hide(); });
+		//HACK: close "popovers" on click anywhere.
+		$('body').on('click', function(ev) {
+			self.subviews.context_menu.hide();
+			self.scope.editing = false;
+		});
 	},
 	subviewCreators: {
 		// Extend ContextMenu
@@ -208,8 +215,11 @@ module.exports = RTChat.Views.Sidebar.extend({
 		this.$el.html(this.template);
 		Rivets.bind(this.$el, {scope: this.scope});
 
-		// start closed.
+		// Start closed.
 		this.$el.removeClass('open');
+
+		// Init Tooltips
+		this.$('[tooltip]').Opentip({targetJoint: 'right'});
 
 		RTChat.RTCWrapper.onStateChange(function(old, newState) {
 			// Open or close if starts or ends

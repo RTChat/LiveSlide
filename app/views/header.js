@@ -1,3 +1,4 @@
+
 var Clipboard = require('clipboard');
 
 var original_render = RTChat.Views.Header.prototype.render;
@@ -18,6 +19,7 @@ module.exports = RTChat.Views.Header.extend({
 			{ scope.users |length } viewers
 		</span> &nbsp;
 		<button class="btn btn-default fa fa-clipboard" rv-show="scope.roomName"
+			tooltip="Invite link copied to Clipboard"
 			rv-data-clipboard-text="scope.href">
 		</button>
 	`,
@@ -26,12 +28,16 @@ module.exports = RTChat.Views.Header.extend({
 			RTChat.RTCWrapper.updateState({albumId: null, slides: null});
 		},
 		// 'click .ping': function(e) { // Handled by "layout" view
-		'click .invite': function(e) {
-
-		},
 	},
 	render: function() {
 		original_render.call(this); // super
+
+		// Init tooltip
+		this.$('[tooltip]').Opentip({
+			targetJoint: 'left bottom',
+			showOn: 'click',
+			hideDelay: 2.0,
+		});
 
 		var self = this;
 		RTChat.RTCWrapper.onStateChange(function(old, newState) {

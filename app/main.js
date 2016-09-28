@@ -1,5 +1,8 @@
 // LiveSlide - Presentation webapp built using the RTChat framework.
 
+// Load custom tooltip library.
+require('jq-opentip');
+
 // Load all views in an extensible way.
 // "views/sample_view.js" becomes "views.SampleView".
 var views = RTChat.load_module(require.context('app/views', true, /\.js$/));

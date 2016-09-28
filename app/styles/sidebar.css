@@ -2,19 +2,18 @@
 #Sidebar {
 	font-size: 18;
 
-	&.open {flex-basis: 260px;}
+	&.open {flex-basis: 280px;}
 
 	> * {
-		margin: 0 5px;
-	}
+		margin: 5px 5px 0;
 
-	> a { color: blue; }
+		&.dropdown { position: static; } /* Bootstrap Override */
 
-	> .dropdown {
-		position: static; /* Bootstrap Override */
+		> a { color: blue; }
 
 		/* List Items */
-		> div, > ul > li {
+		&, > div, > ul > li {
+			margin-top: 5px;
 
 			> .fa {
 				width: 20px;
@@ -37,3 +36,4 @@
 		color: yellow;
 	}
 }
+
