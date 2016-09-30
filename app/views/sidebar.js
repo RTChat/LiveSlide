@@ -51,6 +51,8 @@ module.exports = RTChat.Views.Sidebar.extend({
 		<li class="imgur"><a> View & Edit on Imgur </a></li>
 		<li class="delete"><a> Remove </a></li>
 	`,
+		//TODO:
+		// <li class="refresh"><a> Refresh </a></li>
 	events: {
 		'click .album > li': function(e) {
 			var self = this;
@@ -65,7 +67,9 @@ module.exports = RTChat.Views.Sidebar.extend({
 			// Wait for url change...
 			setTimeout(function() {
 				// Load Presentation
-				ImgurLoader.getAlbum(target.data('id'), function(album) {
+				//BUG: (in jquery or rivets?) for some reason these return different values.
+				// console.log("BUG: (should be the same)", target.data('id'), target.attr('data-id'))
+				ImgurLoader.getAlbum(target.attr('data-id'), function(album) {
 					RTChat.RTCWrapper.updateState({
 						albumId: album.id,
 						title: album.title,
@@ -136,6 +140,9 @@ module.exports = RTChat.Views.Sidebar.extend({
 		'click #ContextMenu li.imgur': function() { // open imgur in a new tab
 			window.open("https://" +this.menu_target + ".imgur.com/", "_blank");
 		},
+		// 'click #ContextMenu li.refresh': function(e) {
+		// 	this.scope.signed_in_accounts = this.getAlbums(this.scope.user.signedin_imgur_accounts);
+		// },
 		'click .fa-ellipsis-v': function(ev) {
 			this.subviews.context_menu.toggle(ev.currentTarget);
 			this.menu_target = $(ev.currentTarget).parent('[data-acct-name]').data("acct-name");

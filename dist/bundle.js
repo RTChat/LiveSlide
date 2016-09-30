@@ -5120,6 +5120,8 @@
 	module.exports = RTChat.Views.Sidebar.extend({
 		template: '\n\t\t<div rv-if="scope.signed_in_accounts |length |eq 0" class="signin">\n\t\t\t<a rv-href="\'https://api.imgur.com/oauth2/authorize?client_id=\' |+ scope.clientId |+ \'&response_type=token&state=\' |+ scope.hash">\n\t\t\t\tSign-in with Imgur to upload\n\t\t\t</a>\n\t\t\t<span class="pull-right fa fa-question-circle"\n\t\t\t\ttooltip="Imgur is a free image hosting site that liveslide uses to store the presentations you upload">\n\t\t\t</span>\n\t\t</div>\n\t\t<div rv-each-user="scope.signed_in_accounts" class="dropdown">\n\t\t\t<div rv-data-acct-name="user.name">\n\t\t\t\t{ user.name }\n\t\t\t\t<span class="pull-right fa fa-ellipsis-v"></span>\n\t\t\t\t<span class="pull-right fa fa-upload"></span>\n\t\t\t</div>\n\t\t\t<ul class="album">\n\t\t\t\t<li rv-each-album="user.albums" rv-data-id="album.id">\n\t\t\t\t\t{ album.title }\n\t\t\t\t</li>\n\t\t\t</ul>\n\t\t</div>\n\t\t<div class="add-acct">\n\t\t\t<span rv-hide="scope.editing">Add  Imgur Account </span>\n\t\t\t<span class="pull-right fa fa-question-circle"\n\t\t\t\ttooltip="You can add any imgur account and view its albums as presentations">\n\t\t\t</span>\n\t\t\t<input rv-show="scope.editing" placeholder="Imgur Account Name">\n\t\t</div>\n\t\t<div rv-each-user="scope.other_accounts" class="dropdown" >\n\t\t\t<div rv-data-acct-name="user.name">\n\t\t\t\t{ user.name }\n\t\t\t\t<span class="pull-right fa fa-ellipsis-v"></span>\n\t\t\t</div>\n\t\t\t<ul class="album">\n\t\t\t\t<li rv-each-album="user.albums" rv-data-id="album.id">\n\t\t\t\t\t{ album.title }\n\t\t\t\t</li>\n\t\t\t</ul>\n\t\t</div>\n\t\t<div data-subview="context_menu"></div>\n\t\t<div data-subview="upload_modal"></div>\n\t',
 		contextMenuTemplate: '\n\t\t<li class="imgur"><a> View & Edit on Imgur </a></li>\n\t\t<li class="delete"><a> Remove </a></li>\n\t',
+		//TODO:
+		// <li class="refresh"><a> Refresh </a></li>
 		events: {
 			'click .album > li': function clickAlbumLi(e) {
 				var self = this;
@@ -5134,7 +5136,9 @@
 				// Wait for url change...
 				setTimeout(function () {
 					// Load Presentation
-					ImgurLoader.getAlbum(target.data('id'), function (album) {
+					//BUG: (in jquery or rivets?) for some reason these return different values.
+					// console.log("BUG: (should be the same)", target.data('id'), target.attr('data-id'))
+					ImgurLoader.getAlbum(target.attr('data-id'), function (album) {
 						RTChat.RTCWrapper.updateState({
 							albumId: album.id,
 							title: album.title,
@@ -5208,6 +5212,9 @@
 				// open imgur in a new tab
 				window.open("https://" + this.menu_target + ".imgur.com/", "_blank");
 			},
+			// 'click #ContextMenu li.refresh': function(e) {
+			// 	this.scope.signed_in_accounts = this.getAlbums(this.scope.user.signedin_imgur_accounts);
+			// },
 			'click .fa-ellipsis-v': function clickFaEllipsisV(ev) {
 				this.subviews.context_menu.toggle(ev.currentTarget);
 				this.menu_target = $(ev.currentTarget).parent('[data-acct-name]').data("acct-name");
@@ -5695,7 +5702,7 @@
 	
 	// Extend WelcomePanel
 	module.exports = RTChat.Views.WelcomePanel.extend({
-		template: '<h2>Welcome To LiveSlide!</h2>\n\t\t<h4>\n\t\t\tA free and <a href="https://github.com/RTChat/LiveSlide" target="_open" rel="nofollow">open source</a>\n\t\t\tlive slideshow presentation app built using the <a href="https://rtchat.github.io" target="_open" rel="nofollow">RTChat</a> framework! </h4>\n\t\t<br>\n\t\t<a class="btn btn-default" rv-href="\'#\' |+ scope.random_rooms |index 0">Get started by creating a new room</a>\n\n\t\t<br> <br>\n\t\t<p>\n\t\t\t&nbsp;\n\t\t\t<span class="fa fa-reddit-alien"></span>\n\t\t\t<a href="https://reddit.com/r/RTChat">Discuss on reddit</a>\n\n\t\t\t&nbsp;\n\t\t\t<span class="fa fa-bug"></span>\n\t\t\t<a href="https://github.com/RTChat/LiveSlide/issues/new">Report a bug</a>\n\t\t</p>\n\t'
+		template: '<h2>Welcome To LiveSlide!</h2>\n\t\t<h4>\n\t\t\tA free and <a href="https://github.com/RTChat/LiveSlide" target="_open" rel="nofollow">open source</a>\n\t\t\tlive slideshow presentation app built using the <a href="https://rtchat.github.io" target="_open" rel="nofollow">RTChat</a> framework! </h4>\n\t\t<br>\n\t\t<a class="btn btn-default" rv-href="\'#\' |+ scope.random_rooms |index 0">Get started by creating a new room</a>\n\n\t\t<br> <br>\n\t\t<p>\n\t\t\t<span class="fa fa-reddit-alien"></span>\n\t\t\t<a href="https://reddit.com/r/RTChat">Discuss on reddit</a>\n\n\t\t\t&nbsp;\n\t\t\t<span class="fa fa-bug"></span>\n\t\t\t<a href="https://github.com/RTChat/LiveSlide/issues/new">Report a bug</a>\n\t\t</p>\n\t'
 	});
 
 /***/ },

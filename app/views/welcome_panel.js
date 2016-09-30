@@ -12,7 +12,6 @@ module.exports = RTChat.Views.WelcomePanel.extend({
 
 		<br> <br>
 		<p>
-			&nbsp;
 			<span class="fa fa-reddit-alien"></span>
 			<a href="https://reddit.com/r/RTChat">Discuss on reddit</a>
 
