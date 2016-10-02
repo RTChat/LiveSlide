@@ -20,8 +20,19 @@
 				margin: 0 2px;
 				line-height: inherit;
 				text-align: center;
+				color: black;
 			}
 		}
+
+		/* Clickable */
+		&:not(.dropdown), > ul > li, .fa {
+			cursor: pointer;
+
+			&:hover {
+				color: lightgrey;
+			}
+		}
+
 	}
 
 	#ContextMenu {
