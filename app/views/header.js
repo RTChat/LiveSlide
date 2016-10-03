@@ -1,4 +1,6 @@
 
+require('styles/header.css')
+
 var Clipboard = require('clipboard');
 
 var original_render = RTChat.Views.Header.prototype.render;
@@ -9,19 +11,23 @@ module.exports = RTChat.Views.Header.extend({
 	},
 	template: `
 		<div class="fa fa-bars toggle-left-sidebar"></div>
-		<span>
+		<span class="bold">
 			<span rv-unless="scope.roomName">{ scope.appName }</span>
 			<span rv-if="scope.roomName"><a href="#">{ scope.appName }</a></span>
 		</span>
-		<button class="stop btn btn-default fa fa-stop" rv-show="scope.state.albumId"></button>
-		<button class="ping btn btn-default fa fa-crosshairs" rv-class-active="capturePing" rv-show="scope.state.albumId"></button>
+		<div class="tools">
+			<span><span class="stop fa fa-stop" rv-show="scope.state.albumId"></span></span>
+			<span><span class="ping fa fa-crosshairs" rv-class-active="capturePing" rv-show="scope.state.albumId"></span></span>
+		</div>
 		<span class="pull-right" rv-show="scope.roomName">
 			{ scope.users |length } viewers
 		</span> &nbsp;
-		<button class="btn btn-default fa fa-clipboard" rv-show="scope.roomName"
-			tooltip="Invite link copied to Clipboard"
-			rv-data-clipboard-text="scope.href">
-		</button>
+		<div class="tools">
+			<span class="fa fa-clipboard" rv-show="scope.roomName"
+				tooltip="Invite link copied to Clipboard"
+				rv-data-clipboard-text="scope.href">
+			</span>
+		</div>
 	`,
 	events: {
 		'click .stop': function(e) {

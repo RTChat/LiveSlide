@@ -59,7 +59,7 @@
 	_.extend(RTChat.Views, views);
 	
 	// Extend AppConfig
-	_.extend(RTChat.AppConfig, __webpack_require__(36));
+	_.extend(RTChat.AppConfig, __webpack_require__(38));
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ },
@@ -3997,14 +3997,14 @@
 
 	var map = {
 		"./header.js": 14,
-		"./help_panel.js": 24,
-		"./imgur_modal.js": 25,
-		"./layout.js": 26,
-		"./room_panel.js": 29,
-		"./sidebar.js": 33,
-		"./upload_modal.js": 37,
-		"./viewer.js": 41,
-		"./welcome_panel.js": 44
+		"./help_panel.js": 26,
+		"./imgur_modal.js": 27,
+		"./layout.js": 28,
+		"./room_panel.js": 31,
+		"./sidebar.js": 35,
+		"./upload_modal.js": 39,
+		"./viewer.js": 43,
+		"./welcome_panel.js": 46
 	};
 	function webpackContext(req) {
 		return __webpack_require__(webpackContextResolve(req));
@@ -4024,9 +4024,11 @@
 /* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 	
-	var Clipboard = __webpack_require__(15);
+	__webpack_require__(15);
+	
+	var Clipboard = __webpack_require__(17);
 	
 	var original_render = RTChat.Views.Header.prototype.render;
 	
@@ -4034,7 +4036,7 @@
 		attributes: {
 			"rv-show": "scope.noHash |or scope.extra.isAdmin"
 		},
-		template: "\n\t\t<div class=\"fa fa-bars toggle-left-sidebar\"></div>\n\t\t<span>\n\t\t\t<span rv-unless=\"scope.roomName\">{ scope.appName }</span>\n\t\t\t<span rv-if=\"scope.roomName\"><a href=\"#\">{ scope.appName }</a></span>\n\t\t</span>\n\t\t<button class=\"stop btn btn-default fa fa-stop\" rv-show=\"scope.state.albumId\"></button>\n\t\t<button class=\"ping btn btn-default fa fa-crosshairs\" rv-class-active=\"capturePing\" rv-show=\"scope.state.albumId\"></button>\n\t\t<span class=\"pull-right\" rv-show=\"scope.roomName\">\n\t\t\t{ scope.users |length } viewers\n\t\t</span> &nbsp;\n\t\t<button class=\"btn btn-default fa fa-clipboard\" rv-show=\"scope.roomName\"\n\t\t\ttooltip=\"Invite link copied to Clipboard\"\n\t\t\trv-data-clipboard-text=\"scope.href\">\n\t\t</button>\n\t",
+		template: '\n\t\t<div class="fa fa-bars toggle-left-sidebar"></div>\n\t\t<span class="bold">\n\t\t\t<span rv-unless="scope.roomName">{ scope.appName }</span>\n\t\t\t<span rv-if="scope.roomName"><a href="#">{ scope.appName }</a></span>\n\t\t</span>\n\t\t<div class="tools">\n\t\t\t<span><span class="stop fa fa-stop" rv-show="scope.state.albumId"></span></span>\n\t\t\t<span><span class="ping fa fa-crosshairs" rv-class-active="capturePing" rv-show="scope.state.albumId"></span></span>\n\t\t</div>\n\t\t<span class="pull-right" rv-show="scope.roomName">\n\t\t\t{ scope.users |length } viewers\n\t\t</span> &nbsp;\n\t\t<div class="tools">\n\t\t\t<span class="fa fa-clipboard" rv-show="scope.roomName"\n\t\t\t\ttooltip="Invite link copied to Clipboard"\n\t\t\t\trv-data-clipboard-text="scope.href">\n\t\t\t</span>\n\t\t</div>\n\t',
 		events: {
 			'click .stop': function clickStop(e) {
 				RTChat.RTCWrapper.updateState({ albumId: null, slides: null });
@@ -4070,9 +4072,49 @@
 /* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+	
+	// load the styles
+	var content = __webpack_require__(16);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(11)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/sass-loader/index.js!./header.css", function() {
+				var newContent = require("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/sass-loader/index.js!./header.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 16 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(10)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, "#Header {\n  display: flex;\n  padding: 0;\n  color: #5A738E;\n  background-color: #EDEDED;\n  border-bottom: 1px solid #D9DEE4; }\n  #Header a {\n    color: #5A738E;\n    margin-right: 5px; }\n  #Header > span {\n    margin: auto 0 auto 15px; }\n  #Header > div.tools {\n    margin: 0 0 0 5px;\n    display: flex; }\n    #Header > div.tools > span {\n      margin: 0;\n      display: flex;\n      align-items: center; }\n      #Header > div.tools > span:hover {\n        background-color: #D9DEE4; }\n  #Header .fa {\n    margin: 0;\n    padding: 0 15px;\n    color: #5A738E;\n    font-size: 18px; }\n  #Header .fa-bars {\n    font-size: 30px;\n    padding: 10px;\n    border-right: 1px solid; }\n", "", {"version":3,"sources":["/./app/styles/header.css"],"names":[],"mappings":"AAAA;EACE,cAAc;EACd,WAAW;EACX,eAAe;EACf,0BAA0B;EAC1B,iCAAiC,EAAE;EACnC;IACE,eAAe;IACf,kBAAkB,EAAE;EACtB;IACE,yBAAyB,EAAE;EAC7B;IACE,kBAAkB;IAClB,cAAc,EAAE;IAChB;MACE,UAAU;MACV,cAAc;MACd,oBAAoB,EAAE;MACtB;QACE,0BAA0B,EAAE;EAClC;IACE,UAAU;IACV,gBAAgB;IAChB,eAAe;IACf,gBAAgB,EAAE;EACpB;IACE,gBAAgB;IAChB,cAAc;IACd,wBAAwB,EAAE","file":"header.css","sourcesContent":["#Header {\n  display: flex;\n  padding: 0;\n  color: #5A738E;\n  background-color: #EDEDED;\n  border-bottom: 1px solid #D9DEE4; }\n  #Header a {\n    color: #5A738E;\n    margin-right: 5px; }\n  #Header > span {\n    margin: auto 0 auto 15px; }\n  #Header > div.tools {\n    margin: 0 0 0 5px;\n    display: flex; }\n    #Header > div.tools > span {\n      margin: 0;\n      display: flex;\n      align-items: center; }\n      #Header > div.tools > span:hover {\n        background-color: #D9DEE4; }\n  #Header .fa {\n    margin: 0;\n    padding: 0 15px;\n    color: #5A738E;\n    font-size: 18px; }\n  #Header .fa-bars {\n    font-size: 30px;\n    padding: 10px;\n    border-right: 1px solid; }\n"],"sourceRoot":"webpack://"}]);
+	
+	// exports
+
+
+/***/ },
+/* 17 */
+/***/ function(module, exports, __webpack_require__) {
+
 	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;(function (global, factory) {
 	    if (true) {
-	        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [module, __webpack_require__(16), __webpack_require__(18), __webpack_require__(19)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+	        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [module, __webpack_require__(18), __webpack_require__(20), __webpack_require__(21)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 	    } else if (typeof exports !== "undefined") {
 	        factory(module, require('./clipboard-action'), require('tiny-emitter'), require('good-listener'));
 	    } else {
@@ -4231,12 +4273,12 @@
 	});
 
 /***/ },
-/* 16 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;(function (global, factory) {
 	    if (true) {
-	        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [module, __webpack_require__(17)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+	        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [module, __webpack_require__(19)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 	    } else if (typeof exports !== "undefined") {
 	        factory(module, require('select'));
 	    } else {
@@ -4462,7 +4504,7 @@
 	});
 
 /***/ },
-/* 17 */
+/* 19 */
 /***/ function(module, exports) {
 
 	function select(element) {
@@ -4496,7 +4538,7 @@
 
 
 /***/ },
-/* 18 */
+/* 20 */
 /***/ function(module, exports) {
 
 	function E () {
@@ -4568,11 +4610,11 @@
 
 
 /***/ },
-/* 19 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var is = __webpack_require__(20);
-	var delegate = __webpack_require__(21);
+	var is = __webpack_require__(22);
+	var delegate = __webpack_require__(23);
 	
 	/**
 	 * Validates all params and calls the right
@@ -4669,7 +4711,7 @@
 
 
 /***/ },
-/* 20 */
+/* 22 */
 /***/ function(module, exports) {
 
 	/**
@@ -4724,10 +4766,10 @@
 
 
 /***/ },
-/* 21 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var closest = __webpack_require__(22);
+	var closest = __webpack_require__(24);
 	
 	/**
 	 * Delegates event to a selector.
@@ -4774,10 +4816,10 @@
 
 
 /***/ },
-/* 22 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var matches = __webpack_require__(23)
+	var matches = __webpack_require__(25)
 	
 	module.exports = function (element, selector, checkYoSelf) {
 	  var parent = checkYoSelf ? element : element.parentNode
@@ -4790,7 +4832,7 @@
 
 
 /***/ },
-/* 23 */
+/* 25 */
 /***/ function(module, exports) {
 
 	
@@ -4835,7 +4877,7 @@
 	}
 
 /***/ },
-/* 24 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($) {'use strict';
@@ -4844,7 +4886,7 @@
 	
 	module.exports = Backbone.View.extend({
 		id: 'HelpPanel',
-		template: '\n\t\t<h4>\n\t\t\tGetting Started is simple:\n\t\t\t<span class="pull-right fa fa-times toggle-help"></span>\n\t\t</h4>\n\t\t<ol>\n\t\t\t<li><span class="signin"> Sign-in with Imgur </span> or\n\t\t\t\t<span class="add-acct"> add anothers account. </span></li>\n\t\t\t<li><span class="upload"> Upload presentation to imgur. </span></li>\n\t\t\t<li><span class="invite"> Invite people to view your live presentation. </span></li>\n\t\t\t<li><span class="start disabled"> Start presentation by clicking it in the sidebar. </span></li>\n\t\t</ol>\n\t\t<a href="https://github.com/RTChat/LiveSlide/issues/new">report a bug</a>\n\t',
+		template: '\n\t\t<h3>\n\t\t\tGetting Started is simple:\n\t\t\t<span class="pull-right fa fa-times toggle-help"></span>\n\t\t</h3>\n\t\t<ol>\n\t\t\t<li>\n\t\t\t\t<span class="signin inline btn btn-primary bold"> Sign-in with Imgur </span> or\n\t\t\t\t<span class="add-acct inline btn btn-default"> add anothers account </span>\n\t\t\t</li>\n\t\t\t<li><span class="upload btn btn-default"> Upload presentation to imgur </span></li>\n\t\t\t<li><span class="invite btn btn-default"> Invite people to view your live presentation </span></li>\n\t\t\t<li><span class="start disabled btn btn-default"> Start presentation by clicking it in the sidebar </span></li>\n\t\t</ol>\n\t\t<span class="fa fa-bug"></span>\n\t\t<a href="https://github.com/RTChat/LiveSlide/issues/new">report a bug</a>\n\t',
 		//NOTE: this is extremely hacky as it relies on, and manipulates other views ☠
 		events: {
 			'click .signin': function clickSignin(ev) {
@@ -4867,7 +4909,6 @@
 		},
 		render: function render() {
 			this.$el.html(this.template);
-			this.$('li > span').addClass("btn btn-default");
 	
 			// Disable "sign in" button when signed in.
 			if (RTChat.UserService.getAppData().signedin_imgur_accounts) this.$('.signin').addClass("disabled");
@@ -4878,7 +4919,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 25 */
+/* 27 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -4903,12 +4944,12 @@
 	});
 
 /***/ },
-/* 26 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(_, $) {'use strict';
 	
-	__webpack_require__(27);
+	__webpack_require__(29);
 	
 	var original_events = RTChat.Views.Layout.prototype.events;
 	
@@ -4961,13 +5002,13 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(3)))
 
 /***/ },
-/* 27 */
+/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(28);
+	var content = __webpack_require__(30);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(11)(content, {});
@@ -4987,7 +5028,7 @@
 	}
 
 /***/ },
-/* 28 */
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(10)();
@@ -4995,18 +5036,18 @@
 	
 	
 	// module
-	exports.push([module.id, "/* Overrides styles from RTChat */\n/* HACK: Fix issues with mobile OpenTips */\n@media (max-width: 600px) {\n  .opentip-container {\n    max-width: 30%;\n    text-align: center; } }\n", "", {"version":3,"sources":["/./app/styles/layout.css"],"names":[],"mappings":"AAAA,kCAAkC;AAClC,2CAA2C;AAC3C;EACE;IACE,eAAe;IACf,mBAAmB,EAAE,EAAE","file":"layout.css","sourcesContent":["/* Overrides styles from RTChat */\n/* HACK: Fix issues with mobile OpenTips */\n@media (max-width: 600px) {\n  .opentip-container {\n    max-width: 30%;\n    text-align: center; } }\n"],"sourceRoot":"webpack://"}]);
+	exports.push([module.id, "/* Overrides styles from RTChat */\n/* HACK: Fix issues with mobile OpenTips */\n@media (max-width: 600px) {\n  .opentip-container {\n    max-width: 30%;\n    text-align: center; } }\n\n.main-panel {\n  color: #5A738E;\n  background-color: #F7F7F7 !important; }\n  .main-panel .btn:not(.btn-primary) {\n    color: inherit; }\n\n.bold {\n  font-weight: bold !important; }\n\n/* Override Bootstrap */\n.btn-default.disabled {\n  color: grey !important; }\n", "", {"version":3,"sources":["/./app/styles/layout.css"],"names":[],"mappings":"AAAA,kCAAkC;AAClC,2CAA2C;AAC3C;EACE;IACE,eAAe;IACf,mBAAmB,EAAE,EAAE;;AAE3B;EACE,eAAe;EACf,qCAAqC,EAAE;EACvC;IACE,eAAe,EAAE;;AAErB;EACE,6BAA6B,EAAE;;AAEjC,wBAAwB;AACxB;EACE,uBAAuB,EAAE","file":"layout.css","sourcesContent":["/* Overrides styles from RTChat */\n/* HACK: Fix issues with mobile OpenTips */\n@media (max-width: 600px) {\n  .opentip-container {\n    max-width: 30%;\n    text-align: center; } }\n\n.main-panel {\n  color: #5A738E;\n  background-color: #F7F7F7 !important; }\n  .main-panel .btn:not(.btn-primary) {\n    color: inherit; }\n\n.bold {\n  font-weight: bold !important; }\n\n/* Override Bootstrap */\n.btn-default.disabled {\n  color: grey !important; }\n"],"sourceRoot":"webpack://"}]);
 	
 	// exports
 
 
 /***/ },
-/* 29 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(Rivets) {'use strict';
 	
-	__webpack_require__(31);
+	__webpack_require__(33);
 	
 	module.exports = RTChat.Views.RoomPanel.extend({
 		template: '\n\t\t<div class="waiting-box" rv-hide="scope.rtc_state.slides">\n\t\t\t<div class="waiting-msg">\n\t\t\t\tWaiting for presentation to start..\n\t\t\t</div>\n\t\t\t<div rv-hide="scope.showHelp">\n\t\t\t\t<button class="btn btn-default toggle-help"> Help </button>\n\t\t\t</div>\n\t\t\t<div class="help" rv-show="scope.isAdmin |and scope.showHelp">\n\t\t\t\t<div data-subview="help"></div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div data-subview="viewer"></div>\n\t\t<div rv-show="scope.rtc_state.showChat">\n\t\t\t<div data-subview="chat"></div>\n\t\t</div>\n\t',
@@ -5057,22 +5098,22 @@
 			return this;
 		}
 	});
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(30)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(32)))
 
 /***/ },
-/* 30 */
+/* 32 */
 /***/ function(module, exports) {
 
 	module.exports = RTChat.Rivets;
 
 /***/ },
-/* 31 */
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(32);
+	var content = __webpack_require__(34);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(11)(content, {});
@@ -5092,7 +5133,7 @@
 	}
 
 /***/ },
-/* 32 */
+/* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(10)();
@@ -5100,29 +5141,36 @@
 	
 	
 	// module
-	exports.push([module.id, "#RoomPanel .waiting-box {\n  padding: 0 25px;\n  padding-bottom: 25px;\n  text-align: center; }\n  #RoomPanel .waiting-box > * {\n    margin-top: 25px; }\n  #RoomPanel .waiting-box .waiting-msg {\n    display: inline-block;\n    padding: 25px 25px;\n    font-size: 20px;\n    background-color: #bcbcbc;\n    border: 1px solid grey;\n    border-radius: 15px; }\n  #RoomPanel .waiting-box ol {\n    text-align: initial;\n    padding-left: 15px; }\n  #RoomPanel .waiting-box .fa {\n    cursor: pointer; }\n  #RoomPanel .waiting-box a {\n    color: blue; }\n", "", {"version":3,"sources":["/./app/styles/room_panel.css"],"names":[],"mappings":"AAAA;EACE,gBAAgB;EAChB,qBAAqB;EACrB,mBAAmB,EAAE;EACrB;IACE,iBAAiB,EAAE;EACrB;IACE,sBAAsB;IACtB,mBAAmB;IACnB,gBAAgB;IAChB,0BAA0B;IAC1B,uBAAuB;IACvB,oBAAoB,EAAE;EACxB;IACE,oBAAoB;IACpB,mBAAmB,EAAE;EACvB;IACE,gBAAgB,EAAE;EACpB;IACE,YAAY,EAAE","file":"room_panel.css","sourcesContent":["#RoomPanel .waiting-box {\n  padding: 0 25px;\n  padding-bottom: 25px;\n  text-align: center; }\n  #RoomPanel .waiting-box > * {\n    margin-top: 25px; }\n  #RoomPanel .waiting-box .waiting-msg {\n    display: inline-block;\n    padding: 25px 25px;\n    font-size: 20px;\n    background-color: #bcbcbc;\n    border: 1px solid grey;\n    border-radius: 15px; }\n  #RoomPanel .waiting-box ol {\n    text-align: initial;\n    padding-left: 15px; }\n  #RoomPanel .waiting-box .fa {\n    cursor: pointer; }\n  #RoomPanel .waiting-box a {\n    color: blue; }\n"],"sourceRoot":"webpack://"}]);
+	exports.push([module.id, "#RoomPanel .waiting-box {\n  padding: 0 25px;\n  padding-bottom: 25px;\n  text-align: center; }\n  #RoomPanel .waiting-box > * {\n    margin-top: 25px; }\n  #RoomPanel .waiting-box .waiting-msg {\n    font-size: 25px; }\n  #RoomPanel .waiting-box .waiting-msg, #RoomPanel .waiting-box #HelpPanel {\n    background-color: white;\n    padding: 25px 25px;\n    border-radius: 15px; }\n  #RoomPanel .waiting-box ol {\n    text-align: initial;\n    padding-left: 15px; }\n    #RoomPanel .waiting-box ol li {\n      margin-top: 9px; }\n      #RoomPanel .waiting-box ol li .btn {\n        font-size: 16px;\n        padding: 20px; }\n  #RoomPanel .waiting-box .fa {\n    cursor: pointer; }\n  #RoomPanel .waiting-box a {\n    color: blue; }\n  #RoomPanel .waiting-box #HelpPanel h3 {\n    margin-bottom: 10px; }\n  #RoomPanel .waiting-box #HelpPanel .btn:not(.inline) {\n    display: block; }\n", "", {"version":3,"sources":["/./app/styles/room_panel.css"],"names":[],"mappings":"AAAA;EACE,gBAAgB;EAChB,qBAAqB;EACrB,mBAAmB,EAAE;EACrB;IACE,iBAAiB,EAAE;EACrB;IACE,gBAAgB,EAAE;EACpB;IACE,wBAAwB;IACxB,mBAAmB;IACnB,oBAAoB,EAAE;EACxB;IACE,oBAAoB;IACpB,mBAAmB,EAAE;IACrB;MACE,gBAAgB,EAAE;MAClB;QACE,gBAAgB;QAChB,cAAc,EAAE;EACtB;IACE,gBAAgB,EAAE;EACpB;IACE,YAAY,EAAE;EAChB;IACE,oBAAoB,EAAE;EACxB;IACE,eAAe,EAAE","file":"room_panel.css","sourcesContent":["#RoomPanel .waiting-box {\n  padding: 0 25px;\n  padding-bottom: 25px;\n  text-align: center; }\n  #RoomPanel .waiting-box > * {\n    margin-top: 25px; }\n  #RoomPanel .waiting-box .waiting-msg {\n    font-size: 25px; }\n  #RoomPanel .waiting-box .waiting-msg, #RoomPanel .waiting-box #HelpPanel {\n    background-color: white;\n    padding: 25px 25px;\n    border-radius: 15px; }\n  #RoomPanel .waiting-box ol {\n    text-align: initial;\n    padding-left: 15px; }\n    #RoomPanel .waiting-box ol li {\n      margin-top: 9px; }\n      #RoomPanel .waiting-box ol li .btn {\n        font-size: 16px;\n        padding: 20px; }\n  #RoomPanel .waiting-box .fa {\n    cursor: pointer; }\n  #RoomPanel .waiting-box a {\n    color: blue; }\n  #RoomPanel .waiting-box #HelpPanel h3 {\n    margin-bottom: 10px; }\n  #RoomPanel .waiting-box #HelpPanel .btn:not(.inline) {\n    display: block; }\n"],"sourceRoot":"webpack://"}]);
 	
 	// exports
 
 
 /***/ },
-/* 33 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(_, $, Rivets) {'use strict';
 	
-	__webpack_require__(34);
+	__webpack_require__(36);
 	
-	var AppConfig = __webpack_require__(36);
-	var UploadModal = __webpack_require__(37);
-	var ImgurLoader = __webpack_require__(40);
+	var AppConfig = __webpack_require__(38);
+	var UploadModal = __webpack_require__(39);
+	var ImgurLoader = __webpack_require__(42);
 	
 	module.exports = RTChat.Views.Sidebar.extend({
-		template: '\n\t\t<div rv-if="scope.signed_in_accounts |length |eq 0" class="signin">\n\t\t\t<a rv-href="\'https://api.imgur.com/oauth2/authorize?client_id=\' |+ scope.clientId |+ \'&response_type=token&state=\' |+ scope.hash">\n\t\t\t\tSign-in with Imgur to upload\n\t\t\t</a>\n\t\t\t<span class="pull-right fa fa-question-circle"\n\t\t\t\ttooltip="Imgur is a free image hosting site that liveslide uses to store the presentations you upload">\n\t\t\t</span>\n\t\t</div>\n\t\t<div rv-each-user="scope.signed_in_accounts" class="dropdown">\n\t\t\t<div rv-data-acct-name="user.name">\n\t\t\t\t{ user.name }\n\t\t\t\t<span class="pull-right fa fa-ellipsis-v"></span>\n\t\t\t\t<span class="pull-right fa fa-upload"></span>\n\t\t\t</div>\n\t\t\t<ul class="album">\n\t\t\t\t<li rv-each-album="user.albums" rv-data-id="album.id">\n\t\t\t\t\t{ album.title }\n\t\t\t\t</li>\n\t\t\t</ul>\n\t\t</div>\n\t\t<div class="add-acct">\n\t\t\t<span rv-hide="scope.editing">Add  Imgur Account </span>\n\t\t\t<span class="pull-right fa fa-question-circle"\n\t\t\t\ttooltip="You can add any imgur account and view its albums as presentations">\n\t\t\t</span>\n\t\t\t<input rv-show="scope.editing" placeholder="Imgur Account Name">\n\t\t</div>\n\t\t<div rv-each-user="scope.other_accounts" class="dropdown" >\n\t\t\t<div rv-data-acct-name="user.name">\n\t\t\t\t{ user.name }\n\t\t\t\t<span class="pull-right fa fa-ellipsis-v"></span>\n\t\t\t</div>\n\t\t\t<ul class="album">\n\t\t\t\t<li rv-each-album="user.albums" rv-data-id="album.id">\n\t\t\t\t\t{ album.title }\n\t\t\t\t</li>\n\t\t\t</ul>\n\t\t</div>\n\t\t<div data-subview="context_menu"></div>\n\t\t<div data-subview="upload_modal"></div>\n\t',
+		template: '\n\t\t<a rv-if="scope.signed_in_accounts |length |eq 0" class="signin menu-item"\n\t\t\trv-href="\'https://api.imgur.com/oauth2/authorize?client_id=\' |+ scope.clientId |+ \'&response_type=token&state=\' |+ scope.hash">\n\t\t\tSign-in with Imgur to upload\n\t\t\t<span class="pull-right fa fa-question-circle"\n\t\t\t\ttooltip="Imgur is a free image hosting site that liveslide uses to store the presentations you upload">\n\t\t\t</span>\n\t\t</a>\n\t\t<div rv-each-user="scope.signed_in_accounts" class="dropdown open">\n\t\t\t<div rv-data-acct-name="user.name">\n\t\t\t\t<span class="fa fa-chevron-circle-right"></span>\n\t\t\t\t{ user.name }\n\t\t\t\t<span class="pull-right fa fa-ellipsis-v"></span>\n\t\t\t\t<span class="pull-right fa fa-upload"></span>\n\t\t\t</div>\n\t\t\t<ul class="album">\n\t\t\t\t<li rv-each-album="user.albums" rv-data-id="album.id">\n\t\t\t\t\t{ album.title }\n\t\t\t\t</li>\n\t\t\t</ul>\n\t\t</div>\n\t\t<div class="add-acct menu-item">\n\t\t\t<span rv-hide="scope.editing">Add  Imgur Account </span>\n\t\t\t<span class="pull-right fa fa-question-circle"\n\t\t\t\ttooltip="You can add any imgur account and view its albums as presentations">\n\t\t\t</span>\n\t\t\t<input rv-show="scope.editing" placeholder="Imgur Account Name">\n\t\t</div>\n\t\t<div rv-each-user="scope.other_accounts" class="dropdown open" >\n\t\t\t<div rv-data-acct-name="user.name">\n\t\t\t\t<span class="fa fa-chevron-circle-right"></span>\n\t\t\t\t{ user.name }\n\t\t\t\t<span class="pull-right fa fa-ellipsis-v"></span>\n\t\t\t</div>\n\t\t\t<ul class="album">\n\t\t\t\t<li rv-each-album="user.albums" rv-data-id="album.id">\n\t\t\t\t\t{ album.title }\n\t\t\t\t</li>\n\t\t\t</ul>\n\t\t</div>\n\t\t<div data-subview="context_menu"></div>\n\t\t<div data-subview="upload_modal"></div>\n\t',
 		contextMenuTemplate: '\n\t\t<li class="imgur"><a> View & Edit on Imgur </a></li>\n\t\t<li class="delete"><a> Remove </a></li>\n\t',
 		//TODO:
 		// <li class="refresh"><a> Refresh </a></li>
 		events: {
+			'click .dropdown > div': function clickDropdownDiv(e) {
+				// Toggle open
+				this.$(e.target).parent().toggleClass('open');
+			},
+			'click .signin .fa': function clickSigninFa(e) {
+				e.preventDefault(); // Dont follow link when clicking tooltip
+			},
 			'click .album > li': function clickAlbumLi(e) {
 				var self = this;
 				var target = this.$(e.currentTarget);
@@ -5153,8 +5201,6 @@
 						self.inhibitAutoOpen = false;
 					});
 				});
-	
-				// target.addClass("selected"); //TODO: loading?
 			},
 			'click .fa-upload': function clickFaUpload() {
 				this.subviews.upload_modal.show();
@@ -5324,16 +5370,16 @@
 		},
 		scope: {}
 	});
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(3), __webpack_require__(30)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(3), __webpack_require__(32)))
 
 /***/ },
-/* 34 */
+/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(35);
+	var content = __webpack_require__(37);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(11)(content, {});
@@ -5353,7 +5399,7 @@
 	}
 
 /***/ },
-/* 35 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(10)();
@@ -5361,26 +5407,26 @@
 	
 	
 	// module
-	exports.push([module.id, "#Sidebar {\n  font-size: 18; }\n  #Sidebar.open {\n    flex-basis: 280px; }\n  #Sidebar > * {\n    margin: 5px 5px 0;\n    /* Bootstrap Override */\n    /* List Items */\n    /* Clickable */ }\n    #Sidebar > *.dropdown {\n      position: static; }\n    #Sidebar > * > a {\n      color: blue; }\n    #Sidebar > *, #Sidebar > * > div, #Sidebar > * > ul > li {\n      margin-top: 5px; }\n      #Sidebar > * > .fa, #Sidebar > * > div > .fa, #Sidebar > * > ul > li > .fa {\n        width: 20px;\n        margin: 0 2px;\n        line-height: inherit;\n        text-align: center;\n        color: black; }\n    #Sidebar > *:not(.dropdown), #Sidebar > * > ul > li, #Sidebar > * .fa {\n      cursor: pointer; }\n      #Sidebar > *:not(.dropdown):hover, #Sidebar > * > ul > li:hover, #Sidebar > * .fa:hover {\n        color: lightgrey; }\n  #Sidebar #ContextMenu {\n    margin: 0;\n    /* Override RTChat */ }\n    #Sidebar #ContextMenu > li {\n      padding: 0;\n      /* Override Bootstrap */ }\n  #Sidebar li.selected {\n    color: yellow; }\n", "", {"version":3,"sources":["/./app/styles/sidebar.css"],"names":[],"mappings":"AAAA;EACE,cAAc,EAAE;EAChB;IACE,kBAAkB,EAAE;EACtB;IACE,kBAAkB;IAClB,wBAAwB;IACxB,gBAAgB;IAChB,eAAe,EAAE;IACjB;MACE,iBAAiB,EAAE;IACrB;MACE,YAAY,EAAE;IAChB;MACE,gBAAgB,EAAE;MAClB;QACE,YAAY;QACZ,cAAc;QACd,qBAAqB;QACrB,mBAAmB;QACnB,aAAa,EAAE;IACnB;MACE,gBAAgB,EAAE;MAClB;QACE,iBAAiB,EAAE;EACzB;IACE,UAAU;IACV,qBAAqB,EAAE;IACvB;MACE,WAAW;MACX,wBAAwB,EAAE;EAC9B;IACE,cAAc,EAAE","file":"sidebar.css","sourcesContent":["#Sidebar {\n  font-size: 18; }\n  #Sidebar.open {\n    flex-basis: 280px; }\n  #Sidebar > * {\n    margin: 5px 5px 0;\n    /* Bootstrap Override */\n    /* List Items */\n    /* Clickable */ }\n    #Sidebar > *.dropdown {\n      position: static; }\n    #Sidebar > * > a {\n      color: blue; }\n    #Sidebar > *, #Sidebar > * > div, #Sidebar > * > ul > li {\n      margin-top: 5px; }\n      #Sidebar > * > .fa, #Sidebar > * > div > .fa, #Sidebar > * > ul > li > .fa {\n        width: 20px;\n        margin: 0 2px;\n        line-height: inherit;\n        text-align: center;\n        color: black; }\n    #Sidebar > *:not(.dropdown), #Sidebar > * > ul > li, #Sidebar > * .fa {\n      cursor: pointer; }\n      #Sidebar > *:not(.dropdown):hover, #Sidebar > * > ul > li:hover, #Sidebar > * .fa:hover {\n        color: lightgrey; }\n  #Sidebar #ContextMenu {\n    margin: 0;\n    /* Override RTChat */ }\n    #Sidebar #ContextMenu > li {\n      padding: 0;\n      /* Override Bootstrap */ }\n  #Sidebar li.selected {\n    color: yellow; }\n"],"sourceRoot":"webpack://"}]);
+	exports.push([module.id, "#Sidebar {\n  font-size: 18;\n  background-color: #2D3C4B;\n  color: lightgrey; }\n  #Sidebar.open {\n    flex-basis: 280px; }\n  #Sidebar > .dropdown, #Sidebar .menu-item {\n    margin: 0;\n    user-select: none;\n    -moz-user-select: none;\n    -webkit-user-select: none;\n    /* Override A */\n    display: block;\n    color: inherit;\n    text-decoration: none !important;\n    /* Bootstrap Override */\n    /* Main Items */ }\n    #Sidebar > .dropdown.dropdown, #Sidebar .menu-item.dropdown {\n      position: static; }\n    #Sidebar > .dropdown:not(.dropdown), #Sidebar > .dropdown > div, #Sidebar .menu-item:not(.dropdown), #Sidebar .menu-item > div {\n      cursor: pointer;\n      border-top: 1px solid rgba(0, 0, 0, 0.1);\n      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);\n      padding: 10px 15px 9px; }\n      #Sidebar > .dropdown:not(.dropdown) > .fa, #Sidebar > .dropdown > div > .fa, #Sidebar .menu-item:not(.dropdown) > .fa, #Sidebar .menu-item > div > .fa {\n        width: 20px;\n        padding: 2px 5px;\n        text-align: center;\n        vertical-align: middle; }\n        #Sidebar > .dropdown:not(.dropdown) > .fa.fa-ellipsis-v:hover, #Sidebar > .dropdown:not(.dropdown) > .fa.fa-upload:hover, #Sidebar > .dropdown > div > .fa.fa-ellipsis-v:hover, #Sidebar > .dropdown > div > .fa.fa-upload:hover, #Sidebar .menu-item:not(.dropdown) > .fa.fa-ellipsis-v:hover, #Sidebar .menu-item:not(.dropdown) > .fa.fa-upload:hover, #Sidebar .menu-item > div > .fa.fa-ellipsis-v:hover, #Sidebar .menu-item > div > .fa.fa-upload:hover {\n          background-color: rgba(255, 255, 255, 0.05); }\n        #Sidebar > .dropdown:not(.dropdown) > .fa.fa-chevron-circle-right, #Sidebar > .dropdown > div > .fa.fa-chevron-circle-right, #Sidebar .menu-item:not(.dropdown) > .fa.fa-chevron-circle-right, #Sidebar .menu-item > div > .fa.fa-chevron-circle-right {\n          pointer-events: none;\n          margin-left: -7px;\n          margin-right: 3px; }\n      #Sidebar > .dropdown:not(.dropdown) input, #Sidebar > .dropdown > div input, #Sidebar .menu-item:not(.dropdown) input, #Sidebar .menu-item > div input {\n        color: #2D3C4B;\n        margin: -3px;\n        /* HACK */ }\n      #Sidebar > .dropdown:not(.dropdown):hover, #Sidebar > .dropdown > div:hover, #Sidebar .menu-item:not(.dropdown):hover, #Sidebar .menu-item > div:hover {\n        background-color: rgba(0, 0, 0, 0.2); }\n    #Sidebar > .dropdown.dropdown > div, #Sidebar .menu-item.dropdown > div {\n      /* button */\n      border-bottom: 1px solid rgba(0, 0, 0, 0.1); }\n    #Sidebar > .dropdown.dropdown > ul, #Sidebar .menu-item.dropdown > ul {\n      height: 0;\n      overflow: hidden;\n      margin-bottom: 0;\n      /* Bootstrap Override */\n      padding: 0;\n      /* Bootstrap Override */\n      background-color: rgba(0, 0, 0, 0.1);\n      /* List Items */ }\n      #Sidebar > .dropdown.dropdown > ul > li, #Sidebar .menu-item.dropdown > ul > li {\n        font-size: 15px;\n        padding: 4px 4px 4px 25px; }\n        #Sidebar > .dropdown.dropdown > ul > li:hover, #Sidebar > .dropdown.dropdown > ul > li.selected, #Sidebar .menu-item.dropdown > ul > li:hover, #Sidebar .menu-item.dropdown > ul > li.selected {\n          background-color: rgba(255, 255, 255, 0.1); }\n    #Sidebar > .dropdown.open > div > .fa-chevron-circle-right, #Sidebar .menu-item.open > div > .fa-chevron-circle-right {\n      transform: rotate(90deg); }\n    #Sidebar > .dropdown.open > ul, #Sidebar .menu-item.open > ul {\n      height: auto; }\n  #Sidebar #ContextMenu {\n    margin: 0;\n    /* Override RTChat */\n    padding: 5px 0;\n    background-color: white; }\n    #Sidebar #ContextMenu > li {\n      padding: 0;\n      /* Override Bootstrap */ }\n  #Sidebar .modal {\n    color: #333; }\n", "", {"version":3,"sources":["/./app/styles/sidebar.css"],"names":[],"mappings":"AAAA;EACE,cAAc;EACd,0BAA0B;EAC1B,iBAAiB,EAAE;EACnB;IACE,kBAAkB,EAAE;EACtB;IACE,UAAU;IACV,kBAAkB;IAClB,uBAAuB;IACvB,0BAA0B;IAC1B,gBAAgB;IAChB,eAAe;IACf,eAAe;IACf,iCAAiC;IACjC,wBAAwB;IACxB,gBAAgB,EAAE;IAClB;MACE,iBAAiB,EAAE;IACrB;MACE,gBAAgB;MAChB,yCAAyC;MACzC,oDAAoD;MACpD,uBAAuB,EAAE;MACzB;QACE,YAAY;QACZ,iBAAiB;QACjB,mBAAmB;QACnB,uBAAuB,EAAE;QACzB;UACE,4CAA4C,EAAE;QAChD;UACE,qBAAqB;UACrB,kBAAkB;UAClB,kBAAkB,EAAE;MACxB;QACE,eAAe;QACf,aAAa;QACb,UAAU,EAAE;MACd;QACE,qCAAqC,EAAE;IAC3C;MACE,YAAY;MACZ,4CAA4C,EAAE;IAChD;MACE,UAAU;MACV,iBAAiB;MACjB,iBAAiB;MACjB,wBAAwB;MACxB,WAAW;MACX,wBAAwB;MACxB,qCAAqC;MACrC,gBAAgB,EAAE;MAClB;QACE,gBAAgB;QAChB,0BAA0B,EAAE;QAC5B;UACE,2CAA2C,EAAE;IACnD;MACE,yBAAyB,EAAE;IAC7B;MACE,aAAa,EAAE;EACnB;IACE,UAAU;IACV,qBAAqB;IACrB,eAAe;IACf,wBAAwB,EAAE;IAC1B;MACE,WAAW;MACX,wBAAwB,EAAE;EAC9B;IACE,YAAY,EAAE","file":"sidebar.css","sourcesContent":["#Sidebar {\n  font-size: 18;\n  background-color: #2D3C4B;\n  color: lightgrey; }\n  #Sidebar.open {\n    flex-basis: 280px; }\n  #Sidebar > .dropdown, #Sidebar .menu-item {\n    margin: 0;\n    user-select: none;\n    -moz-user-select: none;\n    -webkit-user-select: none;\n    /* Override A */\n    display: block;\n    color: inherit;\n    text-decoration: none !important;\n    /* Bootstrap Override */\n    /* Main Items */ }\n    #Sidebar > .dropdown.dropdown, #Sidebar .menu-item.dropdown {\n      position: static; }\n    #Sidebar > .dropdown:not(.dropdown), #Sidebar > .dropdown > div, #Sidebar .menu-item:not(.dropdown), #Sidebar .menu-item > div {\n      cursor: pointer;\n      border-top: 1px solid rgba(0, 0, 0, 0.1);\n      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);\n      padding: 10px 15px 9px; }\n      #Sidebar > .dropdown:not(.dropdown) > .fa, #Sidebar > .dropdown > div > .fa, #Sidebar .menu-item:not(.dropdown) > .fa, #Sidebar .menu-item > div > .fa {\n        width: 20px;\n        padding: 2px 5px;\n        text-align: center;\n        vertical-align: middle; }\n        #Sidebar > .dropdown:not(.dropdown) > .fa.fa-ellipsis-v:hover, #Sidebar > .dropdown:not(.dropdown) > .fa.fa-upload:hover, #Sidebar > .dropdown > div > .fa.fa-ellipsis-v:hover, #Sidebar > .dropdown > div > .fa.fa-upload:hover, #Sidebar .menu-item:not(.dropdown) > .fa.fa-ellipsis-v:hover, #Sidebar .menu-item:not(.dropdown) > .fa.fa-upload:hover, #Sidebar .menu-item > div > .fa.fa-ellipsis-v:hover, #Sidebar .menu-item > div > .fa.fa-upload:hover {\n          background-color: rgba(255, 255, 255, 0.05); }\n        #Sidebar > .dropdown:not(.dropdown) > .fa.fa-chevron-circle-right, #Sidebar > .dropdown > div > .fa.fa-chevron-circle-right, #Sidebar .menu-item:not(.dropdown) > .fa.fa-chevron-circle-right, #Sidebar .menu-item > div > .fa.fa-chevron-circle-right {\n          pointer-events: none;\n          margin-left: -7px;\n          margin-right: 3px; }\n      #Sidebar > .dropdown:not(.dropdown) input, #Sidebar > .dropdown > div input, #Sidebar .menu-item:not(.dropdown) input, #Sidebar .menu-item > div input {\n        color: #2D3C4B;\n        margin: -3px;\n        /* HACK */ }\n      #Sidebar > .dropdown:not(.dropdown):hover, #Sidebar > .dropdown > div:hover, #Sidebar .menu-item:not(.dropdown):hover, #Sidebar .menu-item > div:hover {\n        background-color: rgba(0, 0, 0, 0.2); }\n    #Sidebar > .dropdown.dropdown > div, #Sidebar .menu-item.dropdown > div {\n      /* button */\n      border-bottom: 1px solid rgba(0, 0, 0, 0.1); }\n    #Sidebar > .dropdown.dropdown > ul, #Sidebar .menu-item.dropdown > ul {\n      height: 0;\n      overflow: hidden;\n      margin-bottom: 0;\n      /* Bootstrap Override */\n      padding: 0;\n      /* Bootstrap Override */\n      background-color: rgba(0, 0, 0, 0.1);\n      /* List Items */ }\n      #Sidebar > .dropdown.dropdown > ul > li, #Sidebar .menu-item.dropdown > ul > li {\n        font-size: 15px;\n        padding: 4px 4px 4px 25px; }\n        #Sidebar > .dropdown.dropdown > ul > li:hover, #Sidebar > .dropdown.dropdown > ul > li.selected, #Sidebar .menu-item.dropdown > ul > li:hover, #Sidebar .menu-item.dropdown > ul > li.selected {\n          background-color: rgba(255, 255, 255, 0.1); }\n    #Sidebar > .dropdown.open > div > .fa-chevron-circle-right, #Sidebar .menu-item.open > div > .fa-chevron-circle-right {\n      transform: rotate(90deg); }\n    #Sidebar > .dropdown.open > ul, #Sidebar .menu-item.open > ul {\n      height: auto; }\n  #Sidebar #ContextMenu {\n    margin: 0;\n    /* Override RTChat */\n    padding: 5px 0;\n    background-color: white; }\n    #Sidebar #ContextMenu > li {\n      padding: 0;\n      /* Override Bootstrap */ }\n  #Sidebar .modal {\n    color: #333; }\n"],"sourceRoot":"webpack://"}]);
 	
 	// exports
 
 
 /***/ },
-/* 36 */
+/* 38 */
 /***/ function(module, exports) {
 
 	module.exports = {"AppName":"LiveSlide","imgur_client_id":"f55a248021c48d6"}
 
 /***/ },
-/* 37 */
+/* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($, Rivets) {'use strict';
 	
-	__webpack_require__(38);
+	__webpack_require__(40);
 	
-	var ImgurLoader = __webpack_require__(40);
+	var ImgurLoader = __webpack_require__(42);
 	
 	module.exports = Backbone.View.extend({
 	  className: 'modal fade upload',
@@ -5468,16 +5514,16 @@
 	    this.trigger('hide');
 	  }
 	});
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3), __webpack_require__(30)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3), __webpack_require__(32)))
 
 /***/ },
-/* 38 */
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(39);
+	var content = __webpack_require__(41);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(11)(content, {});
@@ -5497,7 +5543,7 @@
 	}
 
 /***/ },
-/* 39 */
+/* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(10)();
@@ -5511,7 +5557,7 @@
 
 
 /***/ },
-/* 40 */
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($, _) {"use strict";
@@ -5556,14 +5602,14 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3), __webpack_require__(1)))
 
 /***/ },
-/* 41 */
+/* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($, Rivets) {'use strict';
 	
 	// A glorified wrapper for bootstrap carousel.
 	
-	__webpack_require__(42);
+	__webpack_require__(44);
 	
 	module.exports = Backbone.View.extend({
 		id: 'Viewer',
@@ -5650,16 +5696,16 @@
 		},
 		scope: {}
 	});
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3), __webpack_require__(30)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3), __webpack_require__(32)))
 
 /***/ },
-/* 42 */
+/* 44 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(43);
+	var content = __webpack_require__(45);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(11)(content, {});
@@ -5679,7 +5725,7 @@
 	}
 
 /***/ },
-/* 43 */
+/* 45 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(10)();
@@ -5693,12 +5739,12 @@
 
 
 /***/ },
-/* 44 */
+/* 46 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	__webpack_require__(45);
+	__webpack_require__(47);
 	
 	// Extend WelcomePanel
 	module.exports = RTChat.Views.WelcomePanel.extend({
@@ -5706,13 +5752,13 @@
 	});
 
 /***/ },
-/* 45 */
+/* 47 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(46);
+	var content = __webpack_require__(48);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(11)(content, {});
@@ -5732,7 +5778,7 @@
 	}
 
 /***/ },
-/* 46 */
+/* 48 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(10)();

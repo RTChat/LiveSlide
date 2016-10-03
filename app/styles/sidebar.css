@@ -1,50 +1,107 @@
 
 #Sidebar {
 	font-size: 18;
+	background-color: #2D3C4B;
+	color: lightgrey;
 
 	&.open {flex-basis: 280px;}
 
-	> * {
-		margin: 5px 5px 0;
+	> .dropdown, .menu-item {
+		margin: 0;
+
+		user-select: none;
+		-moz-user-select: none;
+		-webkit-user-select: none;
+
+		/* Override A */
+		display: block;
+		color: inherit;
+		text-decoration: none !important;
 
 		&.dropdown { position: static; } /* Bootstrap Override */
 
-		> a { color: blue; }
 
-		/* List Items */
-		&, > div, > ul > li {
-			margin-top: 5px;
+		/* Main Items */
+		&:not(.dropdown), > div {
+			cursor: pointer;
+			border-top: 1px solid rgba(0,0,0,0.1);
+			box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+			padding: 10px 15px 9px;
 
 			> .fa {
 				width: 20px;
-				margin: 0 2px;
-				line-height: inherit;
+				padding: 2px 5px;
 				text-align: center;
-				color: black;
+				vertical-align: middle;
+
+				&.fa-ellipsis-v:hover, &.fa-upload:hover {
+					background-color: rgba(255,255,255,0.05);
+				}
+
+				&.fa-chevron-circle-right {
+					pointer-events: none;
+					margin-left: -7px;
+					margin-right: 3px;
+				}
+			}
+
+			input {
+				color: #2D3C4B;
+				margin: -3px; /* HACK */
+			}
+
+			&:hover {
+				background-color: rgba(0,0,0,0.2);
 			}
 		}
 
-		/* Clickable */
-		&:not(.dropdown), > ul > li, .fa {
-			cursor: pointer;
-
-			&:hover {
-				color: lightgrey;
+		&.dropdown {
+			> div { /* button */
+				border-bottom: 1px solid rgba(0,0,0,0.1);
 			}
+
+			> ul {
+				height: 0;
+				overflow: hidden;
+
+				margin-bottom: 0; /* Bootstrap Override */
+				padding: 0;       /* Bootstrap Override */
+				background-color: rgba(0,0,0,0.1);
+
+
+				/* List Items */
+				> li {
+					font-size: 15px;
+					padding: 4px 4px 4px 25px;
+
+					&:hover, &.selected {
+						background-color: rgba(255,255,255,0.1);
+					}
+				}
+
+			}
+		}
+
+		&.open {
+			> div > .fa-chevron-circle-right { transform: rotate(90deg); }
+			> ul  { height: auto; }
 		}
 
 	}
 
 	#ContextMenu {
 		margin: 0; /* Override RTChat */
+		padding: 5px 0;
+		background-color: white;
 
 		> li {
 			padding: 0; /* Override Bootstrap */
 		}
 	}
 
-	li.selected {
-		color: yellow;
+	.modal {
+		color: #333;
 	}
+
 }
 

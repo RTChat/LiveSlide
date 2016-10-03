@@ -1,0 +1,46 @@
+
+#Header {
+	display: flex;
+	padding: 0;
+	color: #5A738E;
+	background-color: #EDEDED;
+	border-bottom: 1px solid #D9DEE4;
+
+	a {
+		color: #5A738E;
+		margin-right: 5px;
+	}
+
+	> span {
+		margin: auto 0 auto 15px;
+	}
+
+	> div.tools {
+		margin: 0 0 0 5px;
+		display: flex;
+
+		> span {
+			margin: 0;
+			display: flex;
+			align-items: center;
+
+			&:hover {
+				background-color: #D9DEE4;
+			}
+		}
+	}
+
+	.fa {
+		margin: 0;
+		padding: 0 15px;
+		color: #5A738E;
+		font-size: 18px;
+	}
+
+	.fa-bars {
+		font-size: 30px;
+		padding: 10px;
+
+		border-right: 1px solid;
+	}
+}

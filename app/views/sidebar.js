@@ -6,16 +6,16 @@ var ImgurLoader = require('utils/imgur_loader.js');
 
 module.exports = RTChat.Views.Sidebar.extend({
 	template: `
-		<div rv-if="scope.signed_in_accounts |length |eq 0" class="signin">
-			<a rv-href="'https://api.imgur.com/oauth2/authorize?client_id=' |+ scope.clientId |+ '&response_type=token&state=' |+ scope.hash">
-				Sign-in with Imgur to upload
-			</a>
+		<a rv-if="scope.signed_in_accounts |length |eq 0" class="signin menu-item"
+			rv-href="'https://api.imgur.com/oauth2/authorize?client_id=' |+ scope.clientId |+ '&response_type=token&state=' |+ scope.hash">
+			Sign-in with Imgur to upload
 			<span class="pull-right fa fa-question-circle"
 				tooltip="Imgur is a free image hosting site that liveslide uses to store the presentations you upload">
 			</span>
-		</div>
-		<div rv-each-user="scope.signed_in_accounts" class="dropdown">
+		</a>
+		<div rv-each-user="scope.signed_in_accounts" class="dropdown open">
 			<div rv-data-acct-name="user.name">
+				<span class="fa fa-chevron-circle-right"></span>
 				{ user.name }
 				<span class="pull-right fa fa-ellipsis-v"></span>
 				<span class="pull-right fa fa-upload"></span>
@@ -26,15 +26,16 @@ module.exports = RTChat.Views.Sidebar.extend({
 				</li>
 			</ul>
 		</div>
-		<div class="add-acct">
+		<div class="add-acct menu-item">
 			<span rv-hide="scope.editing">Add  Imgur Account </span>
 			<span class="pull-right fa fa-question-circle"
 				tooltip="You can add any imgur account and view its albums as presentations">
 			</span>
 			<input rv-show="scope.editing" placeholder="Imgur Account Name">
 		</div>
-		<div rv-each-user="scope.other_accounts" class="dropdown" >
+		<div rv-each-user="scope.other_accounts" class="dropdown open" >
 			<div rv-data-acct-name="user.name">
+				<span class="fa fa-chevron-circle-right"></span>
 				{ user.name }
 				<span class="pull-right fa fa-ellipsis-v"></span>
 			</div>
@@ -54,6 +55,12 @@ module.exports = RTChat.Views.Sidebar.extend({
 		//TODO:
 		// <li class="refresh"><a> Refresh </a></li>
 	events: {
+		'click .dropdown > div': function(e) { // Toggle open
+			this.$(e.target).parent().toggleClass('open');
+		},
+		'click .signin .fa':function(e) {
+			e.preventDefault(); // Dont follow link when clicking tooltip
+		},
 		'click .album > li': function(e) {
 			var self = this;
 			var target = this.$(e.currentTarget);
@@ -82,8 +89,6 @@ module.exports = RTChat.Views.Sidebar.extend({
 					self.inhibitAutoOpen = false;
 				});
 			});
-
-			// target.addClass("selected"); //TODO: loading?
 		},
 		'click .fa-upload': function() {
 			this.subviews.upload_modal.show();

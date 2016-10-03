@@ -10,3 +10,17 @@
 	}
 
 }
+
+.main-panel {
+	color: #5A738E;
+	background-color: #F7F7F7 !important;
+
+	.btn:not(.btn-primary){ color: inherit; }
+}
+
+.bold { font-weight: bold !important; }
+
+/* Override Bootstrap */
+.btn-default.disabled {
+	color: grey !important;
+}

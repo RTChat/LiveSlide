@@ -3,17 +3,20 @@
 module.exports = Backbone.View.extend({
 	id: 'HelpPanel',
 	template: `
-		<h4>
+		<h3>
 			Getting Started is simple:
 			<span class="pull-right fa fa-times toggle-help"></span>
-		</h4>
+		</h3>
 		<ol>
-			<li><span class="signin"> Sign-in with Imgur </span> or
-				<span class="add-acct"> add anothers account. </span></li>
-			<li><span class="upload"> Upload presentation to imgur. </span></li>
-			<li><span class="invite"> Invite people to view your live presentation. </span></li>
-			<li><span class="start disabled"> Start presentation by clicking it in the sidebar. </span></li>
+			<li>
+				<span class="signin inline btn btn-primary bold"> Sign-in with Imgur </span> or
+				<span class="add-acct inline btn btn-default"> add anothers account </span>
+			</li>
+			<li><span class="upload btn btn-default"> Upload presentation to imgur </span></li>
+			<li><span class="invite btn btn-default"> Invite people to view your live presentation </span></li>
+			<li><span class="start disabled btn btn-default"> Start presentation by clicking it in the sidebar </span></li>
 		</ol>
+		<span class="fa fa-bug"></span>
 		<a href="https://github.com/RTChat/LiveSlide/issues/new">report a bug</a>
 	`,
 	//NOTE: this is extremely hacky as it relies on, and manipulates other views ☠
@@ -41,7 +44,6 @@ module.exports = Backbone.View.extend({
 	},
 	render: function() {
 		this.$el.html(this.template);
-		this.$('li > span').addClass("btn btn-default");
 
 		// Disable "sign in" button when signed in.
 		if (RTChat.UserService.getAppData().signedin_imgur_accounts)
