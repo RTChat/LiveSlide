@@ -24,9 +24,7 @@
 			display: flex;
 			align-items: center;
 
-			&:hover {
-				background-color: #D9DEE4;
-			}
+			&:hover { background-color: #D9DEE4; }
 		}
 	}
 
@@ -42,5 +40,7 @@
 		padding: 10px;
 
 		border-right: 1px solid;
+
+		&:hover { background-color: #D9DEE4; }
 	}
 }

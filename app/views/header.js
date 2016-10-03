@@ -1,5 +1,5 @@
 
-require('styles/header.css')
+require('styles/header.css');
 
 var Clipboard = require('clipboard');
 
