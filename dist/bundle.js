@@ -5452,6 +5452,7 @@
 	      var user_conf = RTChat.UserService.getAppData().signedin_imgur_accounts[0];
 	      var data = new FormData(this.$('form')[0]);
 	      data.set("username", user_conf.name);
+	      data.set("client_id", RTChat.AppConfig.imgur_client_id);
 	      data.set("refresh_token", user_conf.refresh_token);
 	
 	      // Validate Name.
