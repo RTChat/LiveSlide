@@ -5,7 +5,7 @@
   "repository": "https://github.com/RTChat/LiveSlide",
   "version": "0.0.1",
   "scripts": {
-    "start": "node ./RTChat/server.js --port 9003 --plugin imgur_upload"
+    "start": "node node_modules/rtchat/server.js --port 9003 --plugin imgur_upload"
   },
   "license": "AGPL-3.0",
   "dependencies": {
@@ -20,7 +20,7 @@
     "hanson": "^1.1.1",
     "hson-loader": "^1.0.0",
     "imports-loader": "^0.6.5",
-    "jq-opentip": "thann/jq-opentip",
+    "jq-opentip": "github:thann/jq-opentip",
     "jquery": "^2.2.1",
     "jshint": "^2.9.1",
     "jshint-loader": "^0.8.3",
@@ -28,6 +28,7 @@
     "protractor": "^3.3.0",
     "protractor-console": "^2.0.1",
     "rivets": "^0.8.1",
+    "rtchat": "github:rtchat/rtchat",
     "sass-loader": "^3.2.0",
     "style-loader": "^0.13.0",
     "underscore": "^1.8.3",

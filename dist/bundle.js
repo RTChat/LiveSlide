@@ -42,7 +42,7 @@
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(_) {'use strict';
 	
@@ -59,12 +59,12 @@
 	_.extend(RTChat.Views, views);
 	
 	// Extend AppConfig
-	_.extend(RTChat.AppConfig, __webpack_require__(38));
+	_.extend(RTChat.AppConfig, __webpack_require__(36));
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
-/***/ },
+/***/ }),
 /* 1 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;//     Underscore.js 1.8.3
 	//     http://underscorejs.org
@@ -1616,9 +1616,9 @@
 	}.call(this));
 
 
-/***/ },
+/***/ }),
 /* 2 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(_) {// jQuery Tooltip plugin that extends OpenTip.
 	
@@ -1709,15 +1709,15 @@
 	
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
-/***/ },
+/***/ }),
 /* 3 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	module.exports = RTChat.jQuery;
 
-/***/ },
+/***/ }),
 /* 4 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	// Copyright (c) 2012 Matias Meno <m@tias.me>
 	
@@ -1735,9 +1735,9 @@
 	// Exposing the Opentip class
 	module.exports = Opentip;
 
-/***/ },
+/***/ }),
 /* 5 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(module) {
 	/*
@@ -3385,9 +3385,9 @@
 	
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)(module)))
 
-/***/ },
+/***/ }),
 /* 6 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	module.exports = function(module) {
 		if(!module.webpackPolyfill) {
@@ -3401,9 +3401,9 @@
 	}
 
 
-/***/ },
+/***/ }),
 /* 7 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var $, Adapter, ref,
 	  slice = [].slice;
@@ -3565,9 +3565,9 @@
 	})();
 
 
-/***/ },
+/***/ }),
 /* 8 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
@@ -3581,8 +3581,8 @@
 	if(false) {
 		// When the styles change, update the <style> tags
 		if(!content.locals) {
-			module.hot.accept("!!./../../../../css-loader/index.js?sourceMap!./../../../../sass-loader/index.js!./opentip.css", function() {
-				var newContent = require("!!./../../../../css-loader/index.js?sourceMap!./../../../../sass-loader/index.js!./opentip.css");
+			module.hot.accept("!!../../../../css-loader/index.js?sourceMap!../../../../sass-loader/index.js!./opentip.css", function() {
+				var newContent = require("!!../../../../css-loader/index.js?sourceMap!../../../../sass-loader/index.js!./opentip.css");
 				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 				update(newContent);
 			});
@@ -3591,9 +3591,9 @@
 		module.hot.dispose(function() { update(); });
 	}
 
-/***/ },
+/***/ }),
 /* 9 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(10)();
 	// imports
@@ -3605,9 +3605,9 @@
 	// exports
 
 
-/***/ },
+/***/ }),
 /* 10 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	/*
 		MIT License http://www.opensource.org/licenses/mit-license.php
@@ -3661,9 +3661,9 @@
 	};
 
 
-/***/ },
+/***/ }),
 /* 11 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	/*
 		MIT License http://www.opensource.org/licenses/mit-license.php
@@ -3678,7 +3678,7 @@
 			};
 		},
 		isOldIE = memoize(function() {
-			return /msie [6-9]\b/.test(window.navigator.userAgent.toLowerCase());
+			return /msie [6-9]\b/.test(self.navigator.userAgent.toLowerCase());
 		}),
 		getHeadElement = memoize(function () {
 			return document.head || document.getElementsByTagName("head")[0];
@@ -3913,9 +3913,9 @@
 	}
 
 
-/***/ },
+/***/ }),
 /* 12 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	/*** IMPORTS FROM imports-loader ***/
 	var jQuery = __webpack_require__(3);
@@ -3932,29 +3932,44 @@
 	     *       the user visible viewport of a web browser.
 	     *       only accounts for vertical position, not horizontal.
 	     */
-	    var $w = $(window);
-	    $.fn.visible = function(partial,hidden,direction){
+	    var $w=$(window);
+	    $.fn.visible = function(partial,hidden,direction,container){
 	
 	        if (this.length < 1)
 	            return;
-	
-	        var $t        = this.length > 1 ? this.eq(0) : this,
-	            t         = $t.get(0),
-	            vpWidth   = $w.width(),
-	            vpHeight  = $w.height(),
-	            direction = (direction) ? direction : 'both',
-	            clientSize = hidden === true ? t.offsetWidth * t.offsetHeight : true;
+		
+		// Set direction default to 'both'.
+		direction = direction || 'both';
+		    
+	        var $t          = this.length > 1 ? this.eq(0) : this,
+							isContained = typeof container !== 'undefined' && container !== null,
+							$c				  = isContained ? $(container) : $w,
+							wPosition        = isContained ? $c.position() : 0,
+	            t           = $t.get(0),
+	            vpWidth     = $c.outerWidth(),
+	            vpHeight    = $c.outerHeight(),
+	            clientSize  = hidden === true ? t.offsetWidth * t.offsetHeight : true;
 	
 	        if (typeof t.getBoundingClientRect === 'function'){
 	
 	            // Use this native browser method, if available.
 	            var rec = t.getBoundingClientRect(),
-	                tViz = rec.top    >= 0 && rec.top    <  vpHeight,
-	                bViz = rec.bottom >  0 && rec.bottom <= vpHeight,
-	                lViz = rec.left   >= 0 && rec.left   <  vpWidth,
-	                rViz = rec.right  >  0 && rec.right  <= vpWidth,
+	                tViz = isContained ?
+													rec.top - wPosition.top >= 0 && rec.top < vpHeight + wPosition.top :
+													rec.top >= 0 && rec.top < vpHeight,
+	                bViz = isContained ?
+													rec.bottom - wPosition.top > 0 && rec.bottom <= vpHeight + wPosition.top :
+													rec.bottom > 0 && rec.bottom <= vpHeight,
+	                lViz = isContained ?
+													rec.left - wPosition.left >= 0 && rec.left < vpWidth + wPosition.left :
+													rec.left >= 0 && rec.left <  vpWidth,
+	                rViz = isContained ?
+													rec.right - wPosition.left > 0  && rec.right < vpWidth + wPosition.left  :
+													rec.right > 0 && rec.right <= vpWidth,
 	                vVisible   = partial ? tViz || bViz : tViz && bViz,
-	                hVisible   = partial ? lViz || rViz : lViz && rViz;
+	                hVisible   = partial ? lViz || rViz : lViz && rViz,
+			vVisible = (rec.top < 0 && rec.bottom > vpHeight) ? true : vVisible,
+	                hVisible = (rec.left < 0 && rec.right > vpWidth) ? true : hVisible;
 	
 	            if(direction === 'both')
 	                return clientSize && vVisible && hVisible;
@@ -3964,14 +3979,14 @@
 	                return clientSize && hVisible;
 	        } else {
 	
-	            var viewTop         = $w.scrollTop(),
+	            var viewTop 				= isContained ? 0 : wPosition,
 	                viewBottom      = viewTop + vpHeight,
-	                viewLeft        = $w.scrollLeft(),
+	                viewLeft        = $c.scrollLeft(),
 	                viewRight       = viewLeft + vpWidth,
-	                offset          = $t.offset(),
-	                _top            = offset.top,
+	                position          = $t.position(),
+	                _top            = position.top,
 	                _bottom         = _top + $t.height(),
-	                _left           = offset.left,
+	                _left           = position.left,
 	                _right          = _left + $t.width(),
 	                compareTop      = partial === true ? _bottom : _top,
 	                compareBottom   = partial === true ? _top : _bottom,
@@ -3991,20 +4006,19 @@
 	
 
 
-/***/ },
+/***/ }),
 /* 13 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var map = {
 		"./header.js": 14,
-		"./help_panel.js": 26,
-		"./imgur_modal.js": 27,
-		"./layout.js": 28,
-		"./room_panel.js": 31,
-		"./sidebar.js": 35,
-		"./upload_modal.js": 39,
-		"./viewer.js": 43,
-		"./welcome_panel.js": 46
+		"./help_panel.js": 25,
+		"./layout.js": 26,
+		"./room_panel.js": 29,
+		"./sidebar.js": 33,
+		"./upload_modal.js": 37,
+		"./viewer.js": 41,
+		"./welcome_panel.js": 44
 	};
 	function webpackContext(req) {
 		return __webpack_require__(webpackContextResolve(req));
@@ -4020,9 +4034,9 @@
 	webpackContext.id = 13;
 
 
-/***/ },
+/***/ }),
 /* 14 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -4041,6 +4055,7 @@
 			'click .stop': function clickStop(e) {
 				RTChat.RTCWrapper.updateState({ albumId: null, slides: null });
 			}
+			// 'click .ping': function(e) { // Handled by "layout" view
 		},
 		render: function render() {
 			original_render.call(this); // super
@@ -4068,9 +4083,9 @@
 		}
 	});
 
-/***/ },
+/***/ }),
 /* 15 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
@@ -4084,8 +4099,8 @@
 	if(false) {
 		// When the styles change, update the <style> tags
 		if(!content.locals) {
-			module.hot.accept("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/sass-loader/index.js!./header.css", function() {
-				var newContent = require("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/sass-loader/index.js!./header.css");
+			module.hot.accept("!!../../node_modules/css-loader/index.js?sourceMap!../../node_modules/sass-loader/index.js!./header.css", function() {
+				var newContent = require("!!../../node_modules/css-loader/index.js?sourceMap!../../node_modules/sass-loader/index.js!./header.css");
 				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 				update(newContent);
 			});
@@ -4094,9 +4109,9 @@
 		module.hot.dispose(function() { update(); });
 	}
 
-/***/ },
+/***/ }),
 /* 16 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(10)();
 	// imports
@@ -4108,9 +4123,9 @@
 	// exports
 
 
-/***/ },
+/***/ }),
 /* 17 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;(function (global, factory) {
 	    if (true) {
@@ -4139,11 +4154,35 @@
 	        };
 	    }
 	
+	    var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+	        return typeof obj;
+	    } : function (obj) {
+	        return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+	    };
+	
 	    function _classCallCheck(instance, Constructor) {
 	        if (!(instance instanceof Constructor)) {
 	            throw new TypeError("Cannot call a class as a function");
 	        }
 	    }
+	
+	    var _createClass = function () {
+	        function defineProperties(target, props) {
+	            for (var i = 0; i < props.length; i++) {
+	                var descriptor = props[i];
+	                descriptor.enumerable = descriptor.enumerable || false;
+	                descriptor.configurable = true;
+	                if ("value" in descriptor) descriptor.writable = true;
+	                Object.defineProperty(target, descriptor.key, descriptor);
+	            }
+	        }
+	
+	        return function (Constructor, protoProps, staticProps) {
+	            if (protoProps) defineProperties(Constructor.prototype, protoProps);
+	            if (staticProps) defineProperties(Constructor, staticProps);
+	            return Constructor;
+	        };
+	    }();
 	
 	    function _possibleConstructorReturn(self, call) {
 	        if (!self) {
@@ -4176,11 +4215,10 @@
 	         * @param {String|HTMLElement|HTMLCollection|NodeList} trigger
 	         * @param {Object} options
 	         */
-	
 	        function Clipboard(trigger, options) {
 	            _classCallCheck(this, Clipboard);
 	
-	            var _this = _possibleConstructorReturn(this, _Emitter.call(this));
+	            var _this = _possibleConstructorReturn(this, (Clipboard.__proto__ || Object.getPrototypeOf(Clipboard)).call(this));
 	
 	            _this.resolveOptions(options);
 	            _this.listenClick(trigger);
@@ -4194,62 +4232,87 @@
 	         */
 	
 	
-	        Clipboard.prototype.resolveOptions = function resolveOptions() {
-	            var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	        _createClass(Clipboard, [{
+	            key: 'resolveOptions',
+	            value: function resolveOptions() {
+	                var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 	
-	            this.action = typeof options.action === 'function' ? options.action : this.defaultAction;
-	            this.target = typeof options.target === 'function' ? options.target : this.defaultTarget;
-	            this.text = typeof options.text === 'function' ? options.text : this.defaultText;
-	        };
-	
-	        Clipboard.prototype.listenClick = function listenClick(trigger) {
-	            var _this2 = this;
-	
-	            this.listener = (0, _goodListener2.default)(trigger, 'click', function (e) {
-	                return _this2.onClick(e);
-	            });
-	        };
-	
-	        Clipboard.prototype.onClick = function onClick(e) {
-	            var trigger = e.delegateTarget || e.currentTarget;
-	
-	            if (this.clipboardAction) {
-	                this.clipboardAction = null;
+	                this.action = typeof options.action === 'function' ? options.action : this.defaultAction;
+	                this.target = typeof options.target === 'function' ? options.target : this.defaultTarget;
+	                this.text = typeof options.text === 'function' ? options.text : this.defaultText;
+	                this.container = _typeof(options.container) === 'object' ? options.container : document.body;
 	            }
+	        }, {
+	            key: 'listenClick',
+	            value: function listenClick(trigger) {
+	                var _this2 = this;
 	
-	            this.clipboardAction = new _clipboardAction2.default({
-	                action: this.action(trigger),
-	                target: this.target(trigger),
-	                text: this.text(trigger),
-	                trigger: trigger,
-	                emitter: this
-	            });
-	        };
-	
-	        Clipboard.prototype.defaultAction = function defaultAction(trigger) {
-	            return getAttributeValue('action', trigger);
-	        };
-	
-	        Clipboard.prototype.defaultTarget = function defaultTarget(trigger) {
-	            var selector = getAttributeValue('target', trigger);
-	
-	            if (selector) {
-	                return document.querySelector(selector);
+	                this.listener = (0, _goodListener2.default)(trigger, 'click', function (e) {
+	                    return _this2.onClick(e);
+	                });
 	            }
-	        };
+	        }, {
+	            key: 'onClick',
+	            value: function onClick(e) {
+	                var trigger = e.delegateTarget || e.currentTarget;
 	
-	        Clipboard.prototype.defaultText = function defaultText(trigger) {
-	            return getAttributeValue('text', trigger);
-	        };
+	                if (this.clipboardAction) {
+	                    this.clipboardAction = null;
+	                }
 	
-	        Clipboard.prototype.destroy = function destroy() {
-	            this.listener.destroy();
-	
-	            if (this.clipboardAction) {
-	                this.clipboardAction.destroy();
-	                this.clipboardAction = null;
+	                this.clipboardAction = new _clipboardAction2.default({
+	                    action: this.action(trigger),
+	                    target: this.target(trigger),
+	                    text: this.text(trigger),
+	                    container: this.container,
+	                    trigger: trigger,
+	                    emitter: this
+	                });
 	            }
-	        };
+	        }, {
+	            key: 'defaultAction',
+	            value: function defaultAction(trigger) {
+	                return getAttributeValue('action', trigger);
+	            }
+	        }, {
+	            key: 'defaultTarget',
+	            value: function defaultTarget(trigger) {
+	                var selector = getAttributeValue('target', trigger);
+	
+	                if (selector) {
+	                    return document.querySelector(selector);
+	                }
+	            }
+	        }, {
+	            key: 'defaultText',
+	            value: function defaultText(trigger) {
+	                return getAttributeValue('text', trigger);
+	            }
+	        }, {
+	            key: 'destroy',
+	            value: function destroy() {
+	                this.listener.destroy();
+	
+	                if (this.clipboardAction) {
+	                    this.clipboardAction.destroy();
+	                    this.clipboardAction = null;
+	                }
+	            }
+	        }], [{
+	            key: 'isSupported',
+	            value: function isSupported() {
+	                var action = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : ['copy', 'cut'];
+	
+	                var actions = typeof action === 'string' ? [action] : action;
+	                var support = !!document.queryCommandSupported;
+	
+	                actions.forEach(function (action) {
+	                    support = support && !!document.queryCommandSupported(action);
+	                });
+	
+	                return support;
+	            }
+	        }]);
 	
 	        return Clipboard;
 	    }(_tinyEmitter2.default);
@@ -4272,9 +4335,9 @@
 	    module.exports = Clipboard;
 	});
 
-/***/ },
+/***/ }),
 /* 18 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;(function (global, factory) {
 	    if (true) {
@@ -4302,7 +4365,7 @@
 	    var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
 	        return typeof obj;
 	    } : function (obj) {
-	        return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
+	        return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
 	    };
 	
 	    function _classCallCheck(instance, Constructor) {
@@ -4333,7 +4396,6 @@
 	        /**
 	         * @param {Object} options
 	         */
-	
 	        function ClipboardAction(options) {
 	            _classCallCheck(this, ClipboardAction);
 	
@@ -4347,122 +4409,126 @@
 	         */
 	
 	
-	        ClipboardAction.prototype.resolveOptions = function resolveOptions() {
-	            var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	        _createClass(ClipboardAction, [{
+	            key: 'resolveOptions',
+	            value: function resolveOptions() {
+	                var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 	
-	            this.action = options.action;
-	            this.emitter = options.emitter;
-	            this.target = options.target;
-	            this.text = options.text;
-	            this.trigger = options.trigger;
+	                this.action = options.action;
+	                this.container = options.container;
+	                this.emitter = options.emitter;
+	                this.target = options.target;
+	                this.text = options.text;
+	                this.trigger = options.trigger;
 	
-	            this.selectedText = '';
-	        };
-	
-	        ClipboardAction.prototype.initSelection = function initSelection() {
-	            if (this.text) {
-	                this.selectFake();
-	            } else if (this.target) {
-	                this.selectTarget();
+	                this.selectedText = '';
 	            }
-	        };
-	
-	        ClipboardAction.prototype.selectFake = function selectFake() {
-	            var _this = this;
-	
-	            var isRTL = document.documentElement.getAttribute('dir') == 'rtl';
-	
-	            this.removeFake();
-	
-	            this.fakeHandlerCallback = function () {
-	                return _this.removeFake();
-	            };
-	            this.fakeHandler = document.body.addEventListener('click', this.fakeHandlerCallback) || true;
-	
-	            this.fakeElem = document.createElement('textarea');
-	            // Prevent zooming on iOS
-	            this.fakeElem.style.fontSize = '12pt';
-	            // Reset box model
-	            this.fakeElem.style.border = '0';
-	            this.fakeElem.style.padding = '0';
-	            this.fakeElem.style.margin = '0';
-	            // Move element out of screen horizontally
-	            this.fakeElem.style.position = 'absolute';
-	            this.fakeElem.style[isRTL ? 'right' : 'left'] = '-9999px';
-	            // Move element to the same position vertically
-	            this.fakeElem.style.top = (window.pageYOffset || document.documentElement.scrollTop) + 'px';
-	            this.fakeElem.setAttribute('readonly', '');
-	            this.fakeElem.value = this.text;
-	
-	            document.body.appendChild(this.fakeElem);
-	
-	            this.selectedText = (0, _select2.default)(this.fakeElem);
-	            this.copyText();
-	        };
-	
-	        ClipboardAction.prototype.removeFake = function removeFake() {
-	            if (this.fakeHandler) {
-	                document.body.removeEventListener('click', this.fakeHandlerCallback);
-	                this.fakeHandler = null;
-	                this.fakeHandlerCallback = null;
+	        }, {
+	            key: 'initSelection',
+	            value: function initSelection() {
+	                if (this.text) {
+	                    this.selectFake();
+	                } else if (this.target) {
+	                    this.selectTarget();
+	                }
 	            }
+	        }, {
+	            key: 'selectFake',
+	            value: function selectFake() {
+	                var _this = this;
 	
-	            if (this.fakeElem) {
-	                document.body.removeChild(this.fakeElem);
-	                this.fakeElem = null;
+	                var isRTL = document.documentElement.getAttribute('dir') == 'rtl';
+	
+	                this.removeFake();
+	
+	                this.fakeHandlerCallback = function () {
+	                    return _this.removeFake();
+	                };
+	                this.fakeHandler = this.container.addEventListener('click', this.fakeHandlerCallback) || true;
+	
+	                this.fakeElem = document.createElement('textarea');
+	                // Prevent zooming on iOS
+	                this.fakeElem.style.fontSize = '12pt';
+	                // Reset box model
+	                this.fakeElem.style.border = '0';
+	                this.fakeElem.style.padding = '0';
+	                this.fakeElem.style.margin = '0';
+	                // Move element out of screen horizontally
+	                this.fakeElem.style.position = 'absolute';
+	                this.fakeElem.style[isRTL ? 'right' : 'left'] = '-9999px';
+	                // Move element to the same position vertically
+	                var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+	                this.fakeElem.style.top = yPosition + 'px';
+	
+	                this.fakeElem.setAttribute('readonly', '');
+	                this.fakeElem.value = this.text;
+	
+	                this.container.appendChild(this.fakeElem);
+	
+	                this.selectedText = (0, _select2.default)(this.fakeElem);
+	                this.copyText();
 	            }
-	        };
+	        }, {
+	            key: 'removeFake',
+	            value: function removeFake() {
+	                if (this.fakeHandler) {
+	                    this.container.removeEventListener('click', this.fakeHandlerCallback);
+	                    this.fakeHandler = null;
+	                    this.fakeHandlerCallback = null;
+	                }
 	
-	        ClipboardAction.prototype.selectTarget = function selectTarget() {
-	            this.selectedText = (0, _select2.default)(this.target);
-	            this.copyText();
-	        };
-	
-	        ClipboardAction.prototype.copyText = function copyText() {
-	            var succeeded = undefined;
-	
-	            try {
-	                succeeded = document.execCommand(this.action);
-	            } catch (err) {
-	                succeeded = false;
+	                if (this.fakeElem) {
+	                    this.container.removeChild(this.fakeElem);
+	                    this.fakeElem = null;
+	                }
 	            }
+	        }, {
+	            key: 'selectTarget',
+	            value: function selectTarget() {
+	                this.selectedText = (0, _select2.default)(this.target);
+	                this.copyText();
+	            }
+	        }, {
+	            key: 'copyText',
+	            value: function copyText() {
+	                var succeeded = void 0;
 	
-	            this.handleResult(succeeded);
-	        };
+	                try {
+	                    succeeded = document.execCommand(this.action);
+	                } catch (err) {
+	                    succeeded = false;
+	                }
 	
-	        ClipboardAction.prototype.handleResult = function handleResult(succeeded) {
-	            if (succeeded) {
-	                this.emitter.emit('success', {
+	                this.handleResult(succeeded);
+	            }
+	        }, {
+	            key: 'handleResult',
+	            value: function handleResult(succeeded) {
+	                this.emitter.emit(succeeded ? 'success' : 'error', {
 	                    action: this.action,
 	                    text: this.selectedText,
 	                    trigger: this.trigger,
 	                    clearSelection: this.clearSelection.bind(this)
 	                });
-	            } else {
-	                this.emitter.emit('error', {
-	                    action: this.action,
-	                    trigger: this.trigger,
-	                    clearSelection: this.clearSelection.bind(this)
-	                });
 	            }
-	        };
+	        }, {
+	            key: 'clearSelection',
+	            value: function clearSelection() {
+	                if (this.trigger) {
+	                    this.trigger.focus();
+	                }
 	
-	        ClipboardAction.prototype.clearSelection = function clearSelection() {
-	            if (this.target) {
-	                this.target.blur();
+	                window.getSelection().removeAllRanges();
 	            }
-	
-	            window.getSelection().removeAllRanges();
-	        };
-	
-	        ClipboardAction.prototype.destroy = function destroy() {
-	            this.removeFake();
-	        };
-	
-	        _createClass(ClipboardAction, [{
+	        }, {
+	            key: 'destroy',
+	            value: function destroy() {
+	                this.removeFake();
+	            }
+	        }, {
 	            key: 'action',
 	            set: function set() {
-	                var action = arguments.length <= 0 || arguments[0] === undefined ? 'copy' : arguments[0];
+	                var action = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'copy';
 	
 	                this._action = action;
 	
@@ -4503,16 +4569,31 @@
 	    module.exports = ClipboardAction;
 	});
 
-/***/ },
+/***/ }),
 /* 19 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	function select(element) {
 	    var selectedText;
 	
-	    if (element.nodeName === 'INPUT' || element.nodeName === 'TEXTAREA') {
+	    if (element.nodeName === 'SELECT') {
 	        element.focus();
+	
+	        selectedText = element.value;
+	    }
+	    else if (element.nodeName === 'INPUT' || element.nodeName === 'TEXTAREA') {
+	        var isReadOnly = element.hasAttribute('readonly');
+	
+	        if (!isReadOnly) {
+	            element.setAttribute('readonly', '');
+	        }
+	
+	        element.select();
 	        element.setSelectionRange(0, element.value.length);
+	
+	        if (!isReadOnly) {
+	            element.removeAttribute('readonly');
+	        }
 	
 	        selectedText = element.value;
 	    }
@@ -4537,9 +4618,9 @@
 	module.exports = select;
 
 
-/***/ },
+/***/ }),
 /* 20 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	function E () {
 	  // Keep this empty so it's easier to inherit from
@@ -4609,9 +4690,9 @@
 	module.exports = E;
 
 
-/***/ },
+/***/ }),
 /* 21 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var is = __webpack_require__(22);
 	var delegate = __webpack_require__(23);
@@ -4710,9 +4791,9 @@
 	module.exports = listen;
 
 
-/***/ },
+/***/ }),
 /* 22 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	/**
 	 * Check if argument is a HTML element.
@@ -4765,9 +4846,9 @@
 	};
 
 
-/***/ },
+/***/ }),
 /* 23 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var closest = __webpack_require__(24);
 	
@@ -4804,7 +4885,7 @@
 	 */
 	function listener(element, selector, type, callback) {
 	    return function(e) {
-	        e.delegateTarget = closest(e.target, selector, true);
+	        e.delegateTarget = closest(e.target, selector);
 	
 	        if (e.delegateTarget) {
 	            callback.call(element, e);
@@ -4815,70 +4896,48 @@
 	module.exports = delegate;
 
 
-/***/ },
+/***/ }),
 /* 24 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports) {
 
-	var matches = __webpack_require__(25)
+	var DOCUMENT_NODE_TYPE = 9;
 	
-	module.exports = function (element, selector, checkYoSelf) {
-	  var parent = checkYoSelf ? element : element.parentNode
+	/**
+	 * A polyfill for Element.matches()
+	 */
+	if (typeof Element !== 'undefined' && !Element.prototype.matches) {
+	    var proto = Element.prototype;
 	
-	  while (parent && parent !== document) {
-	    if (matches(parent, selector)) return parent;
-	    parent = parent.parentNode
-	  }
+	    proto.matches = proto.matchesSelector ||
+	                    proto.mozMatchesSelector ||
+	                    proto.msMatchesSelector ||
+	                    proto.oMatchesSelector ||
+	                    proto.webkitMatchesSelector;
 	}
-
-
-/***/ },
-/* 25 */
-/***/ function(module, exports) {
-
 	
 	/**
-	 * Element prototype.
-	 */
-	
-	var proto = Element.prototype;
-	
-	/**
-	 * Vendor function.
-	 */
-	
-	var vendor = proto.matchesSelector
-	  || proto.webkitMatchesSelector
-	  || proto.mozMatchesSelector
-	  || proto.msMatchesSelector
-	  || proto.oMatchesSelector;
-	
-	/**
-	 * Expose `match()`.
-	 */
-	
-	module.exports = match;
-	
-	/**
-	 * Match `el` to `selector`.
+	 * Finds the closest parent that matches a selector.
 	 *
-	 * @param {Element} el
+	 * @param {Element} element
 	 * @param {String} selector
-	 * @return {Boolean}
-	 * @api public
+	 * @return {Function}
 	 */
-	
-	function match(el, selector) {
-	  if (vendor) return vendor.call(el, selector);
-	  var nodes = el.parentNode.querySelectorAll(selector);
-	  for (var i = 0; i < nodes.length; ++i) {
-	    if (nodes[i] == el) return true;
-	  }
-	  return false;
+	function closest (element, selector) {
+	    while (element && element.nodeType !== DOCUMENT_NODE_TYPE) {
+	        if (typeof element.matches === 'function' &&
+	            element.matches(selector)) {
+	          return element;
+	        }
+	        element = element.parentNode;
+	    }
 	}
+	
+	module.exports = closest;
 
-/***/ },
-/* 26 */
-/***/ function(module, exports, __webpack_require__) {
+
+/***/ }),
+/* 25 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($) {'use strict';
 	
@@ -4918,38 +4977,13 @@
 	});
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
-/***/ },
-/* 27 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	// Used to Sign in to imgur
-	
-	module.exports = Backbone.View.extend({
-	  id: 'Imgur',
-	  className: 'modal fade',
-	  template: '\n    <div class="modal-dialog">\n      <div class="modal-content">\n        <div class="modal-header">\n          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>\n          <h4 class="modal-title">Authenticate with Imgur</h4>\n        </div>\n\n        <div class="modal-body">\n          // iframe\n          <iframe src="https://api.imgur.com/oauth2/authorize?client_id=f55a248021c48d6&response_type=token&state=APPLICATION_STATE"></iframe>\n\n        </div>\n\n        <div class="modal-footer">\n          <button type="button" class="btn btn-primary upload">Upload</button>\n          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>\n          <div class="progress" rv-show="progress">\n            <div class="progress-bar progress-bar-striped active" rv-width="progress"></div>\n          </div>\n        </div>\n      </div><!-- /.modal-content -->\n    </div><!-- /.modal-dialog -->\n  ',
-	  events: {},
-	  // initialize: function() {
-	  //   this.scope = {};
-	  // },
-	  render: function render() {
-	    this.$el.html(this.template);
-	    RTChat.Rivets.bind(this.$el, this.scope);
-	
-	    this.$el.modal('show');
-	    return this;
-	  }
-	});
-
-/***/ },
-/* 28 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 26 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(_, $) {'use strict';
 	
-	__webpack_require__(29);
+	__webpack_require__(27);
 	
 	var original_events = RTChat.Views.Layout.prototype.events;
 	
@@ -5001,14 +5035,14 @@
 	// console.log(one, "==>", paramsToObj(one));
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(3)))
 
-/***/ },
-/* 29 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 27 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(30);
+	var content = __webpack_require__(28);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(11)(content, {});
@@ -5017,8 +5051,8 @@
 	if(false) {
 		// When the styles change, update the <style> tags
 		if(!content.locals) {
-			module.hot.accept("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/sass-loader/index.js!./layout.css", function() {
-				var newContent = require("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/sass-loader/index.js!./layout.css");
+			module.hot.accept("!!../../node_modules/css-loader/index.js?sourceMap!../../node_modules/sass-loader/index.js!./layout.css", function() {
+				var newContent = require("!!../../node_modules/css-loader/index.js?sourceMap!../../node_modules/sass-loader/index.js!./layout.css");
 				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 				update(newContent);
 			});
@@ -5027,9 +5061,9 @@
 		module.hot.dispose(function() { update(); });
 	}
 
-/***/ },
-/* 30 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 28 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(10)();
 	// imports
@@ -5041,13 +5075,13 @@
 	// exports
 
 
-/***/ },
-/* 31 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 29 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(Rivets) {'use strict';
 	
-	__webpack_require__(33);
+	__webpack_require__(31);
 	
 	module.exports = RTChat.Views.RoomPanel.extend({
 		template: '\n\t\t<div class="waiting-box" rv-hide="scope.rtc_state.slides">\n\t\t\t<div class="waiting-msg">\n\t\t\t\tWaiting for presentation to start..\n\t\t\t</div>\n\t\t\t<div rv-hide="scope.showHelp">\n\t\t\t\t<button class="btn btn-default toggle-help"> Help </button>\n\t\t\t</div>\n\t\t\t<div class="help" rv-show="scope.isAdmin |and scope.showHelp">\n\t\t\t\t<div data-subview="help"></div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div data-subview="viewer"></div>\n\t\t<div rv-show="scope.rtc_state.showChat">\n\t\t\t<div data-subview="chat"></div>\n\t\t</div>\n\t',
@@ -5098,22 +5132,22 @@
 			return this;
 		}
 	});
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(32)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(30)))
 
-/***/ },
-/* 32 */
-/***/ function(module, exports) {
+/***/ }),
+/* 30 */
+/***/ (function(module, exports) {
 
 	module.exports = RTChat.Rivets;
 
-/***/ },
-/* 33 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 31 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(34);
+	var content = __webpack_require__(32);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(11)(content, {});
@@ -5122,8 +5156,8 @@
 	if(false) {
 		// When the styles change, update the <style> tags
 		if(!content.locals) {
-			module.hot.accept("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/sass-loader/index.js!./room_panel.css", function() {
-				var newContent = require("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/sass-loader/index.js!./room_panel.css");
+			module.hot.accept("!!../../node_modules/css-loader/index.js?sourceMap!../../node_modules/sass-loader/index.js!./room_panel.css", function() {
+				var newContent = require("!!../../node_modules/css-loader/index.js?sourceMap!../../node_modules/sass-loader/index.js!./room_panel.css");
 				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 				update(newContent);
 			});
@@ -5132,9 +5166,9 @@
 		module.hot.dispose(function() { update(); });
 	}
 
-/***/ },
-/* 34 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 32 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(10)();
 	// imports
@@ -5146,17 +5180,17 @@
 	// exports
 
 
-/***/ },
-/* 35 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 33 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(_, $, Rivets) {'use strict';
 	
-	__webpack_require__(36);
+	__webpack_require__(34);
 	
-	var AppConfig = __webpack_require__(38);
-	var UploadModal = __webpack_require__(39);
-	var ImgurLoader = __webpack_require__(42);
+	var AppConfig = __webpack_require__(36);
+	var UploadModal = __webpack_require__(37);
+	var ImgurLoader = __webpack_require__(40);
 	
 	module.exports = RTChat.Views.Sidebar.extend({
 		template: '\n\t\t<a rv-if="scope.signed_in_accounts |length |eq 0" class="signin menu-item"\n\t\t\trv-href="\'https://api.imgur.com/oauth2/authorize?client_id=\' |+ scope.clientId |+ \'&response_type=token&state=\' |+ scope.hash">\n\t\t\tSign-in with Imgur to upload\n\t\t\t<span class="pull-right fa fa-question-circle"\n\t\t\t\ttooltip="Imgur is a free image hosting site that liveslide uses to store the presentations you upload">\n\t\t\t</span>\n\t\t</a>\n\t\t<div rv-each-user="scope.signed_in_accounts" class="dropdown open">\n\t\t\t<div rv-data-acct-name="user.name">\n\t\t\t\t<span class="fa fa-chevron-circle-right"></span>\n\t\t\t\t{ user.name }\n\t\t\t\t<span class="pull-right fa fa-ellipsis-v"></span>\n\t\t\t\t<span class="pull-right fa fa-upload"></span>\n\t\t\t</div>\n\t\t\t<ul class="album">\n\t\t\t\t<li rv-each-album="user.albums" rv-data-id="album.id">\n\t\t\t\t\t{ album.title }\n\t\t\t\t</li>\n\t\t\t</ul>\n\t\t</div>\n\t\t<div class="add-acct menu-item">\n\t\t\t<span rv-hide="scope.editing">Add  Imgur Account </span>\n\t\t\t<span class="pull-right fa fa-question-circle"\n\t\t\t\ttooltip="You can add any imgur account and view its albums as presentations">\n\t\t\t</span>\n\t\t\t<input rv-show="scope.editing" placeholder="Imgur Account Name">\n\t\t</div>\n\t\t<div rv-each-user="scope.other_accounts" class="dropdown open" >\n\t\t\t<div rv-data-acct-name="user.name">\n\t\t\t\t<span class="fa fa-chevron-circle-right"></span>\n\t\t\t\t{ user.name }\n\t\t\t\t<span class="pull-right fa fa-ellipsis-v"></span>\n\t\t\t</div>\n\t\t\t<ul class="album">\n\t\t\t\t<li rv-each-album="user.albums" rv-data-id="album.id">\n\t\t\t\t\t{ album.title }\n\t\t\t\t</li>\n\t\t\t</ul>\n\t\t</div>\n\t\t<div data-subview="context_menu"></div>\n\t\t<div data-subview="upload_modal"></div>\n\t',
@@ -5370,16 +5404,16 @@
 		},
 		scope: {}
 	});
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(3), __webpack_require__(32)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(3), __webpack_require__(30)))
 
-/***/ },
-/* 36 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 34 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(37);
+	var content = __webpack_require__(35);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(11)(content, {});
@@ -5388,8 +5422,8 @@
 	if(false) {
 		// When the styles change, update the <style> tags
 		if(!content.locals) {
-			module.hot.accept("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/sass-loader/index.js!./sidebar.css", function() {
-				var newContent = require("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/sass-loader/index.js!./sidebar.css");
+			module.hot.accept("!!../../node_modules/css-loader/index.js?sourceMap!../../node_modules/sass-loader/index.js!./sidebar.css", function() {
+				var newContent = require("!!../../node_modules/css-loader/index.js?sourceMap!../../node_modules/sass-loader/index.js!./sidebar.css");
 				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 				update(newContent);
 			});
@@ -5398,9 +5432,9 @@
 		module.hot.dispose(function() { update(); });
 	}
 
-/***/ },
-/* 37 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 35 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(10)();
 	// imports
@@ -5412,21 +5446,21 @@
 	// exports
 
 
-/***/ },
-/* 38 */
-/***/ function(module, exports) {
+/***/ }),
+/* 36 */
+/***/ (function(module, exports) {
 
 	module.exports = {"AppName":"LiveSlide","imgur_client_id":"f55a248021c48d6"}
 
-/***/ },
-/* 39 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 37 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($, Rivets) {'use strict';
 	
-	__webpack_require__(40);
+	__webpack_require__(38);
 	
-	var ImgurLoader = __webpack_require__(42);
+	var ImgurLoader = __webpack_require__(40);
 	
 	module.exports = Backbone.View.extend({
 	  className: 'modal fade upload',
@@ -5515,16 +5549,16 @@
 	    this.trigger('hide');
 	  }
 	});
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3), __webpack_require__(32)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3), __webpack_require__(30)))
 
-/***/ },
-/* 40 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 38 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(41);
+	var content = __webpack_require__(39);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(11)(content, {});
@@ -5533,8 +5567,8 @@
 	if(false) {
 		// When the styles change, update the <style> tags
 		if(!content.locals) {
-			module.hot.accept("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/sass-loader/index.js!./upload_modal.css", function() {
-				var newContent = require("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/sass-loader/index.js!./upload_modal.css");
+			module.hot.accept("!!../../node_modules/css-loader/index.js?sourceMap!../../node_modules/sass-loader/index.js!./upload_modal.css", function() {
+				var newContent = require("!!../../node_modules/css-loader/index.js?sourceMap!../../node_modules/sass-loader/index.js!./upload_modal.css");
 				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 				update(newContent);
 			});
@@ -5543,9 +5577,9 @@
 		module.hot.dispose(function() { update(); });
 	}
 
-/***/ },
-/* 41 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 39 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(10)();
 	// imports
@@ -5557,9 +5591,9 @@
 	// exports
 
 
-/***/ },
-/* 42 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 40 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($, _) {"use strict";
 	
@@ -5602,15 +5636,15 @@
 	};
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3), __webpack_require__(1)))
 
-/***/ },
-/* 43 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 41 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($, Rivets) {'use strict';
 	
 	// A glorified wrapper for bootstrap carousel.
 	
-	__webpack_require__(44);
+	__webpack_require__(42);
 	
 	module.exports = Backbone.View.extend({
 		id: 'Viewer',
@@ -5691,22 +5725,26 @@
 			ping.css({
 				top: (ping_state.top - (viewer.height / (viewer.height - ping.height()) - 1) / 2) * 100 + '%',
 				left: (ping_state.left - (viewer.width / (viewer.width - ping.width()) - 1) / 2) * 100 + '%'
+				// simpler method, sets px instead
+				// top: (ping_state.top * viewer.height) - (ping.height() / 2),
+				// left:(ping_state.left * viewer.width) - (ping.width()  / 2) //+ offset
+				// var offset = parseInt(viewer.css('marginLeft'), 10); // for when the screen is wider than the image.?
 			});
 			window.getComputedStyle(ping[0]); // Force opacity render.
 			ping.addClass('hidden');
 		},
 		scope: {}
 	});
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3), __webpack_require__(32)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3), __webpack_require__(30)))
 
-/***/ },
-/* 44 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 42 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(45);
+	var content = __webpack_require__(43);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(11)(content, {});
@@ -5715,8 +5753,8 @@
 	if(false) {
 		// When the styles change, update the <style> tags
 		if(!content.locals) {
-			module.hot.accept("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/sass-loader/index.js!./viewer.css", function() {
-				var newContent = require("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/sass-loader/index.js!./viewer.css");
+			module.hot.accept("!!../../node_modules/css-loader/index.js?sourceMap!../../node_modules/sass-loader/index.js!./viewer.css", function() {
+				var newContent = require("!!../../node_modules/css-loader/index.js?sourceMap!../../node_modules/sass-loader/index.js!./viewer.css");
 				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 				update(newContent);
 			});
@@ -5725,9 +5763,9 @@
 		module.hot.dispose(function() { update(); });
 	}
 
-/***/ },
-/* 45 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 43 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(10)();
 	// imports
@@ -5739,27 +5777,27 @@
 	// exports
 
 
-/***/ },
-/* 46 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 44 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	__webpack_require__(47);
+	__webpack_require__(45);
 	
 	// Extend WelcomePanel
 	module.exports = RTChat.Views.WelcomePanel.extend({
 		template: '<h2>Welcome To LiveSlide!</h2>\n\t\t<h4>\n\t\t\tA free and <a href="https://github.com/RTChat/LiveSlide" target="_open" rel="nofollow">open source</a>\n\t\t\tlive slideshow presentation app built using the <a href="https://rtchat.github.io" target="_open" rel="nofollow">RTChat</a> framework! </h4>\n\t\t<br>\n\t\t<a class="btn btn-default" rv-href="\'#\' |+ scope.random_rooms |index 0">Get started by creating a new room</a>\n\n\t\t<br> <br>\n\t\t<p>\n\t\t\t<span class="fa fa-reddit-alien"></span>\n\t\t\t<a href="https://reddit.com/r/RTChat">Discuss on reddit</a>\n\n\t\t\t&nbsp;\n\t\t\t<span class="fa fa-bug"></span>\n\t\t\t<a href="https://github.com/RTChat/LiveSlide/issues/new">Report a bug</a>\n\t\t</p>\n\t'
 	});
 
-/***/ },
-/* 47 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 45 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 	
 	// load the styles
-	var content = __webpack_require__(48);
+	var content = __webpack_require__(46);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(11)(content, {});
@@ -5768,8 +5806,8 @@
 	if(false) {
 		// When the styles change, update the <style> tags
 		if(!content.locals) {
-			module.hot.accept("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/sass-loader/index.js!./welcome_panel.css", function() {
-				var newContent = require("!!./../../node_modules/css-loader/index.js?sourceMap!./../../node_modules/sass-loader/index.js!./welcome_panel.css");
+			module.hot.accept("!!../../node_modules/css-loader/index.js?sourceMap!../../node_modules/sass-loader/index.js!./welcome_panel.css", function() {
+				var newContent = require("!!../../node_modules/css-loader/index.js?sourceMap!../../node_modules/sass-loader/index.js!./welcome_panel.css");
 				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 				update(newContent);
 			});
@@ -5778,9 +5816,9 @@
 		module.hot.dispose(function() { update(); });
 	}
 
-/***/ },
-/* 48 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ }),
+/* 46 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(10)();
 	// imports
@@ -5792,6 +5830,6 @@
 	// exports
 
 
-/***/ }
+/***/ })
 /******/ ]);
 //# sourceMappingURL=bundle.js.map
